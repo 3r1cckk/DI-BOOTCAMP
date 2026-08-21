@@ -1,12 +1,3 @@
-# Exercise 1: Use the terminal
-# On Windows, use: python
-# PATH is an environment variable that tells the system where to find executable files.
-# Because the Python installation folder is in PATH, you can run python without typing the full path.
-
-# Exercise 2: Alias
-# On Windows, py is often an alias to the Python launcher.
-# It allows you to open the Python console with a shorter command.
-
 # Exercise 3: Outputs
 print(3 <= 3 < 9)
 print(3 == 3 == 3)
