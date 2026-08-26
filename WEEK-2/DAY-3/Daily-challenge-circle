@@ -1,0 +1,79 @@
+import math
+
+
+class Circle:
+    def __init__(self, radius=None, diameter=None):
+        if radius is not None and diameter is not None:
+            raise ValueError("Provide either radius or diameter, not both.")
+        if radius is None and diameter is None:
+            raise ValueError("You must provide either radius or diameter.")
+
+        if radius is not None:
+            self.radius = radius
+        else:
+            self.diameter = diameter
+
+    @property
+    def radius(self):
+        return self._radius
+
+    @radius.setter
+    def radius(self, value):
+        if value <= 0:
+            raise ValueError("Radius must be greater than zero.")
+        self._radius = value
+
+    @property
+    def diameter(self):
+        return self._radius * 2
+
+    @diameter.setter
+    def diameter(self, value):
+        if value <= 0:
+            raise ValueError("Diameter must be greater than zero.")
+        self._radius = value / 2
+
+    def area(self):
+        return math.pi * self.radius ** 2
+
+    def __str__(self):
+        return f"Circle(radius={self.radius}, diameter={self.diameter}, area={self.area():.2f})"
+
+    def __repr__(self):
+        return f"Circle({self.radius})"
+
+    def __add__(self, other):
+        if not isinstance(other, Circle):
+            return NotImplemented
+        return Circle(radius=self.radius + other.radius)
+
+    def __gt__(self, other):
+        if not isinstance(other, Circle):
+            return NotImplemented
+        return self.radius > other.radius
+
+    def __lt__(self, other):
+        if not isinstance(other, Circle):
+            return NotImplemented
+        return self.radius < other.radius
+
+    def __eq__(self, other):
+        if not isinstance(other, Circle):
+            return NotImplemented
+        return self.radius == other.radius
+
+
+# Demo
+c1 = Circle(radius=3)
+c2 = Circle(diameter=10)
+c3 = Circle(radius=5)
+
+print(c1)
+print(repr(c1))
+print(f"Area: {c1.area():.2f}")
+print(c1 + c3)
+print(c1 > c3)
+print(c1 == c2)
+
+circles = [Circle(radius=4), Circle(radius=1), Circle(radius=3)]
+print(sorted(circles))
