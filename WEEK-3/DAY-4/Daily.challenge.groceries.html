@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Groceries: Value and Reference</title>
+    <style>
+        :root { color: #18212f; font-family: Arial, sans-serif; }
+        * { box-sizing: border-box; }
+        body { background: #edf3f0; margin: 0; padding: 1rem; }
+        main { background: #fffdf8; border-top: 8px solid #e66a4e; box-shadow: 10px 10px 0 #b8d8d0; margin: 2rem auto; max-width: 44rem; padding: 2rem; }
+        h1 { font-family: Georgia, serif; font-size: 2.8rem; margin-top: 0; }
+        section { border-bottom: 1px solid #d5dfdc; padding: 1rem 0; }
+        strong { display: block; margin-bottom: .4rem; }
+        code { background: #edf3f0; padding: .2rem .4rem; }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Groceries</h1>
+        <section><strong>Fruits</strong><code id="fruits"></code></section>
+        <section><strong>Primitive copy</strong><code id="client-result"></code><p>user remains John; reassigning client to Betty does not change the copied string.</p></section>
+        <section><strong>Object reference</strong><code id="shopping-result"></code><p>shopping reflects the changed groceries object.</p></section>
+    </main>
+    <script src="Daily.challenge.groceries.js"></script>
+</body>
+</html>
