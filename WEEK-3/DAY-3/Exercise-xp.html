@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>JavaScript DOM Exercises</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.5; margin: 2rem auto; max-width: 50rem; padding: 0 1rem; }
+        section { border-top: 1px solid #ccc; margin-top: 2rem; padding-top: 1rem; }
+        label, input { display: block; margin-top: .5rem; }
+        .fade-out { animation: fade-out 600ms forwards; }
+        @keyframes fade-out { to { opacity: 0; } }
+    </style>
+</head>
+<body>
+    <main>
+        <section>
+            <article>
+                <h1>Some Facts</h1>
+                <h2>The Chocolate</h2>
+                <h3>History of the chocolate</h3>
+                <p>Chocolate is made from tropical Theobroma cacao tree seeds. Its earliest use dates back to the Olmec civilization in Mesoamerica.</p>
+                <p>After the European discovery of the Americas, chocolate became very popular in the wider world, and its demand exploded.</p>
+                <p>Chocolate has since become a popular food product that millions enjoy every day, thanks to its unique, rich, and sweet taste.</p>
+                <p>But what effect does eating chocolate have on our health?</p>
+            </article>
+            <button type="button" id="bold-button">Make paragraphs bold</button>
+        </section>
+
+        <section>
+            <form id="user-form">
+                <label for="fname">First name:</label>
+                <input type="text" id="fname" name="firstname">
+                <label for="lname">Last name:</label>
+                <input type="text" id="lname" name="lastname">
+                <input type="submit" value="Submit">
+            </form>
+            <ul class="usersAnswer"></ul>
+        </section>
+
+        <section>
+            <p class="bold-paragraph"><strong>Hello</strong> I hope you are enjoying <strong>this</strong> class. At the
+                <strong>end</strong> you <strong>will</strong> be great Developers! <strong>Enjoy</strong> the
+                <strong>JavaScript</strong> lessons</p>
+        </section>
+
+        <section>
+            <p>Input radius value and get the volume of a sphere.</p>
+            <form id="MyForm">
+                <label for="radius">Radius</label>
+                <input type="number" name="radius" id="radius" min="0" step="any" required>
+                <label for="volume">Volume</label>
+                <input type="text" name="volume" id="volume" readonly>
+                <input type="submit" value="Calculate">
+            </form>
+        </section>
+    </main>
+    <script src="Exercise-xp.js"></script>
+</body>
+</html>

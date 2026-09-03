@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DOM Timers and Animation</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.5; margin: 2rem auto; max-width: 50rem; padding: 0 1rem; }
+        section { border-top: 1px solid #ccc; margin-top: 2rem; padding-top: 1rem; }
+        #container { background: yellow; color: red; min-height: 2rem; padding: .5rem; }
+        #move-container { background: yellow; height: 400px; position: relative; width: 400px; }
+        #animate { background: red; height: 50px; position: absolute; width: 50px; }
+        button { margin: .25rem; }
+    </style>
+</head>
+<body>
+    <main>
+        <section>
+            <h1>Timer</h1>
+            <button type="button" id="alert-button">Alert after 2 seconds</button>
+            <button type="button" id="paragraph-button">Add paragraph after 2 seconds</button>
+            <button type="button" id="start-interval">Start interval</button>
+            <button type="button" id="clear">Clear interval</button>
+            <div id="container"></div>
+        </section>
+
+        <section>
+            <h1>Move the box</h1>
+            <p><button type="button" id="move-button">Click Me</button></p>
+            <div id="move-container">
+                <div id="animate"></div>
+            </div>
+        </section>
+    </main>
+    <script src="Exercise-xp-animaton.js"></script>
+</body>
+</html>

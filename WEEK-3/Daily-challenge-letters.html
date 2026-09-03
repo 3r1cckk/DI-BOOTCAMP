@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Letters Only</title>
+    <style>
+        body { align-items: center; background: #e9f2ef; color: #18212f; display: flex; font-family: Georgia, "Times New Roman", serif; justify-content: center; margin: 0; min-height: 100vh; padding: 1rem; }
+        main { background: #fffdf8; border-top: 8px solid #e66a4e; box-shadow: 10px 10px 0 #b8d8d0; max-width: 30rem; padding: 2.5rem; width: 100%; }
+        h1 { font-size: 2.7rem; margin-top: 0; }
+        label, p { font-family: Arial, sans-serif; }
+        label { display: block; font-size: .85rem; font-weight: bold; margin-bottom: .5rem; }
+        input { border: 0; border-bottom: 2px solid #b8d8d0; font: 1.2rem Arial, sans-serif; outline: 0; padding: .75rem 0; width: 100%; }
+        input:focus { border-color: #e66a4e; }
+        #input-message { color: #64716f; font-size: .85rem; min-height: 1.2rem; }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Show only the letters</h1>
+        <label for="letters-only">Type a word</label>
+        <input type="text" id="letters-only" autocomplete="off">
+        <p id="input-message">Letters only</p>
+    </main>
+    <script src="Daily-challenge-letters.js"></script>
+</body>
+</html>

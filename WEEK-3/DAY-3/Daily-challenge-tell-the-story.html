@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mad Libs</title>
+    <style>
+        body { background: #f4efe6; color: #25221e; font-family: Georgia, "Times New Roman", serif; margin: 0; padding: 2rem 1rem; }
+        main { background: #fffdf8; border-left: 8px solid #e36b4f; box-shadow: 10px 10px 0 #c5d9d0; margin: auto; max-width: 40rem; padding: 2rem; }
+        h1 { font-size: 3rem; margin-top: 0; }
+        form { display: grid; gap: .75rem; grid-template-columns: 1fr 2fr; }
+        label { align-self: center; font-weight: bold; }
+        input { border: 1px solid #bbc9c4; font: inherit; padding: .6rem; }
+        button { background: #25221e; border: 0; color: white; cursor: pointer; font: inherit; padding: .7rem 1rem; }
+        button:disabled { cursor: not-allowed; opacity: .45; }
+        .actions { grid-column: 2; display: flex; gap: .5rem; }
+        .story { border-top: 2px solid #e36b4f; font-size: 1.2rem; margin-top: 2rem; padding-top: 1rem; }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Mad Libs</h1>
+        <form id="libform" novalidate>
+            <label for="noun">Noun:</label>
+            <input type="text" id="noun" required>
+            <label for="adjective">Adjective:</label>
+            <input type="text" id="adjective" required>
+            <label for="person">Someone's Name:</label>
+            <input type="text" id="person" required>
+            <label for="verb">Verb:</label>
+            <input type="text" id="verb" required>
+            <label for="place">A place:</label>
+            <input type="text" id="place" required>
+            <div class="actions">
+                <button type="submit" id="lib-button">Lib it!</button>
+                <button type="button" id="shuffle-button" disabled>Shuffle</button>
+            </div>
+        </form>
+        <p class="story">Generated story: <span id="story"></span></p>
+    </main>
+    <script src="Daily-challenge-tell-the-story.js"></script>
+</body>
+</html>
