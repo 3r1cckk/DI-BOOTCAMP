@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coloring Squares</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .color-palette-section,
+        .canvas-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .section-title {
+            font-weight: bold;
+            color: #555;
+            font-size: 1.1em;
+        }
+
+        /* Color Palette */
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .color-square {
+            width: 100%;
+            aspect-ratio: 1;
+            border: 3px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .color-square:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .color-square.selected {
+            border: 5px solid #333;
+            transform: scale(1.1);
+        }
+
+        /* Drawing Canvas */
+        .canvas {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 250px;
+        }
+
+        .canvas-square {
+            aspect-ratio: 1;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .canvas-square:hover {
+            transform: scale(0.95);
+        }
+
+        .canvas-square.filled {
+            border-color: #999;
+        }
+
+        /* Reset Button */
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            grid-column: 1 / -1;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        #resetBtn {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        #resetBtn:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(255, 107, 107, 0.4);
+        }
+
+        #clearBtn {
+            background: #4ecdc4;
+            color: white;
+        }
+
+        #clearBtn:hover {
+            background: #45b7aa;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(78, 205, 196, 0.4);
+        }
+
+        /* Color indicator */
+        .current-color {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .color-preview {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            border: 2px solid #ddd;
+            background: #cccccc;
+        }
+
+        @media (max-width: 600px) {
+            .game-wrapper {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Coloring Squares</h1>
+        
+        <div class="game-wrapper">
+            <div class="color-palette-section">
+                <div class="section-title">Select a Color</div>
+                <div class="color-palette" id="colorPalette"></div>
+                <div class="current-color">
+                    <span>Current:</span>
+                    <div class="color-preview" id="colorPreview"></div>
+                </div>
+            </div>
+
+            <div class="canvas-section">
+                <div class="section-title">Draw Here</div>
+                <div class="canvas" id="canvas"></div>
+            </div>
+
+            <div class="button-group">
+                <button id="resetBtn">Reset</button>
+                <button id="clearBtn">Clear Canvas</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Color palette options
+        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2'];
+        let selectedColor = colors[0];
+        let isDrawing = false;
+
+        // Initialize color palette
+        const colorPalette = document.getElementById('colorPalette');
+        colors.forEach(color => {
+            const colorSquare = document.createElement('div');
+            colorSquare.className = 'color-square';
+            colorSquare.style.backgroundColor = color;
+            colorSquare.dataset.color = color;
+            
+            // Set first color as selected
+            if (color === selectedColor) {
+                colorSquare.classList.add('selected');
+            }
+
+            colorSquare.addEventListener('click', () => selectColor(color, colorSquare));
+            colorPalette.appendChild(colorSquare);
+        });
+
+        // Select color function
+        function selectColor(color, element) {
+            // Remove selected class from all color squares
+            document.querySelectorAll('.color-square').forEach(sq => {
+                sq.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked element
+            element.classList.add('selected');
+            selectedColor = color;
+            
+            // Update color preview
+            document.getElementById('colorPreview').style.backgroundColor = color;
+        }
+
+        // Update initial color preview
+        document.getElementById('colorPreview').style.backgroundColor = selectedColor;
+
+        // Initialize canvas
+        const canvas = document.getElementById('canvas');
+        for (let i = 0; i < 25; i++) {
+            const square = document.createElement('div');
+            square.className = 'canvas-square';
+            square.dataset.color = 'white';
+
+            // Mouse events for drawing
+            square.addEventListener('mousedown', () => {
+                isDrawing = true;
+                fillSquare(square);
+            });
+
+            square.addEventListener('mouseover', () => {
+                if (isDrawing) {
+                    fillSquare(square);
+                }
+            });
+
+            square.addEventListener('mouseup', () => {
+                isDrawing = false;
+            });
+
+            // Touch events for mobile
+            square.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                isDrawing = true;
+                fillSquare(square);
+            });
+
+            square.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                if (element && element.classList.contains('canvas-square')) {
+                    fillSquare(element);
+                }
+            });
+
+            square.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                isDrawing = false;
+            });
+
+            canvas.appendChild(square);
+        }
+
+        // Fill square function
+        function fillSquare(square) {
+            square.style.backgroundColor = selectedColor;
+            square.dataset.color = selectedColor;
+            square.classList.add('filled');
+        }
+
+        // Reset button - clears all squares
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            document.querySelectorAll('.canvas-square').forEach(square => {
+                square.style.backgroundColor = 'white';
+                square.dataset.color = 'white';
+                square.classList.remove('filled');
+            });
+        });
+
+        // Clear button - alternative to reset
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            document.querySelectorAll('.canvas-square').forEach(square => {
+                square.style.backgroundColor = 'white';
+                square.dataset.color = 'white';
+                square.classList.remove('filled');
+            });
+        });
+
+        // Stop drawing when mouse leaves window
+        document.addEventListener('mouseup', () => {
+            isDrawing = false;
+        });
+    </script>
+</body>
+</html>

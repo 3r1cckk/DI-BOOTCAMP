@@ -1,0 +1,293 @@
+/* ==================== DRUMSET PROJECT STYLES ==================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow-x: hidden;
+}
+
+.container {
+    text-align: center;
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+h1 {
+    color: white;
+    margin-bottom: 10px;
+    font-size: 3em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    letter-spacing: 2px;
+}
+
+.instructions {
+    color: #ddd;
+    margin-bottom: 30px;
+    font-size: 0.95em;
+    font-weight: 500;
+}
+
+/* ==================== DRUMSET LAYOUT ==================== */
+
+.drumset {
+    display: grid;
+    grid-template-columns: repeat(3, 120px);
+    gap: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    margin: 0 auto;
+}
+
+/* ==================== DRUM BUTTON STYLES ==================== */
+
+.drum {
+    width: 120px;
+    height: 120px;
+    border: none;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3), inset 0 4px 8px rgba(255, 255, 255, 0.3);
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    user-select: none;
+}
+
+.drum:hover {
+    transform: scale(1.05);
+}
+
+.drum:active,
+.drum.active {
+    transform: scale(0.95);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.2);
+}
+
+.drum-key {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.drum-name {
+    font-size: 0.8em;
+    opacity: 0.9;
+}
+
+/* ==================== DRUM COLOR SCHEMES ==================== */
+
+.kick {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.kick:hover {
+    background: linear-gradient(135deg, #7b8ff0 0%, #8b56b2 100%);
+}
+
+.snare {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.snare:hover {
+    background: linear-gradient(135deg, #f3a5fc 0%, #f67382 100%);
+}
+
+.hihat-closed {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.hihat-closed:hover {
+    background: linear-gradient(135deg, #65b5fe 0%, #1af5ff 100%);
+}
+
+.tom-high {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+.tom-high:hover {
+    background: linear-gradient(135deg, #fb82aa 0%, #fff056 100%);
+}
+
+.tom-mid {
+    background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+}
+
+.tom-mid:hover {
+    background: linear-gradient(135deg, #4dd7d8 0%, #521a7f 100%);
+}
+
+.tom-low {
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+}
+
+.tom-low:hover {
+    background: linear-gradient(135deg, #b8f1ed 0%, #feddeb 100%);
+}
+
+.cymbal {
+    background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+}
+
+.cymbal:hover {
+    background: linear-gradient(135deg, #ffe0ad 0%, #2a6b96 100%);
+}
+
+.hihat-open {
+    background: linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%);
+}
+
+.hihat-open:hover {
+    background: linear-gradient(135deg, #ffab72 0%, #ff7d9b 100%);
+}
+
+.clap {
+    background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+}
+
+.clap:hover {
+    background: linear-gradient(135deg, #b1d4fd 0%, #d2f3fc 100%);
+}
+
+/* ==================== KEYBOARD HINT ==================== */
+
+.keyboard-hint {
+    color: white;
+    margin-top: 30px;
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+.keyboard-hint .key {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin: 0 2px;
+    font-family: monospace;
+    font-weight: bold;
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+
+@media (max-width: 600px) {
+    .drumset {
+        grid-template-columns: repeat(2, 100px);
+        gap: 12px;
+        padding: 20px;
+    }
+
+    .drum {
+        width: 100px;
+        height: 100px;
+        font-size: 1em;
+    }
+
+    .drum-key {
+        font-size: 1.5em;
+    }
+
+    .drum-name {
+        font-size: 0.7em;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    .instructions {
+        font-size: 0.85em;
+    }
+}
+
+@media (max-width: 400px) {
+    .drumset {
+        grid-template-columns: repeat(3, 70px);
+        gap: 10px;
+        padding: 15px;
+    }
+
+    .drum {
+        width: 70px;
+        height: 70px;
+        font-size: 0.85em;
+    }
+
+    .drum-key {
+        font-size: 1.2em;
+    }
+
+    h1 {
+        font-size: 1.5em;
+    }
+}
+
+/* ==================== ANIMATIONS ==================== */
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+    }
+}
+
+.drum.active {
+    animation: pulse 0.6s ease-out;
+}
+
+/* ==================== ACCESSIBILITY ==================== */
+
+.drum:focus {
+    outline: 3px solid #FFD700;
+    outline-offset: 2px;
+}
+
+button {
+    font-family: inherit;
+}
+
+/* ==================== PRINT STYLES ==================== */
+
+@media print {
+    body {
+        background: white;
+    }
+
+    .container {
+        background: white;
+        box-shadow: none;
+    }
+}
