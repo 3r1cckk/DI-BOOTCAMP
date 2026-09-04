@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Erick Juma's frontend development portfolio.">
+    <title>Erick Juma | Frontend developer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="page-shell">
+        <header class="site-header">
+            <div class="profile-rail">
+                <a class="rail-portrait" href="#top" aria-label="Back to top"><img src="profile.jpg" alt="Erick Juma wearing a green blazer outdoors"></a>
+                <a class="rail-name" href="#top"><img src="logo.jpg" alt="Erick Juma EJ logo"><span>Erick Juma</span></a>
+                <div class="rail-socials" aria-label="Contact links">
+                    <a href="https://github.com/3r1cckk" target="_blank" rel="noopener noreferrer" aria-label="Erick Juma on GitHub"><svg class="github-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.61-3.37-1.18-3.37-1.18-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02A9.58 9.58 0 0 1 12 7.91c.85 0 1.71.12 2.51.37 1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.94.36.31.68.92.68 1.85v2.75c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"></path></svg></a>
+                    <a href="https://www.instagram.com/3r1cckk" target="_blank" rel="noopener noreferrer" aria-label="Erick Juma on Instagram"><span class="instagram-mark" aria-hidden="true"></span></a>
+                </div>
+                <nav class="nav-links" aria-label="Primary navigation">
+                    <a class="active" href="#top">⌂ <span>Home</span></a>
+                    <a href="#about">♙ <span>About</span></a>
+                    <a href="#about">▤ <span>Resume</span></a>
+                    <a href="#work">▧ <span>Portfolio</span></a>
+                    <a href="#about">▱ <span>Services</span></a>
+                    <a href="#contact-title">✉ <span>Contact</span></a>
+                </nav>
+            </div>
+            <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open navigation">Menu</button>
+        </header>
+        <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation">
+            <a href="#work">Work</a>
+            <a href="#about">About</a>
+            <a href="mailto:allabouterick0@gmail.com">Let's talk <span aria-hidden="true">↗</span></a>
+        </nav>
+
+        <main id="top">
+            <section class="hero" aria-labelledby="hero-title">
+                <div class="hero-copy reveal">
+                    <p class="eyebrow"><span class="status-dot"></span> Welcome to my portfolio</p>
+                    <h1 id="hero-title">Erick Juma</h1>
+                    <p class="hero-role">I’m a <em>software developer</em></p>
+                    <p class="hero-intro">I build responsive, user-friendly web experiences with HTML, CSS, and JavaScript.</p>
+                    <div class="hero-actions">
+                        <a class="button button-primary" href="#work">View my work <span aria-hidden="true">↓</span></a>
+                        <a class="text-link" href="#about">More about me <span aria-hidden="true">↗</span></a>
+                    </div>
+                </div>
+                <div class="floating-words" aria-hidden="true">
+                    <span class="float-word word-html">HTML</span>
+                    <span class="float-word word-css">CSS</span>
+                    <span class="float-word word-js">JAVASCRIPT</span>
+                    <span class="float-word word-python">PYTHON</span>
+                </div>
+                <a class="hero-logo" href="#contact-title" aria-label="Contact Erick Juma"><img src="logo.jpg" alt="Erick Juma EJ logo"></a>
+                <a class="hire-button" href="#contact-title">HIRE ME <span aria-hidden="true">↗</span></a>
+                <div class="scroll-note"><span class="scroll-line"></span> Scroll to explore</div>
+            </section>
+
+            <section class="work-section" id="work" aria-labelledby="work-title">
+                <div class="section-heading reveal">
+                    <p class="eyebrow">Selected experiments / 2024—26</p>
+                    <h2 id="work-title">A few things<br><em>I’ve made.</em></h2>
+                    <div class="filter-bar" role="group" aria-label="Filter projects">
+                        <button class="filter-button active" type="button" data-filter="all">All</button>
+                        <button class="filter-button" type="button" data-filter="games">Games</button>
+                        <button class="filter-button" type="button" data-filter="apps">Apps</button>
+                    </div>
+                </div>
+                <div class="project-grid">
+                    <article class="project-card project-large reveal" data-category="apps">
+                        <a href="../../WEEK-2/DAY-5/weather-app.py" class="project-visual visual-coloring">
+                            <span class="story-word">weather<br><em>app</em></span><span class="visual-tag">BUILD / 01</span>
+                        </a>
+                        <div class="project-info"><div><p class="project-type">Python application</p><h3>Weather App</h3></div><a href="../../WEEK-2/DAY-5/weather-app.py" class="arrow-link" aria-label="View Weather App">↗</a></div>
+                    </article>
+                    <article class="project-card reveal reveal-delay" data-category="apps">
+                        <a href="../../WEEK-3/DAY-3/Mini-Project-Create-a-Sign-in-form.html" class="project-visual visual-drum">
+                            <span class="story-word">sign<br><em>in</em></span><span class="visual-tag">BUILD / 02</span>
+                        </a>
+                        <div class="project-info"><div><p class="project-type">JavaScript application</p><h3>Sign In Form</h3></div><a href="../../WEEK-3/DAY-3/Mini-Project-Create-a-Sign-in-form.html" class="arrow-link" aria-label="View Sign In Form">↗</a></div>
+                    </article>
+                    <article class="project-card reveal" data-category="games">
+                        <a href="../DAY-5/Mini-project2-Hangman.py" class="project-visual visual-story">
+                            <span class="story-word">hang<br><em>man</em></span><span class="visual-tag">PLAY / 03</span>
+                        </a>
+                        <div class="project-info"><div><p class="project-type">Python game</p><h3>Hangman</h3></div><a href="../DAY-5/Mini-project2-Hangman.py" class="arrow-link" aria-label="View Hangman">↗</a></div>
+                    </article>
+                </div>
+            </section>
+
+            <section class="about-section" id="about" aria-labelledby="about-title">
+                <div class="about-photo reveal">
+                    <img src="profile.jpg" alt="Erick Juma wearing a green blazer outdoors">
+                    <span>ERICK JUMA / 01</span>
+                </div>
+                <div class="about-copy reveal reveal-delay">
+                    <p class="eyebrow">A little context</p>
+                    <h2 id="about-title">Learning by<br><em>making.</em></h2>
+                    <p>I am Erick Juma, a passionate software developer focused on building responsive, user-friendly, and modern web experiences. I work with HTML, CSS, and JavaScript to turn ideas into functional websites and applications. I enjoy learning new technologies, solving problems through code, and continuously improving my development skills.</p>
+                    <div class="skill-list"><span>01 / JavaScript</span><span>02 / HTML & CSS</span><span>03 / Python</span><span>04 / Problem solving</span></div>
+                </div>
+            </section>
+            <section class="contact-section reveal" aria-labelledby="contact-title">
+                <p class="eyebrow">Have something in mind?</p>
+                <h2 id="contact-title">Let’s make it<br><em>real.</em> <a href="mailto:allabouterick0@gmail.com" aria-label="Email Erick Juma">↗</a></h2>
+                <div class="contact-details">
+                    <a href="mailto:allabouterick0@gmail.com">allabouterick0@gmail.com</a>
+                    <a href="tel:0756633648">0756633648</a>
+                </div>
+            </section>
+        </main>
+        <footer class="site-footer"><span>© 2026 Erick Juma</span><span>Built with HTML, CSS & JavaScript</span><a href="#top">Back to top ↑</a></footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
