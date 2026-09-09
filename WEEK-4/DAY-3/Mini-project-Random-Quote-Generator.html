@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Random Quote Generator</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+        background: #f7f7f7;
+      }
+
+      main {
+        max-width: 700px;
+        margin: 0 auto;
+      }
+
+      section {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      #quote-box {
+        border-left: 5px solid #4caf50;
+        padding-left: 15px;
+        margin: 20px 0;
+      }
+
+      #quote-text {
+        font-size: 1.3rem;
+        margin: 0;
+      }
+
+      #quote-author {
+        margin-top: 10px;
+        font-weight: bold;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      input, button {
+        padding: 10px;
+        font-size: 1rem;
+      }
+
+      button {
+        cursor: pointer;
+        border: none;
+        border-radius: 6px;
+        background: #4caf50;
+        color: white;
+      }
+
+      button:hover {
+        opacity: 0.9;
+      }
+
+      .action-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section>
+        <h1>Random Quote Generator</h1>
+        <div id="quote-box">
+          <p id="quote-text">Press the button to generate a quote.</p>
+          <p id="quote-author"></p>
+          <p id="quote-likes"></p>
+        </div>
+        <button id="generate-quote" type="button">Generate Quote</button>
+      </section>
+
+      <section>
+        <h2>Add a Quote</h2>
+        <form id="add-quote-form">
+          <label>
+            Quote
+            <input id="new-quote" type="text" placeholder="Enter your quote" required />
+          </label>
+          <label>
+            Author
+            <input id="new-author" type="text" placeholder="Enter author name" required />
+          </label>
+          <button type="submit">Add Quote</button>
+        </form>
+      </section>
+
+      <section>
+        <h2>Quote Stats</h2>
+        <div class="action-row">
+          <button id="count-chars" type="button">Characters (with spaces)</button>
+          <button id="count-no-spaces" type="button">Characters (without spaces)</button>
+          <button id="count-words" type="button">Words</button>
+          <button id="like-quote" type="button">Like</button>
+        </div>
+        <p id="stats-output"></p>
+      </section>
+
+      <section>
+        <h2>Filter by Author</h2>
+        <form id="filter-form">
+          <label>
+            Author name
+            <input id="author-filter" type="text" placeholder="e.g. Albert Einstein" required />
+          </label>
+          <button type="submit">Filter</button>
+        </form>
+        <div class="action-row">
+          <button id="prev-quote" type="button">Previous</button>
+          <button id="next-quote" type="button">Next</button>
+        </div>
+        <p id="filter-output"></p>
+      </section>
+    </main>
+
+    <script src="./Mini-project-Random-Quote-Generator.js"></script>
+  </body>
+</html>
