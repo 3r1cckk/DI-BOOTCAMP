@@ -1,112 +1,56 @@
-const API_BASE = "https://www.swapi.tech/api";
-const TOTAL_CHARACTERS = 83; // per the assignment brief
-
-// ---------------------------------------------------------------
-// 1. DOM references — grabbed once, reused everywhere
-// ---------------------------------------------------------------
-function getDomElements() {
-  return {
-    button: document.getElementById("query-btn"),
-    states: {
-      idle: document.querySelector('[data-state="idle"]'),
-      loading: document.querySelector('[data-state="loading"]'),
-      error: document.querySelector('[data-state="error"]'),
-      card: document.querySelector('[data-state="card"]'),
-    },
-    card: {
-      id: document.getElementById("card-id"),
-      name: document.getElementById("card-name"),
-      height: document.getElementById("card-height"),
-      gender: document.getElementById("card-gender"),
-      birth: document.getElementById("card-birth"),
-      homeworld: document.getElementById("card-homeworld"),
-    },
-  };
-}
-
-const dom = getDomElements();
-
-// ---------------------------------------------------------------
-// 2. Fetching — talks to swapi.tech, nothing else
-// ---------------------------------------------------------------
-
-// A person record's `homeworld` field is a URL, not a name —
-// swapi.tech makes you resolve it with a second request.
-async function getPlanetName(planetUrl) {
-  const res = await fetch(planetUrl);
-  if (!res.ok) throw new Error(`Planet request failed: ${res.status}`);
-  const data = await res.json();
-  return data.result.properties.name;
-}
-
-async function getCharacterData(id) {
-  const res = await fetch(`${API_BASE}/people/${id}`);
-  if (!res.ok) throw new Error(`Character request failed: ${res.status}`);
-
-  const data = await res.json();
-  const person = data.result.properties;
-
-  const homeworldName = await getPlanetName(person.homeworld);
-
-  return {
-    id,
-    name: person.name,
-    height: person.height,
-    gender: person.gender,
-    birthYear: person.birth_year,
-    homeworld: homeworldName,
-  };
-}
-
-// ---------------------------------------------------------------
-// 3. Rendering — pure DOM writes, no fetch logic in here
-// ---------------------------------------------------------------
-function setState(stateName) {
-  Object.entries(dom.states).forEach(([name, el]) => {
-    el.hidden = name !== stateName;
-  });
-}
-
-function displayCharacter(character) {
-  dom.card.id.textContent = `#${String(character.id).padStart(3, "0")}`;
-  dom.card.name.textContent = character.name;
-  dom.card.height.textContent = `${character.height} cm`;
-  dom.card.gender.textContent = capitalize(character.gender);
-  dom.card.birth.textContent = character.birthYear;
-  dom.card.homeworld.textContent = character.homeworld;
-  setState("card");
-}
-
-function displayError() {
-  setState("error");
-}
-
-function capitalize(str) {
-  if (!str) return "Unknown";
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-function getRandomCharacterId() {
-  return Math.floor(Math.random() * TOTAL_CHARACTERS) + 1;
-}
-
-// ---------------------------------------------------------------
-// Orchestration — wires button click to the flow above
-// ---------------------------------------------------------------
-async function handleQueryClick() {
-  dom.button.disabled = true;
-  setState("loading");
-
-  try {
-    const id = getRandomCharacterId();
-    const character = await getCharacterData(id);
-    displayCharacter(character);
-  } catch (err) {
-    console.error("Failed to fetch character:", err);
-    displayError();
-  } finally {
-    dom.button.disabled = false;
-  }
-}
-
-dom.button.addEventListener("click", handleQueryClick);
+const CURRENCY_CODES = [
+  ["AED","UAE Dirham"], ["AFN","Afghan Afghani"], ["ALL","Albanian Lek"],
+  ["AMD","Armenian Dram"], ["ANG","Netherlands Antillian Guilder"], ["AOA","Angolan Kwanza"],
+  ["ARS","Argentine Peso"], ["AUD","Australian Dollar"], ["AWG","Aruban Florin"],
+  ["AZN","Azerbaijani Manat"], ["BAM","Bosnia and Herzegovina Mark"], ["BBD","Barbados Dollar"],
+  ["BDT","Bangladeshi Taka"], ["BGN","Bulgarian Lev"], ["BHD","Bahraini Dinar"],
+  ["BIF","Burundian Franc"], ["BMD","Bermudian Dollar"], ["BND","Brunei Dollar"],
+  ["BOB","Bolivian Boliviano"], ["BRL","Brazilian Real"], ["BSD","Bahamian Dollar"],
+  ["BTN","Bhutanese Ngultrum"], ["BWP","Botswana Pula"], ["BYN","Belarusian Ruble"],
+  ["BZD","Belize Dollar"], ["CAD","Canadian Dollar"], ["CDF","Congolese Franc"],
+  ["CHF","Swiss Franc"], ["CLF","Chilean Unidad de Fomento"], ["CLP","Chilean Peso"],
+  ["CNH","Offshore Chinese Renminbi"], ["CNY","Chinese Renminbi"], ["COP","Colombian Peso"],
+  ["CRC","Costa Rican Colon"], ["CUP","Cuban Peso"], ["CVE","Cape Verdean Escudo"],
+  ["CZK","Czech Koruna"], ["DJF","Djiboutian Franc"], ["DKK","Danish Krone"],
+  ["DOP","Dominican Peso"], ["DZD","Algerian Dinar"], ["EGP","Egyptian Pound"],
+  ["ERN","Eritrean Nakfa"], ["ETB","Ethiopian Birr"], ["EUR","Euro"],
+  ["FJD","Fiji Dollar"], ["FKP","Falkland Islands Pound"], ["FOK","Faroese Króna"],
+  ["GBP","Pound Sterling"], ["GEL","Georgian Lari"], ["GGP","Guernsey Pound"],
+  ["GHS","Ghanaian Cedi"], ["GIP","Gibraltar Pound"], ["GMD","Gambian Dalasi"],
+  ["GNF","Guinean Franc"], ["GTQ","Guatemalan Quetzal"], ["GYD","Guyanese Dollar"],
+  ["HKD","Hong Kong Dollar"], ["HNL","Honduran Lempira"], ["HRK","Croatian Kuna"],
+  ["HTG","Haitian Gourde"], ["HUF","Hungarian Forint"], ["IDR","Indonesian Rupiah"],
+  ["ILS","Israeli New Shekel"], ["IMP","Manx Pound"], ["INR","Indian Rupee"],
+  ["IQD","Iraqi Dinar"], ["ISK","Icelandic Króna"], ["JEP","Jersey Pound"],
+  ["JMD","Jamaican Dollar"], ["JOD","Jordanian Dinar"], ["JPY","Japanese Yen"],
+  ["KES","Kenyan Shilling"], ["KGS","Kyrgyzstani Som"], ["KHR","Cambodian Riel"],
+  ["KID","Kiribati Dollar"], ["KMF","Comorian Franc"], ["KRW","South Korean Won"],
+  ["KWD","Kuwaiti Dinar"], ["KYD","Cayman Islands Dollar"], ["KZT","Kazakhstani Tenge"],
+  ["LAK","Lao Kip"], ["LBP","Lebanese Pound"], ["LKR","Sri Lanka Rupee"],
+  ["LRD","Liberian Dollar"], ["LSL","Lesotho Loti"], ["LYD","Libyan Dinar"],
+  ["MAD","Moroccan Dirham"], ["MDL","Moldovan Leu"], ["MGA","Malagasy Ariary"],
+  ["MKD","Macedonian Denar"], ["MMK","Burmese Kyat"], ["MNT","Mongolian Tögrög"],
+  ["MOP","Macanese Pataca"], ["MRU","Mauritanian Ouguiya"], ["MUR","Mauritian Rupee"],
+  ["MVR","Maldivian Rufiyaa"], ["MWK","Malawian Kwacha"], ["MXN","Mexican Peso"],
+  ["MYR","Malaysian Ringgit"], ["MZN","Mozambican Metical"], ["NAD","Namibian Dollar"],
+  ["NGN","Nigerian Naira"], ["NIO","Nicaraguan Córdoba"], ["NOK","Norwegian Krone"],
+  ["NPR","Nepalese Rupee"], ["NZD","New Zealand Dollar"], ["OMR","Omani Rial"],
+  ["PAB","Panamanian Balboa"], ["PEN","Peruvian Sol"], ["PGK","Papua New Guinean Kina"],
+  ["PHP","Philippine Peso"], ["PKR","Pakistani Rupee"], ["PLN","Polish Złoty"],
+  ["PYG","Paraguayan Guaraní"], ["QAR","Qatari Riyal"], ["RON","Romanian Leu"],
+  ["RSD","Serbian Dinar"], ["RUB","Russian Ruble"], ["RWF","Rwandan Franc"],
+  ["SAR","Saudi Riyal"], ["SBD","Solomon Islands Dollar"], ["SCR","Seychellois Rupee"],
+  ["SDG","Sudanese Pound"], ["SEK","Swedish Krona"], ["SGD","Singapore Dollar"],
+  ["SHP","Saint Helena Pound"], ["SLE","Sierra Leonean Leone"], ["SOS","Somali Shilling"],
+  ["SRD","Surinamese Dollar"], ["SSP","South Sudanese Pound"], ["STN","São Tomé and Príncipe Dobra"],
+  ["SYP","Syrian Pound"], ["SZL","Eswatini Lilangeni"], ["THB","Thai Baht"],
+  ["TJS","Tajikistani Somoni"], ["TMT","Turkmenistan Manat"], ["TND","Tunisian Dinar"],
+  ["TOP","Tongan Paʻanga"], ["TRY","Turkish Lira"], ["TTD","Trinidad and Tobago Dollar"],
+  ["TVD","Tuvaluan Dollar"], ["TWD","New Taiwan Dollar"], ["TZS","Tanzanian Shilling"],
+  ["UAH","Ukrainian Hryvnia"], ["UGX","Ugandan Shilling"], ["USD","United States Dollar"],
+  ["UYU","Uruguayan Peso"], ["UZS","Uzbekistani So'm"], ["VES","Venezuelan Bolívar Soberano"],
+  ["VND","Vietnamese Đồng"], ["VUV","Vanuatu Vatu"], ["WST","Samoan Tālā"],
+  ["XAF","Central African CFA Franc"], ["XCD","East Caribbean Dollar"], ["XDR","Special Drawing Rights"],
+  ["XOF","West African CFA Franc"], ["XPF","CFP Franc"], ["YER","Yemeni Rial"],
+  ["ZAR","South African Rand"], ["ZMW","Zambian Kwacha"], ["ZWL","Zimbabwean Dollar"]
+];
