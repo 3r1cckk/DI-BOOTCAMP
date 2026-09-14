@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Holotable // Character Archive</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Mono:ital@0;1&display=swap"
+    rel="stylesheet"
+  />
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+  />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="scanlines"></div>
+
+  <main class="console">
+    <header class="console__header">
+      <p class="console__eyebrow">Imperial Archive Terminal</p>
+      <h1 class="console__title">Holotable</h1>
+      <p class="console__sub">83 records on file. Pull one at random.</p>
+    </header>
+
+    <section class="readout" id="readout">
+
+      <!-- Idle state -->
+      <div class="state state--idle" data-state="idle">
+        <i class="fa-solid fa-satellite-dish"></i>
+        <p>No signal locked. Query the archive to begin.</p>
+      </div>
+
+      <!-- Loading state -->
+      <div class="state state--loading" data-state="loading" hidden>
+        <i class="fa-solid fa-circle-notch fa-spin"></i>
+        <p>Accessing archive<span class="dots"><span>.</span><span>.</span><span>.</span></span></p>
+      </div>
+
+      <!-- Error state -->
+      <div class="state state--error" data-state="error" hidden>
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <p class="state__error-title">Signal lost.</p>
+        <p class="state__error-detail">The archive did not respond. Try the query again.</p>
+      </div>
+
+      <!-- Character card -->
+      <article class="card" data-state="card" hidden>
+        <div class="card__id">
+          <i class="fa-solid fa-fingerprint"></i>
+          <span id="card-id">#000</span>
+        </div>
+
+        <h2 class="card__name" id="card-name">—</h2>
+
+        <dl class="card__grid">
+          <div class="card__stat">
+            <dt><i class="fa-solid fa-ruler-vertical"></i> Height</dt>
+            <dd id="card-height">—</dd>
+          </div>
+          <div class="card__stat">
+            <dt><i class="fa-solid fa-venus-mars"></i> Gender</dt>
+            <dd id="card-gender">—</dd>
+          </div>
+          <div class="card__stat">
+            <dt><i class="fa-solid fa-cake-candles"></i> Birth Year</dt>
+            <dd id="card-birth">—</dd>
+          </div>
+          <div class="card__stat">
+            <dt><i class="fa-solid fa-earth-americas"></i> Homeworld</dt>
+            <dd id="card-homeworld">—</dd>
+          </div>
+        </dl>
+      </article>
+
+    </section>
+
+    <button class="query-btn" id="query-btn" type="button">
+      <i class="fa-solid fa-bolt"></i>
+      <span>Pull random record</span>
+    </button>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
