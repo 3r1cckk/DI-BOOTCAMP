@@ -1,0 +1,160 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Akiba Chama Manager</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div>
+      <h1>Akiba</h1>
+      <p>Chama Management System</p>
+    </div>
+    <button id="logoutBtn" class="secondary hidden">Sign out</button>
+  </header>
+
+  <main class="container">
+
+    <section id="authSection" class="auth-card">
+      <h2>Welcome to Akiba</h2>
+      <p>Sign in to manage your Chama.</p>
+
+      <form id="authForm">
+        <input
+          type="email"
+          id="email"
+          placeholder="Email address"
+          required
+        >
+
+        <input
+          type="password"
+          id="password"
+          placeholder="Password"
+          minlength="6"
+          required
+        >
+
+        <button type="submit" id="authBtn">
+          Sign in
+        </button>
+      </form>
+
+      <button id="registerBtn" class="secondary full">
+        Create account
+      </button>
+
+      <p id="authMessage" class="message"></p>
+    </section>
+
+    <section id="appSection" class="hidden">
+
+      <nav class="navigation">
+        <button data-page="dashboard">Dashboard</button>
+        <button data-page="members">Members</button>
+        <button data-page="contributions">Contributions</button>
+        <button data-page="expenses">Expenses</button>
+        <button data-page="reports">Reports</button>
+      </nav>
+
+      <section id="dashboard" class="page">
+        <h2>Dashboard</h2>
+
+        <div class="stats">
+          <div class="stat">
+            <span>Total members</span>
+            <strong id="memberCount">0</strong>
+          </div>
+
+          <div class="stat">
+            <span>Contributions</span>
+            <strong id="contributionTotal">KSh 0</strong>
+          </div>
+
+          <div class="stat">
+            <span>Expenses</span>
+            <strong id="expenseTotal">KSh 0</strong>
+          </div>
+
+          <div class="stat">
+            <span>Balance</span>
+            <strong id="balanceTotal">KSh 0</strong>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Welcome to Akiba</h3>
+          <p>Use the navigation to manage your Chama.</p>
+        </div>
+      </section>
+
+      <section id="members" class="page hidden">
+        <div class="page-header">
+          <div>
+            <h2>Members</h2>
+            <p>Manage Akiba members.</p>
+          </div>
+          <button id="showMemberForm">+ Add Member</button>
+        </div>
+
+        <form id="memberForm" class="card hidden">
+          <h3>New Member</h3>
+
+          <label for="memberName">Full name</label>
+          <input id="memberName" required>
+
+          <label for="memberPhone">Phone number</label>
+          <input id="memberPhone" type="tel">
+
+          <label for="memberJoinDate">Join date</label>
+          <input id="memberJoinDate" type="date" required>
+
+          <div class="form-actions">
+            <button type="submit">Save Member</button>
+            <button type="button" id="cancelMember" class="secondary">
+              Cancel
+            </button>
+          </div>
+        </form>
+
+        <div class="card">
+          <h3>Member List</h3>
+          <div id="memberList">
+            <p>No members yet.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="contributions" class="page hidden">
+        <h2>Contributions</h2>
+        <div class="card">
+          <p>Contribution tracking will be added next.</p>
+        </div>
+      </section>
+
+      <section id="expenses" class="page hidden">
+        <h2>Expenses</h2>
+        <div class="card">
+          <p>Expense tracking will be added next.</p>
+        </div>
+      </section>
+
+      <section id="reports" class="page hidden">
+        <h2>Reports</h2>
+        <div class="card">
+          <p>Financial reports will be added next.</p>
+        </div>
+      </section>
+
+    </section>
+
+  </main>
+
+  <script type="module" src="app.js"></script>
+
+</body>
+</html>

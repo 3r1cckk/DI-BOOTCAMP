@@ -1,0 +1,133 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SomaSmart — Learn Better</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">📚 SomaSmart</div>
+    <span class="tagline">Learn. Practice. Improve.</span>
+  </header>
+
+  <main class="container">
+    <section id="home-screen" class="screen">
+      <div class="hero">
+        <p class="eyebrow">AI-POWERED LEARNING</p>
+        <h1>Understand any topic.<br>Practice with confidence.</h1>
+        <p class="subtitle">
+          Get simple explanations and a quick quiz
+          tailored to what you're learning.
+        </p>
+      </div>
+
+      <form id="learn-form" class="panel">
+        <label for="subject">Choose a subject</label>
+        <select id="subject" required>
+          <option value="">Select subject</option>
+          <option>History</option>
+          <option>Biology</option>
+          <option>Mathematics</option>
+          <option>Geography</option>
+          <option>English</option>
+          <option>Computer Studies</option>
+        </select>
+
+        <label for="topic">What topic do you want to learn?</label>
+        <input
+          id="topic"
+          type="text"
+          placeholder="e.g. Causes of the First World War"
+          maxlength="200"
+          required
+        >
+
+        <button type="submit" class="primary-btn">
+          Start learning →
+        </button>
+
+        <p id="form-error" class="error"></p>
+      </form>
+    </section>
+
+    <section id="lesson-screen" class="screen hidden">
+      <button class="back-btn" id="back-home">← Change topic</button>
+
+      <div class="lesson-header">
+        <p class="eyebrow" id="lesson-subject"></p>
+        <h1 id="lesson-title"></h1>
+      </div>
+
+      <div id="demo-warning" class="warning hidden"></div>
+
+      <article class="panel">
+        <h2>💡 Simple explanation</h2>
+        <p id="explanation"></p>
+      </article>
+
+      <article class="panel">
+        <h2>Key points</h2>
+        <ul id="key-points"></ul>
+      </article>
+
+      <article class="panel">
+        <h2>Example</h2>
+        <p id="example"></p>
+      </article>
+
+      <button id="start-quiz" class="primary-btn">
+        Take the 5-question quiz →
+      </button>
+    </section>
+
+    <section id="quiz-screen" class="screen hidden">
+      <div class="quiz-top">
+        <p class="eyebrow">PRACTICE QUIZ</p>
+        <span id="question-count"></span>
+      </div>
+
+      <div class="progress-track">
+        <div id="progress" class="progress-fill"></div>
+      </div>
+
+      <div class="panel">
+        <h2 id="question-text"></h2>
+        <div id="options" class="options"></div>
+        <p id="answer-feedback" class="feedback"></p>
+      </div>
+
+      <button id="next-question" class="primary-btn" disabled>
+        Next question →
+      </button>
+    </section>
+
+    <section id="results-screen" class="screen hidden">
+      <div class="result-hero">
+        <div class="trophy">🏆</div>
+        <p class="eyebrow">QUIZ COMPLETE</p>
+        <h1 id="score-title"></h1>
+        <p id="score-text"></p>
+      </div>
+
+      <div class="panel">
+        <h2>What to revise</h2>
+        <p id="revision-tip"></p>
+      </div>
+
+      <button id="try-again" class="primary-btn">
+        Try another topic →
+      </button>
+    </section>
+
+    <div id="loading" class="loading hidden">
+      <div class="spinner"></div>
+      <p>Preparing your learning session...</p>
+    </div>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
