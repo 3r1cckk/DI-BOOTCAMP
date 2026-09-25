@@ -1,0 +1,13 @@
+{
+  "name": "daily-challenge",
+  "version": "1.0.0",
+  "description": "Node.js modules and file operations daily challenge",
+  "main": "challenge.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node challenge.js"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2"
+  }
+}
