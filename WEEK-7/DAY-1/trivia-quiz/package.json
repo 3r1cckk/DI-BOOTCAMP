@@ -1,0 +1,13 @@
+{
+  "name": "trivia-quiz",
+  "version": "1.0.0",
+  "description": "A session-based trivia quiz built with Express Router",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "express-session": "^1.18.2"
+  }
+}
