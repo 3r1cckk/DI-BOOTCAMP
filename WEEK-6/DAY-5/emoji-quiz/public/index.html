@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5f5ef" />
+    <title>Emoji Quiz | Name that face</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Emoji Quiz home"><span class="brand-mark">:)</span> EMOJI QUIZ</a>
+      <span class="topbar-note"><span class="live-dot"></span> DAILY BRAIN BREAK</span>
+    </header>
+
+    <main class="layout">
+      <section class="game-column" aria-labelledby="page-title">
+        <div class="eyebrow"><span>01</span> THE EMOJI EDITION</div>
+        <h1 id="page-title">Name that<br /><span>emoji.</span></h1>
+        <p class="intro">A tiny quiz for your very large brain.</p>
+
+        <section class="game-panel" aria-label="Emoji quiz game">
+          <div class="game-heading">
+            <div>
+              <p class="panel-kicker" id="round-label">READY WHEN YOU ARE</p>
+              <p class="panel-prompt" id="prompt-label">Pick a name. Trust your instincts.</p>
+            </div>
+            <div class="streak-chip" id="streak-chip" hidden><span>✦</span> <span id="streak-value">0</span> streak</div>
+          </div>
+
+          <div class="emoji-stage" id="emoji-stage" aria-live="polite">
+            <span class="stage-spark spark-one">✳</span>
+            <span class="stage-spark spark-two">✳</span>
+            <span class="hero-emoji" id="emoji-display" aria-label="Your mystery emoji">?</span>
+          </div>
+
+          <form id="start-form" class="start-form">
+            <label for="player-name">YOUR NAME</label>
+            <div class="start-row">
+              <input id="player-name" name="name" maxlength="20" placeholder="e.g. Emoji expert" autocomplete="nickname" required />
+              <button class="start-button" type="submit">Let’s play <span aria-hidden="true">↗</span></button>
+            </div>
+          </form>
+
+          <form id="guess-form" class="guess-form" hidden>
+            <fieldset>
+              <legend>What do you think it is?</legend>
+              <div class="options-grid" id="options-list"></div>
+            </fieldset>
+            <div class="answer-row">
+              <p class="feedback" id="feedback" role="status" aria-live="polite"></p>
+              <button class="submit-button" id="submit-button" type="submit">Lock it in <span aria-hidden="true">↗</span></button>
+            </div>
+          </form>
+        </section>
+        <p class="fine-print"><span>✦</span> 10 points for every correct guess. Keep the streak alive.</p>
+      </section>
+
+      <aside class="side-column" aria-label="Game stats and leaderboard">
+        <section class="score-panel" aria-labelledby="score-heading">
+          <div class="side-panel-heading">
+            <div><p class="panel-kicker">YOUR RUN</p><h2 id="score-heading">The score</h2></div>
+            <span class="score-icon" aria-hidden="true">↗</span>
+          </div>
+          <p class="score-number" id="score-value">00</p>
+          <div class="score-footer"><span id="player-label">PLAYER 01</span><span>POINTS</span></div>
+        </section>
+
+        <section class="leaderboard-panel" aria-labelledby="leaderboard-heading">
+          <div class="side-panel-heading leaderboard-heading">
+            <div><p class="panel-kicker">THE HALL OF FAME</p><h2 id="leaderboard-heading">Top players</h2></div>
+            <span class="trophy" aria-hidden="true">✳</span>
+          </div>
+          <ol class="leaderboard-list" id="leaderboard-list">
+            <li class="empty-board">Your name could go here.</li>
+          </ol>
+          <p class="board-note">Best scores from this session</p>
+        </section>
+
+        <div class="side-note"><span class="note-mark">!</span><p>Good guesses are nice.<br /><strong>Great guesses are legendary.</strong></p></div>
+      </aside>
+    </main>
+    <footer class="page-footer"><span>MADE FOR CURIOUS MINDS</span><span>ROUND AFTER ROUND <span aria-hidden="true">↗</span></span></footer>
+  </body>
+</html>
