@@ -1,0 +1,14 @@
+{
+  "name": "user-management-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "User registration and login API backed by a JSON file",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "express": "^5.1.0"
+  }
+}

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Create account | Northstar</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/form.js" defer></script>
+</head>
+<body>
+  <main class="auth-layout">
+    <section class="visual-panel register-visual" aria-label="Northstar account portal">
+      <a class="wordmark" href="/">northstar<span>.</span></a>
+      <div class="visual-copy">
+        <p class="eyebrow">A FRESH START</p>
+        <h1>Make room<br>for what’s next.</h1>
+        <p>Your account, ready when you are.</p>
+      </div>
+      <div class="visual-index">MEMBER PORTAL <span>02 / 02</span></div>
+    </section>
+
+    <section class="form-panel">
+      <div class="form-wrap register-wrap">
+        <p class="eyebrow">JOIN NORTHSTAR</p>
+        <h2>Create account</h2>
+        <p class="form-intro">A few details and you’re in.</p>
+        <form data-form="register" novalidate>
+          <div class="field-pair">
+            <div><label for="name">Name</label><input id="name" name="name" autocomplete="given-name" required></div>
+            <div><label for="lastName">Last name</label><input id="lastName" name="lastName" autocomplete="family-name" required></div>
+          </div>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" required>
+
+          <label for="username">Username</label>
+          <input id="username" name="username" autocomplete="username" required>
+
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required>
+          <p class="field-hint">Use at least 8 characters.</p>
+
+          <button type="submit" disabled>Create account <span aria-hidden="true">&#8594;</span></button>
+          <p class="form-message" role="status" aria-live="polite"></p>
+        </form>
+        <p class="form-switch">Already a member? <a href="/login.html">Sign in</a></p>
+      </div>
+      <footer>ACCOUNT SERVICES <span>SECURE REGISTRATION</span></footer>
+    </section>
+  </main>
+</body>
+</html>

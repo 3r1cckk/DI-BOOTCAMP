@@ -1,0 +1,13 @@
+{
+  "name": "task-management-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Task management API backed by a JSON file",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
