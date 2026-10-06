@@ -1,0 +1,130 @@
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #1e293b;
+  background: #f6f7fb;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(circle at 15% 15%, rgb(129 140 248 / 12%), transparent 24rem),
+    #f6f7fb;
+}
+
+.page-shell {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 1.5rem;
+}
+
+.message-card {
+  width: min(100%, 600px);
+  padding: clamp(1.5rem, 5vw, 3rem);
+  border: 1px solid #e2e8f0;
+  border-radius: 1.25rem;
+  background: #fff;
+  box-shadow: 0 24px 70px rgb(30 41 59 / 10%);
+}
+
+.eyebrow {
+  margin: 0 0 0.75rem;
+  color: #4f46e5;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+h1 {
+  margin: 0;
+  color: #172554;
+  font-size: clamp(1.8rem, 6vw, 2.5rem);
+  letter-spacing: -0.045em;
+}
+
+.intro {
+  margin: 0.8rem 0 2rem;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+form label {
+  display: block;
+  margin-bottom: 0.55rem;
+  color: #334155;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.form-row {
+  display: flex;
+  gap: 0.65rem;
+}
+
+.form-row input {
+  min-width: 0;
+  flex: 1;
+  padding: 0.85rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.65rem;
+  color: #1e293b;
+  font: inherit;
+}
+
+.form-row input:focus {
+  border-color: #6366f1;
+  outline: 3px solid rgb(99 102 241 / 15%);
+}
+
+.form-row button {
+  padding: 0.85rem 1.2rem;
+  border: 0;
+  border-radius: 0.65rem;
+  color: #fff;
+  background: #4f46e5;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.form-row button:hover:not(:disabled) {
+  background: #4338ca;
+}
+
+.form-row button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.server-response,
+.error-message {
+  margin: 1.15rem 0 0;
+  padding: 0.9rem 1rem;
+  border-radius: 0.65rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.server-response {
+  color: #166534;
+  background: #f0fdf4;
+}
+
+.error-message {
+  color: #991b1b;
+  background: #fef2f2;
+}
+
+@media (max-width: 520px) {
+  .form-row {
+    flex-direction: column;
+  }
+}
