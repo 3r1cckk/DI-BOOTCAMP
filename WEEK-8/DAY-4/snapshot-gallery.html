@@ -1,0 +1,997 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Explore beautiful photographs of mountains, beaches, birds, and food."
+    />
+    <title>SnapScout — Discover a little more</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react-router-dom@5.3.4/umd/react-router-dom.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        font-family: "DM Sans", sans-serif;
+        color: #192321;
+        background: #fafaf8;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        font-optical-sizing: auto;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-width: 320px;
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      button,
+      a {
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .site-header {
+        position: sticky;
+        z-index: 5;
+        top: 0;
+        border-bottom: 1px solid #eceee9;
+        background: rgb(250 250 248 / 94%);
+        backdrop-filter: blur(16px);
+      }
+
+      .header-inner {
+        display: flex;
+        width: min(100% - 56px, 1200px);
+        min-height: 82px;
+        margin: 0 auto;
+        align-items: center;
+        justify-content: space-between;
+        gap: 32px;
+      }
+
+      .brand {
+        display: inline-flex;
+        flex: 0 0 auto;
+        align-items: center;
+        gap: 10px;
+        color: inherit;
+        font-family: Manrope, sans-serif;
+        font-size: 1.3rem;
+        font-weight: 800;
+        letter-spacing: -0.065em;
+        text-decoration: none;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+        background: #dff1e9;
+        color: #327c5a;
+        font-size: 1.2rem;
+        place-items: center;
+      }
+
+      .search-form {
+        display: flex;
+        width: min(100%, 430px);
+        height: 46px;
+        margin-left: auto;
+        align-items: center;
+        border: 1px solid #e7e9e4;
+        border-radius: 14px;
+        background: #fff;
+        transition:
+          border-color 180ms ease,
+          box-shadow 180ms ease;
+      }
+
+      .search-form:focus-within {
+        border-color: #78aa91;
+        box-shadow: 0 0 0 3px rgb(89 153 117 / 12%);
+      }
+
+      .search-icon {
+        flex: 0 0 auto;
+        width: 18px;
+        height: 18px;
+        margin-left: 14px;
+        color: #7b8580;
+      }
+
+      .search-input {
+        width: 100%;
+        min-width: 0;
+        height: 100%;
+        padding: 0 10px;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: #192321;
+        font-size: 0.88rem;
+      }
+
+      .search-input::placeholder {
+        color: #9ba29d;
+      }
+
+      .search-submit {
+        display: grid;
+        width: 34px;
+        height: 34px;
+        margin-right: 5px;
+        flex: 0 0 auto;
+        border: 0;
+        border-radius: 10px;
+        background: #eef5f0;
+        color: #327c5a;
+        cursor: pointer;
+        place-items: center;
+        transition: background-color 180ms ease;
+      }
+
+      .search-submit:hover {
+        background: #dff1e9;
+      }
+
+      .search-submit svg {
+        width: 17px;
+        height: 17px;
+      }
+
+      .header-note {
+        flex: 0 0 auto;
+        color: #828b85;
+        font-size: 0.78rem;
+      }
+
+      .page-shell {
+        width: min(100% - 56px, 1200px);
+        margin: 0 auto;
+      }
+
+      .hero {
+        padding: 64px 0 38px;
+      }
+
+      .hero-kicker {
+        display: flex;
+        margin: 0 0 15px;
+        align-items: center;
+        gap: 9px;
+        color: #548268;
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .hero-kicker::before {
+        width: 18px;
+        height: 1px;
+        background: #78aa91;
+        content: "";
+      }
+
+      .hero h1 {
+        max-width: 750px;
+        margin: 0;
+        font-family: Manrope, sans-serif;
+        font-size: clamp(2.7rem, 7vw, 5.4rem);
+        font-weight: 600;
+        letter-spacing: -0.085em;
+        line-height: 1.04;
+      }
+
+      .hero h1 span {
+        color: #79a58a;
+      }
+
+      .hero-copy {
+        max-width: 520px;
+        margin: 20px 0 0;
+        color: #737e78;
+        font-size: 1.02rem;
+        line-height: 1.7;
+      }
+
+      .category-nav {
+        display: flex;
+        margin: 0 0 38px;
+        align-items: center;
+        gap: 10px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+
+      .category-nav::-webkit-scrollbar {
+        display: none;
+      }
+
+      .category-link {
+        padding: 10px 16px;
+        flex: 0 0 auto;
+        border: 1px solid #e9ebe6;
+        border-radius: 999px;
+        background: #fff;
+        color: #626e67;
+        font-size: 0.83rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition:
+          background-color 180ms ease,
+          border-color 180ms ease,
+          color 180ms ease,
+          transform 180ms ease;
+      }
+
+      .category-link:hover {
+        border-color: #b6d0bf;
+        color: #327c5a;
+        transform: translateY(-1px);
+      }
+
+      .category-link.active {
+        border-color: #2e7151;
+        background: #2e7151;
+        color: #fff;
+      }
+
+      .gallery-heading {
+        display: flex;
+        margin-bottom: 20px;
+        align-items: end;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      .gallery-title {
+        margin: 0;
+        font-family: Manrope, sans-serif;
+        font-size: clamp(1.45rem, 3vw, 2rem);
+        font-weight: 700;
+        letter-spacing: -0.055em;
+      }
+
+      .gallery-subtitle {
+        margin: 6px 0 0;
+        color: #828b85;
+        font-size: 0.86rem;
+      }
+
+      .photo-count {
+        padding: 7px 11px;
+        border: 1px solid #e9ebe6;
+        border-radius: 999px;
+        background: #fff;
+        color: #737e78;
+        font-size: 0.75rem;
+        white-space: nowrap;
+      }
+
+      .photo-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 20px;
+      }
+
+      .photo-card {
+        position: relative;
+        min-width: 0;
+        overflow: hidden;
+        aspect-ratio: 4 / 3;
+        border-radius: 18px;
+        background: #e7ebe6;
+        box-shadow: 0 4px 16px rgb(31 46 38 / 5%);
+      }
+
+      .photo-image {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition:
+          transform 500ms cubic-bezier(0.2, 0.7, 0.2, 1),
+          filter 350ms ease;
+      }
+
+      .photo-card:hover .photo-image {
+        filter: saturate(1.08);
+        transform: scale(1.055);
+      }
+
+      .photo-overlay {
+        position: absolute;
+        inset: auto 0 0;
+        display: flex;
+        padding: 36px 16px 15px;
+        align-items: end;
+        justify-content: space-between;
+        gap: 12px;
+        background: linear-gradient(transparent, rgb(13 21 17 / 72%));
+        color: #fff;
+        opacity: 0;
+        transform: translateY(7px);
+        transition:
+          opacity 220ms ease,
+          transform 220ms ease;
+      }
+
+      .photo-card:hover .photo-overlay,
+      .photo-card:focus-within .photo-overlay {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .photo-name {
+        display: -webkit-box;
+        overflow: hidden;
+        font-size: 0.8rem;
+        font-weight: 600;
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+      }
+
+      .photo-source {
+        flex: 0 0 auto;
+        color: #fff;
+        font-size: 0.72rem;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      .photo-card:focus-within {
+        outline: 3px solid #4c8a68;
+        outline-offset: 3px;
+      }
+
+      .gallery-message {
+        display: grid;
+        min-height: 240px;
+        padding: 28px;
+        border: 1px dashed #d9dfd8;
+        border-radius: 18px;
+        color: #737e78;
+        line-height: 1.6;
+        text-align: center;
+        place-items: center;
+      }
+
+      .gallery-message h2 {
+        margin: 0 0 8px;
+        color: #26352d;
+        font-family: Manrope, sans-serif;
+        font-size: 1.15rem;
+      }
+
+      .gallery-message p {
+        max-width: 470px;
+        margin: 0;
+      }
+
+      .spinner {
+        width: 32px;
+        height: 32px;
+        margin: 0 auto 14px;
+        border: 3px solid #dce9df;
+        border-top-color: #327c5a;
+        border-radius: 50%;
+        animation: spin 700ms linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .load-more-wrap {
+        display: flex;
+        min-height: 116px;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .load-more {
+        min-height: 46px;
+        padding: 0 22px;
+        border: 1px solid #dce5dc;
+        border-radius: 12px;
+        background: #fff;
+        color: #327c5a;
+        cursor: pointer;
+        font-size: 0.86rem;
+        font-weight: 700;
+        transition:
+          background-color 180ms ease,
+          border-color 180ms ease,
+          transform 180ms ease;
+      }
+
+      .load-more:hover:not(:disabled) {
+        transform: translateY(-2px);
+        border-color: #8ab39a;
+        background: #f2f8f3;
+      }
+
+      .load-more:disabled {
+        cursor: wait;
+        opacity: 0.65;
+      }
+
+      .site-footer {
+        padding: 24px 0 38px;
+        border-top: 1px solid #eceee9;
+        color: #89928c;
+        font-size: 0.76rem;
+        line-height: 1.7;
+        text-align: center;
+      }
+
+      .site-footer a {
+        color: #527b62;
+      }
+
+      @media (max-width: 780px) {
+        .header-inner,
+        .page-shell {
+          width: min(100% - 36px, 1200px);
+        }
+
+        .header-inner {
+          min-height: 72px;
+          gap: 16px;
+        }
+
+        .header-note {
+          display: none;
+        }
+
+        .photo-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 14px;
+        }
+
+        .photo-card {
+          border-radius: 14px;
+        }
+
+        .photo-overlay {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .header-inner,
+        .page-shell {
+          width: min(100% - 28px, 1200px);
+        }
+
+        .header-inner {
+          min-height: 68px;
+          gap: 12px;
+        }
+
+        .brand {
+          gap: 7px;
+          font-size: 1.08rem;
+        }
+
+        .brand-mark {
+          width: 31px;
+          height: 31px;
+          border-radius: 10px;
+        }
+
+        .search-form {
+          height: 42px;
+        }
+
+        .search-icon {
+          width: 16px;
+          height: 16px;
+          margin-left: 10px;
+        }
+
+        .search-input {
+          padding: 0 7px;
+          font-size: 0.77rem;
+        }
+
+        .hero {
+          padding: 48px 0 30px;
+        }
+
+        .hero-copy {
+          margin-top: 14px;
+          font-size: 0.92rem;
+        }
+
+        .category-nav {
+          margin-bottom: 30px;
+          gap: 8px;
+        }
+
+        .category-link {
+          padding: 9px 13px;
+          font-size: 0.78rem;
+        }
+
+        .photo-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .photo-card {
+          aspect-ratio: 1.2;
+        }
+
+        .gallery-heading {
+          align-items: start;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          animation-duration: 0.01ms !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const {
+        HashRouter,
+        NavLink,
+        Redirect,
+        Route,
+        Switch,
+        useHistory,
+        useLocation,
+        useParams,
+      } = ReactRouterDOM;
+
+      const categories = [
+        { label: "Mountains", path: "mountain", icon: "⛰" },
+        { label: "Beaches", path: "beaches", icon: "☼" },
+        { label: "Birds", path: "birds", icon: "♧" },
+        { label: "Food", path: "food", icon: "✳" },
+      ];
+
+      function SearchBar() {
+        const [searchTerm, setSearchTerm] = React.useState("");
+        const history = useHistory();
+        const location = useLocation();
+
+        React.useEffect(() => {
+          const match = location.pathname.match(/^\/search\/(.+)$/);
+          if (match) {
+            setSearchTerm(decodeURIComponent(match[1]));
+          }
+        }, [location.pathname]);
+
+        function handleSubmit(event) {
+          event.preventDefault();
+          const query = searchTerm.trim();
+
+          if (query) {
+            history.push(`/search/${encodeURIComponent(query)}`);
+          }
+        }
+
+        return (
+          <form className="search-form" onSubmit={handleSubmit} role="search">
+            <svg
+              className="search-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              aria-hidden="true"
+            >
+              <circle cx="10.8" cy="10.8" r="6.8" />
+              <path d="m16 16 4 4" strokeLinecap="round" />
+            </svg>
+            <input
+              className="search-input"
+              type="search"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder="Search for anything..."
+              aria-label="Search photos"
+            />
+            <button className="search-submit" type="submit" aria-label="Search">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                aria-hidden="true"
+              >
+                <path d="M5 12h14m-6-6 6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          </form>
+        );
+      }
+
+      function Header() {
+        return (
+          <header className="site-header">
+            <div className="header-inner">
+              <NavLink
+                exact
+                className="brand"
+                to="/"
+                aria-label="SnapScout home"
+              >
+                <span className="brand-mark" aria-hidden="true">
+                  ◉
+                </span>
+                SnapScout
+              </NavLink>
+              <SearchBar />
+              <span className="header-note">Find your next favorite</span>
+            </div>
+          </header>
+        );
+      }
+
+      function Hero() {
+        return (
+          <section className="hero">
+            <p className="hero-kicker">A little inspiration, in pictures</p>
+            <h1>
+              See the world
+              <br />
+              <span>a little differently.</span>
+            </h1>
+            <p className="hero-copy">
+              A collection of moments, places, and little details worth
+              stopping for. Pick a theme and start exploring.
+            </p>
+          </section>
+        );
+      }
+
+      function CategoryNav() {
+        return (
+          <nav className="category-nav" aria-label="Photo categories">
+            {categories.map((category) => (
+              <NavLink
+                exact
+                key={category.path}
+                className={({ isActive }) =>
+                  `category-link${isActive ? " active" : ""}`
+                }
+                to={`/${category.path}`}
+              >
+                <span aria-hidden="true">{category.icon}</span>{" "}
+                {category.label}
+              </NavLink>
+            ))}
+          </nav>
+        );
+      }
+
+      function getGalleryTitle(category, query) {
+        if (query) {
+          return `Results for “${query}”`;
+        }
+
+        const selectedCategory = categories.find(
+          (item) => item.path === category,
+        );
+        return selectedCategory
+          ? `${selectedCategory.label} worth a closer look`
+          : "Explore photos";
+      }
+
+      function PhotoCard({ photo }) {
+        const title = photo.title.replace(/^File:/, "").replace(/\.[^.]+$/, "");
+        const image = photo.imageinfo?.[0];
+
+        if (!image?.thumburl) {
+          return null;
+        }
+
+        return (
+          <article className="photo-card">
+            <img
+              className="photo-image"
+              src={image.thumburl}
+              alt={title}
+              loading="lazy"
+              referrerPolicy="no-referrer"
+            />
+            <div className="photo-overlay">
+              <span className="photo-name">{title}</span>
+              <a
+                className="photo-source"
+                href={image.descriptionurl}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={`View ${title} on Wikimedia Commons`}
+              >
+                View source ↗
+              </a>
+            </div>
+          </article>
+        );
+      }
+
+      function Gallery() {
+        const params = useParams();
+        const category = params.category;
+        const query = params.query || null;
+        const searchTerm = query || category || "nature";
+        const [photos, setPhotos] = React.useState([]);
+        const [continuation, setContinuation] = React.useState(null);
+        const [loading, setLoading] = React.useState(true);
+        const [loadingMore, setLoadingMore] = React.useState(false);
+        const [error, setError] = React.useState("");
+
+        React.useEffect(() => {
+          const controller = new AbortController();
+          let active = true;
+
+          async function fetchPhotos() {
+            setLoading(true);
+            setLoadingMore(false);
+            setError("");
+            setPhotos([]);
+            setContinuation(null);
+
+            const request = new URLSearchParams({
+              action: "query",
+              generator: "search",
+              gsrsearch: `filetype:bitmap ${searchTerm}`,
+              gsrnamespace: "6",
+              gsrlimit: "30",
+              prop: "imageinfo",
+              iiprop: "url",
+              iiurlwidth: "800",
+              format: "json",
+              origin: "*",
+            });
+
+            try {
+              const response = await fetch(
+                `https://commons.wikimedia.org/w/api.php?${request}`,
+                { signal: controller.signal },
+              );
+
+              if (!response.ok) {
+                throw new Error(
+                  `The photo service responded with ${response.status}.`,
+                );
+              }
+
+              const data = await response.json();
+              if (data.error) {
+                throw new Error(data.error.info || "The photo search failed.");
+              }
+              if (!active) {
+                return;
+              }
+
+              const results = Object.values(data.query?.pages || {});
+              setPhotos(results);
+              setContinuation(data.continue || null);
+            } catch (requestError) {
+              if (requestError.name === "AbortError") {
+                return;
+              }
+              if (active) {
+                setError(
+                  "We could not load the photos right now. Check your connection and try another category.",
+                );
+              }
+            } finally {
+              if (active) {
+                setLoading(false);
+              }
+            }
+          }
+
+          fetchPhotos();
+
+          return () => {
+            active = false;
+            controller.abort();
+          };
+        }, [searchTerm]);
+
+        async function loadMore() {
+          if (!continuation || loadingMore) {
+            return;
+          }
+
+          setLoadingMore(true);
+          setError("");
+          const request = new URLSearchParams({
+            action: "query",
+            generator: "search",
+            gsrsearch: `filetype:bitmap ${searchTerm}`,
+            gsrnamespace: "6",
+            gsrlimit: "30",
+            prop: "imageinfo",
+            iiprop: "url",
+            iiurlwidth: "800",
+            format: "json",
+            origin: "*",
+            ...continuation,
+          });
+
+          try {
+            const response = await fetch(
+              `https://commons.wikimedia.org/w/api.php?${request}`,
+            );
+
+            if (!response.ok) {
+              throw new Error(
+                `The photo service responded with ${response.status}.`,
+              );
+            }
+
+            const data = await response.json();
+            if (data.error) {
+              throw new Error(data.error.info || "The photo search failed.");
+            }
+            const results = Object.values(data.query?.pages || {});
+            setPhotos((currentPhotos) => {
+              const knownPageIds = new Set(
+                currentPhotos.map((photo) => photo.pageid),
+              );
+              const newPhotos = results.filter(
+                (photo) => !knownPageIds.has(photo.pageid),
+              );
+              return [...currentPhotos, ...newPhotos];
+            });
+            setContinuation(data.continue || null);
+          } catch (requestError) {
+            setError(
+              "We could not load more photos. Please try again in a moment.",
+            );
+          } finally {
+            setLoadingMore(false);
+          }
+        }
+
+        const visiblePhotos = photos.filter(
+          (photo) => photo.imageinfo?.[0]?.thumburl,
+        );
+
+        return (
+          <>
+            <div className="gallery-heading">
+              <div>
+                <h2 className="gallery-title">
+                  {getGalleryTitle(category, query)}
+                </h2>
+                <p className="gallery-subtitle">
+                  Fresh discoveries from Wikimedia Commons
+                </p>
+              </div>
+              {!loading && visiblePhotos.length > 0 && (
+                <span className="photo-count">
+                  {visiblePhotos.length} photos
+                </span>
+              )}
+            </div>
+
+            {loading ? (
+              <div className="gallery-message" role="status">
+                <div>
+                  <div className="spinner" />
+                  <p>Finding something lovely...</p>
+                </div>
+              </div>
+            ) : error && photos.length === 0 ? (
+              <div className="gallery-message" role="alert">
+                <div>
+                  <h2>Photos are taking a little break</h2>
+                  <p>{error}</p>
+                </div>
+              </div>
+            ) : visiblePhotos.length === 0 ? (
+              <div className="gallery-message">
+                <div>
+                  <h2>No photos found just yet</h2>
+                  <p>
+                    Try a broader search or choose one of the categories above.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="photo-grid">
+                  {visiblePhotos.map((photo) => (
+                    <PhotoCard key={photo.pageid} photo={photo} />
+                  ))}
+                </div>
+                {error && (
+                  <div className="gallery-message" role="alert">
+                    <p>{error}</p>
+                  </div>
+                )}
+                <div className="load-more-wrap">
+                  {continuation && (
+                    <button
+                      className="load-more"
+                      onClick={loadMore}
+                      disabled={loadingMore}
+                      type="button"
+                    >
+                      {loadingMore ? "Loading photos..." : "Show 30 more"}
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
+          </>
+        );
+      }
+
+      function App() {
+        return (
+          <HashRouter>
+            <Header />
+            <main className="page-shell">
+              <Hero />
+              <CategoryNav />
+              <Switch>
+                <Route exact path="/search/:query" component={Gallery} />
+                <Route exact path="/:category" component={Gallery} />
+                <Redirect to="/mountain" />
+              </Switch>
+            </main>
+            <footer className="site-footer">
+              <div className="page-shell">
+                Photos provided by{" "}
+                <a
+                  href="https://commons.wikimedia.org/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Wikimedia Commons
+                </a>
+                . Each photo links to its original source and license.
+              </div>
+            </footer>
+          </HashRouter>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>
