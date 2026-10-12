@@ -1662,8 +1662,8 @@
 
         function renderHome() {
           const recommendations = profile.speakingExercises > 0 && averagePronunciation < 80
-            ? "A few more short speaking rounds can help tricky words feel familiar."
-            : "A quick speaking round is a lovely way to keep your new words moving.";
+            ? "Some words take a few tries. A short speaking round can help them feel more familiar."
+            : "Want to practise speaking? Try one short phrase whenever you feel ready.";
           return (
             <>
               <PageHeader
@@ -1704,7 +1704,7 @@
                     <h2 className="lq-card-title">A gentle goal for today</h2>
                     <span aria-hidden="true">☀️</span>
                   </div>
-                  <p className="lq-muted">{dailyComplete ? "You did it! Your daily challenge is complete." : "No rush—each step counts. Complete all four for 50 bonus XP."}</p>
+                  <p className="lq-muted">{dailyComplete ? "You finished today's goals. Nice work!" : "Try a few small activities today to earn 50 bonus XP. There's no need to do them all at once."}</p>
                   <div className="lq-challenge-list">
                     {tasks.slice(0, 3).map((task) => (
                       <div className="lq-check-row" key={task.id}>
@@ -1738,20 +1738,20 @@
           if (!gameRound.length) {
             return (
               <>
-                <PageHeader kicker="Choose your next step" title="A little practice goes a long way." copy={`Pick any activity. We'll keep it at your ${profile.difficulty.toLowerCase()} level.`} />
+                <PageHeader kicker="Choose your next step" title="What would you like to practise?" copy={`Pick whatever sounds good. Activities are set to your ${profile.difficulty.toLowerCase()} level.`} />
                 <div className="lq-two-col">
                   <section className="lq-practice-card">
-                    <h2>Speaking comes first</h2>
-                    <p>Listen to a phrase, say it into your microphone, then get an approximate word-match report. No pressure to be perfect.</p>
-                    <button className="lq-primary" onClick={() => changeTab("speak")} type="button">Practice speaking 🎙️</button>
+                    <h2>Want to practise speaking?</h2>
+                    <p>Listen to a phrase, then try saying it. You can use your microphone or type what you said—either way, this is just practice.</p>
+                    <button className="lq-primary" onClick={() => changeTab("speak")} type="button">Try a speaking exercise 🎙️</button>
                   </section>
                   <section className="lq-card">
-                    <h2 className="lq-card-title">Recommended for you</h2>
-                    <p className="lq-muted">{profile.speakingExercises && averagePronunciation < 80 ? "Short, clear phrases can help you get comfortable with the sounds." : "Start with a quick word quiz, then try a conversation."}</p>
-                    <button className="lq-sidebar-link" onClick={() => beginGame("quiz")} type="button">Try a quick quiz →</button>
+                    <h2 className="lq-card-title">Not sure where to start?</h2>
+                    <p className="lq-muted">{profile.speakingExercises && averagePronunciation < 80 ? "Try a few short phrases at your own pace. Repeating them is part of learning." : "A quick word quiz is an easy way to warm up."}</p>
+                    <button className="lq-sidebar-link" onClick={() => beginGame("quiz")} type="button">Start with a word quiz →</button>
                   </section>
                 </div>
-                <div className="lq-section-heading"><h2>Choose an activity</h2><span className="lq-muted">Small steps, steady progress</span></div>
+                <div className="lq-section-heading"><h2>Choose an activity</h2><span className="lq-muted">Go at your own pace</span></div>
                 <div className="lq-activity-grid">
                   {activityItems.map((item) => (
                     <button className="lq-activity" key={item.id} onClick={() => item.id === "speak" ? changeTab("speak") : item.id === "conversation" ? startConversation() : beginGame(item.id)} type="button">
@@ -1763,7 +1763,7 @@
                 </div>
                 <div className="lq-section-heading"><h2>Language notes</h2></div>
                 <section className="lq-card">
-                  <p className="lq-muted">Beginner: pronunciation hints and simple words. Intermediate: longer phrases and fewer hints. Advanced: natural sentences and more independent practice. You can change your level in your profile.</p>
+                  <p className="lq-muted"><strong>Beginner</strong> includes pronunciation hints and familiar words. <strong>Intermediate</strong> brings longer phrases and fewer hints. <strong>Advanced</strong> offers more natural sentences and independent practice. You can change your level any time in your profile.</p>
                 </section>
               </>
             );
@@ -1772,12 +1772,12 @@
           if (gameDone) {
             return (
               <>
-                <PageHeader kicker="Practice complete" title="Look at you, showing up!" copy="Every round gives your new language a little more room to grow." />
+                <PageHeader kicker="That's a round done" title="Thanks for practising." copy="Here's how you did. Every answer—including the tricky ones—helps you learn." />
                 <section className="lq-card" style={{ maxWidth: 600 }}>
                   <div className="lq-stat-value">{gameScore} / {gameRound.length}</div>
-                  <p className="lq-muted">You earned experience and moved today's learning goal forward. Mistakes are part of learning—you're doing great.</p>
-                  <button className="lq-primary" onClick={() => beginGame(gameMode)} type="button">Try another round →</button>
-                  <button className="lq-secondary" style={{ marginLeft: 8 }} onClick={() => { setGameRound([]); setGameDone(false); }} type="button">Back to activities</button>
+                  <p className="lq-muted">You earned some XP and made progress on today's goal. If a few answers were tricky, you can always come back to them.</p>
+                  <button className="lq-primary" onClick={() => beginGame(gameMode)} type="button">Play another round →</button>
+                  <button className="lq-secondary" style={{ marginLeft: 8 }} onClick={() => { setGameRound([]); setGameDone(false); }} type="button">Choose another activity</button>
                 </section>
               </>
             );
@@ -1786,12 +1786,12 @@
           if (gameMode === "match") {
             return (
               <>
-                <PageHeader kicker="Word game · Match pairs" title="Find the matching meanings." copy={`${gameScore} of ${gameRound.length} pairs found. Pick one word from each column.`} action={<button className="lq-secondary" onClick={() => { setGameRound([]); }} type="button">Exit activity</button>} />
+                <PageHeader kicker="Match the words" title="Which words go together?" copy={`${gameScore} of ${gameRound.length} pairs matched. Choose one word from each side.`} action={<button className="lq-secondary" onClick={() => { setGameRound([]); }} type="button">Leave activity</button>} />
                 <div className="lq-two-col">
                   <section className="lq-card"><h2 className="lq-card-title">In {language}</h2><div className="lq-challenge-list" style={{ marginTop: 14 }}>{gameRound.map((item) => <button className={`lq-game-card${matchedPairs.includes(item.meaning) ? " correct" : ""}`} style={{ minHeight: 48, justifyContent: "center", background: matchedPairs.includes(item.meaning) ? "#eef7ee" : matchLeft === item.meaning ? "#f2f6e9" : "" }} key={item.word} onClick={() => chooseMatch("left", item.meaning)} disabled={matchedPairs.includes(item.meaning)} type="button">{item.word}</button>)}</div></section>
                   <section className="lq-card"><h2 className="lq-card-title">In English</h2><div className="lq-challenge-list" style={{ marginTop: 14 }}>{matchOptions.map((meaning) => <button className="lq-game-card" style={{ minHeight: 48, justifyContent: "center", background: matchedPairs.includes(meaning) ? "#eef7ee" : matchRight === meaning ? "#f2f6e9" : "" }} key={meaning} onClick={() => chooseMatch("right", meaning)} disabled={matchedPairs.includes(meaning)} type="button">{meaning}</button>)}</div></section>
                 </div>
-                <p className="lq-muted" role="status">{gameNote || "Take your time. You can do this."}</p>
+                <p className="lq-muted" role="status">{gameNote || "Pick a word on each side. No rush."}</p>
               </>
             );
           }
@@ -1799,12 +1799,12 @@
           if (gameMode === "flashcards") {
             return (
               <>
-                <PageHeader kicker="Vocabulary · Flashcards" title="Let the words sink in." copy={`Card ${gameIndex + 1} of ${gameRound.length} · Take a guess before flipping.`} />
+                <PageHeader kicker="Flashcards" title="A quick way to review." copy={`Card ${gameIndex + 1} of ${gameRound.length} · Try to remember the meaning before you turn it over.`} />
                 <section className="lq-practice-card" style={{ maxWidth: 620, textAlign: "center" }}>
                   <p className="lq-kicker">{language} · {currentQuestion.hint}</p>
                   <h2 className="lq-target-text">{flashRevealed ? currentQuestion.meaning : currentQuestion.word}</h2>
-                  {!flashRevealed ? <button className="lq-primary" style={{ marginTop: 19 }} onClick={() => { setFlashRevealed(true); playAudio(currentQuestion.word); }} type="button">Flip to see the meaning</button> : <div style={{ display: "flex", marginTop: 18, justifyContent: "center", gap: 9 }}><button className="lq-secondary" onClick={() => markFlashcard(false)} type="button">I'll review this one</button><button className="lq-primary" onClick={() => markFlashcard(true)} type="button">I knew it ✓</button></div>}
-                  <p className="lq-muted" style={{ marginTop: 18 }}>A card you review is still a win—come back to it whenever you're ready.</p>
+                  {!flashRevealed ? <button className="lq-primary" style={{ marginTop: 19 }} onClick={() => { setFlashRevealed(true); playAudio(currentQuestion.word); }} type="button">Show me the meaning</button> : <div style={{ display: "flex", marginTop: 18, justifyContent: "center", gap: 9 }}><button className="lq-secondary" onClick={() => markFlashcard(false)} type="button">I'll practise this one</button><button className="lq-primary" onClick={() => markFlashcard(true)} type="button">I remembered it ✓</button></div>}
+                  <p className="lq-muted" style={{ marginTop: 18 }}>Forgot it? That's okay. Seeing a word again is how it starts to stick.</p>
                 </section>
               </>
             );
@@ -1861,7 +1861,7 @@
               : "Nice work. Listening and repeating is a great way to build confidence.";
           return (
             <>
-              <PageHeader kicker={`${language} · ${profile.difficulty} speaking`} title="Say it out loud." copy="Listen first, then try saying the phrase. We'll show an approximate word-match from your browser's speech recognition." />
+              <PageHeader kicker={`${language} · ${profile.difficulty}`} title="Let's practise saying a phrase." copy="Listen, then say it or type it below. Your browser checks which words it recognises, so the match is only a rough guide—not a pronunciation grade." />
               {storageNotice && <div className="lq-notice" role="status">{storageNotice}</div>}
               <div className="lq-speak-layout">
                 <section className="lq-speak-target">
@@ -1877,11 +1877,11 @@
                 </section>
                 <section className="lq-mic-panel">
                   <button className={`lq-mic-button${speechState === "listening" ? " listening" : ""}`} onClick={() => startListening(currentPhrase.target)} type="button" aria-label={speechState === "listening" ? "Stop recording" : "Start speaking"}>🎙️</button>
-                  <p className="lq-mic-title">{speechState === "listening" ? "Listening…" : speechState === "analyzing" ? "Checking the transcript…" : "Tap and say the phrase"}</p>
-                  <p className="lq-mic-hint">{speechSupported ? "Your browser may ask for microphone permission. You can also type below." : "Microphone speech recognition isn't available. You can still practise by listening and typing."}</p>
-                  <label className="lq-transcript-label" htmlFor="speak-transcript">What did you say?</label>
-                  <textarea id="speak-transcript" className="lq-textarea" value={transcript} onChange={(event) => setTranscript(event.target.value)} placeholder="Your recognized words will appear here…" />
-                  <button className="lq-primary" style={{ width: "100%", marginTop: 8 }} onClick={() => analyzeTypedSpeech(currentPhrase.target)} disabled={!transcript.trim() || speechState !== "idle"} type="button">Check my attempt</button>
+                  <p className="lq-mic-title">{speechState === "listening" ? "I'm listening…" : speechState === "analyzing" ? "One moment…" : "Tap the microphone when you're ready"}</p>
+                  <p className="lq-mic-hint">{speechSupported ? "Your browser may ask to use your microphone. Prefer not to? You can type instead." : "Your browser doesn't offer speech recognition here, but you can still listen and type."}</p>
+                  <label className="lq-transcript-label" htmlFor="speak-transcript">Type what you said</label>
+                  <textarea id="speak-transcript" className="lq-textarea" value={transcript} onChange={(event) => setTranscript(event.target.value)} placeholder="Your words will show up here…" />
+                  <button className="lq-primary" style={{ width: "100%", marginTop: 8 }} onClick={() => analyzeTypedSpeech(currentPhrase.target)} disabled={!transcript.trim() || speechState !== "idle"} type="button">See how it went</button>
                 </section>
               </div>
               {speechMessage && <div className="lq-notice" style={{ marginTop: 14 }} role="status">{speechMessage}</div>}
@@ -1889,16 +1889,16 @@
                 <section className="lq-feedback-card" aria-live="polite">
                   <div className="lq-score-row">
                     <div className="lq-score-circle">{speechFeedback.score}%</div>
-                    <div><strong style={{ color: "#3f6746" }}>{speechFeedback.score >= 90 ? "Lovely clarity!" : speechFeedback.score >= 70 ? "You're getting there!" : "Good first try!"}</strong><p className="lq-muted" style={{ margin: "4px 0 0" }}>Approximate speech-to-text match · not a scientific pronunciation score</p></div>
+                    <div><strong style={{ color: "#3f6746" }}>{speechFeedback.score >= 90 ? "Most of the words came through!" : speechFeedback.score >= 70 ? "A good start—keep going!" : "Thanks for giving it a try!"}</strong><p className="lq-muted" style={{ margin: "4px 0 0" }}>This is only a rough match of the words your browser heard. It isn't a pronunciation grade.</p></div>
                   </div>
-                  <p className="lq-muted"><strong>We heard:</strong> {speechFeedback.heard || "No clear words recognized."}</p>
-                  <p className="lq-muted"><strong>Target:</strong> {speechFeedback.target}</p>
+                  <p className="lq-muted"><strong>Your attempt:</strong> {speechFeedback.heard || "We couldn't make out any words this time."}</p>
+                  <p className="lq-muted"><strong>Phrase to practise:</strong> {speechFeedback.target}</p>
                   <div className="lq-word-feedback">{speechFeedback.matched.map((word, index) => <span className="lq-word-chip" key={`${word}-${index}`}>✓ {word}</span>)}{speechFeedback.missing.map((word, index) => <span className="lq-word-chip missed" key={`miss-${word}-${index}`}>Practice: {word}</span>)}{speechFeedback.extra.map((word, index) => <span className="lq-word-chip missed" key={`extra-${word}-${index}`}>Extra: {word}</span>)}</div>
                   <p className="lq-muted" style={{ marginBottom: 0 }}>{tip}</p>
                   {speechFeedback.missing.length > 0 && <button className="lq-secondary" style={{ marginTop: 12 }} onClick={() => { const word = speechFeedback.missing[0]; setTranscript(""); setSpeechFeedback(null); setSpeechMessage(`Practise this word, then try the phrase again: ${word}`); playAudio(word); }} type="button">Practise a tricky word</button>}
                 </section>
               )}
-              {!speechSupported && <p className="lq-muted" style={{ marginTop: 12 }}>Microphone access is unavailable in this browser. You can still listen and type your attempt to receive approximate word feedback.</p>}
+              {!speechSupported && <p className="lq-muted" style={{ marginTop: 12 }}>Speech recognition isn't available in this browser. You can still listen to the phrase and type your attempt.</p>}
             </>
           );
         }
@@ -1907,18 +1907,18 @@
           if (conversationFinished) {
             return (
               <>
-                <PageHeader kicker="Conversation complete" title="You kept the conversation going!" copy="Speaking up takes courage. You did a lovely job practising." />
+                <PageHeader kicker="Conversation finished" title="You made it through the chat." copy="Nice work sticking with it. You can look back at your replies or try another scene." />
                 <section className="lq-card" style={{ maxWidth: 680 }}>
                   <div className="lq-chat">{conversationMessages.map((message, index) => <div className={`lq-chat-bubble${message.from === "you" ? " user" : ""}`} key={`${index}-${message.text}`}><span className="lq-chat-speaker">{message.from === "you" ? profile.name : "Your conversation partner"}</span>{message.text}</div>)}</div>
-                  <p className="lq-muted" style={{ marginTop: 17 }}>Speech feedback is approximate and based on browser speech-to-text, not a phoneme-level accent assessment.</p>
-                  <button className="lq-primary" onClick={startConversation} type="button">Have another conversation</button>
+                  <p className="lq-muted" style={{ marginTop: 17 }}>The word-match is a rough guide from your browser, not a score for your accent or pronunciation.</p>
+                  <button className="lq-primary" onClick={startConversation} type="button">Try another conversation</button>
                 </section>
               </>
             );
           }
           return (
             <>
-              <PageHeader kicker={`${language} · Guided conversation`} title="A friendly little chat." copy="Choose a scene, listen to your conversation partner, then reply with your voice or by typing." />
+              <PageHeader kicker={`${language} · Conversation practice`} title="Have a short conversation." copy="Choose a scene, listen to the other person, and reply in your own words—or use the suggested phrase if you need a hand." />
               <div className="lq-form-field" style={{ maxWidth: 300 }}>
                 <label className="lq-form-label" htmlFor="conversation-scenario">Choose a scene</label>
                 <select id="conversation-scenario" className="lq-select" value={conversationScenario} onChange={(event) => { setConversationScenario(event.target.value); setConversationTurn(0); setConversationMessages([]); setConversationAnswer(""); }}>
@@ -1955,12 +1955,12 @@
         function renderChallenges() {
           return (
             <>
-              <PageHeader kicker="Your own pace, your own progress" title="Today's little goals." copy="Four gentle challenges. Finish them all for a 50 XP bonus—no worries if you save some for tomorrow." />
+              <PageHeader kicker="A few ideas for today" title="Your daily goals." copy="Try these four small activities when you have time. Finish all four to earn 50 bonus XP; it's fine to leave some for another day." />
               <section className="lq-card" style={{ maxWidth: 720 }}>
                 <div className="lq-card-heading"><h2 className="lq-card-title">{dailyComplete ? "All done for today!" : `${Object.values(daily.checks).filter(Boolean).length} of ${tasks.length} goals complete`}</h2><span className="lq-pill">+50 bonus XP</span></div>
                 <div className="lq-progress-track"><div className="lq-progress-fill" style={{ width: `${Object.values(daily.checks).filter(Boolean).length / tasks.length * 100}%` }} /></div>
                 <div className="lq-challenge-list">{tasks.map((task) => <div className="lq-check-row" key={task.id}><span className={`lq-check-icon${daily.checks[task.id] ? " done" : ""}`}>{daily.checks[task.id] ? "✓" : ""}</span><span>{task.text}</span><span className="lq-muted" style={{ marginLeft: "auto" }}>{daily.checks[task.id] ? "Done" : "Whenever you're ready"}</span></div>)}</div>
-                <p className="lq-muted" style={{ marginTop: 17 }}>Your streak grows when you practice. Missing a day just means you can start again—no guilt, just one word at a time.</p>
+                <p className="lq-muted" style={{ marginTop: 17 }}>Your streak counts days you practise. If you miss a day, you can simply pick it up again when you're ready.</p>
               </section>
             </>
           );
