@@ -1,0 +1,302 @@
+:root {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #000;
+  background: #fff;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  font-size: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: #fff;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 3px;
+}
+
+.page-shell {
+  width: min(100% - 36px, 620px);
+  margin: 0 auto;
+}
+
+.topbar {
+  padding: 36px 0 24px;
+  border-bottom: 1px solid #000;
+}
+
+.brand {
+  color: #000;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.todo-card {
+  padding: 42px 0 0;
+}
+
+.card-heading {
+  margin-bottom: 28px;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  font-size: 12px;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 0;
+  font-size: clamp(28px, 6vw, 36px);
+  letter-spacing: -1px;
+}
+
+h1 span {
+  font-weight: 400;
+}
+
+.add-form {
+  display: flex;
+  gap: 10px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.add-form input {
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #000;
+  border-radius: 0;
+  background: #fff;
+  color: #000;
+}
+
+.add-form input::placeholder {
+  color: #000;
+  opacity: 0.55;
+}
+
+.add-button {
+  flex: 0 0 auto;
+  padding: 0 18px;
+  border: 1px solid #000;
+  border-radius: 0;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+}
+
+.add-button:hover:not(:disabled) {
+  background: #fff;
+  color: #000;
+}
+
+.add-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.add-button span {
+  display: none;
+}
+
+.list-toolbar {
+  display: flex;
+  min-height: 66px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+  border-bottom: 1px solid #000;
+}
+
+.list-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.list-heading h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.task-count {
+  font-size: 12px;
+}
+
+.filters {
+  display: flex;
+  gap: 12px;
+}
+
+.filter-button {
+  padding: 7px 0;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.filter-button.is-selected {
+  border-bottom-color: #000;
+  font-weight: 700;
+}
+
+.todo-list {
+  min-height: 120px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.todo-item {
+  display: flex;
+  min-height: 58px;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid rgb(0 0 0 / 20%);
+}
+
+.todo-check {
+  display: grid;
+  width: 19px;
+  height: 19px;
+  flex: 0 0 auto;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #000;
+  border-radius: 0;
+  background: #fff;
+  color: #000;
+  cursor: pointer;
+}
+
+.is-completed .todo-check {
+  background: #000;
+  color: #fff;
+}
+
+.todo-text {
+  flex: 1;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.is-completed .todo-text {
+  text-decoration: line-through;
+}
+
+.remove-button {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.remove-button:hover {
+  background: #000;
+  color: #fff;
+}
+
+.empty-state {
+  min-height: 150px;
+  padding: 40px 0;
+}
+
+.empty-icon {
+  display: none;
+}
+
+.empty-title {
+  margin-bottom: 6px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.empty-copy {
+  margin-bottom: 0;
+  font-size: 13px;
+}
+
+.card-footer {
+  display: flex;
+  min-height: 50px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid #000;
+  font-size: 12px;
+}
+
+.keyboard-hint {
+  display: none;
+}
+
+.page-caption {
+  margin: 28px 0;
+  font-size: 12px;
+}
+
+@media (max-width: 480px) {
+  .page-shell {
+    width: min(100% - 28px, 620px);
+  }
+
+  .topbar {
+    padding-top: 24px;
+  }
+
+  .todo-card {
+    padding-top: 30px;
+  }
+
+  .list-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    padding: 12px 0;
+  }
+
+  .filters {
+    gap: 16px;
+  }
+}

@@ -1,0 +1,310 @@
+:root {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #000;
+  background: #fff;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  font-size: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: #fff;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  color: #000;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 3px;
+}
+
+.page {
+  width: min(100% - 36px, 650px);
+  margin: 0 auto;
+}
+
+.page-header {
+  padding: 46px 0 30px;
+  border-bottom: 1px solid #000;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 8px;
+  font-size: clamp(30px, 6vw, 38px);
+  letter-spacing: -1px;
+}
+
+.intro {
+  margin: 0;
+  font-size: 14px;
+}
+
+.planner {
+  padding-top: 28px;
+}
+
+.date-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #000;
+}
+
+.date-navigation {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.date-navigation h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.date-label {
+  margin: 0 0 3px;
+  font-size: 12px;
+}
+
+.day-button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #000;
+  border-radius: 0;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.day-button:hover,
+.day-button:focus-visible {
+  background: #000;
+  color: #fff;
+}
+
+.date-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.date-tools input {
+  padding: 8px;
+  border: 1px solid #000;
+  border-radius: 0;
+  background: #fff;
+  color: #000;
+}
+
+.text-button,
+.edit-button,
+.delete-button {
+  padding: 6px 8px;
+  border: 1px solid #000;
+  border-radius: 0;
+  background: #fff;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.text-button:hover,
+.edit-button:hover,
+.delete-button:hover {
+  background: #000;
+  color: #fff;
+}
+
+.task-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 26px 0 14px;
+}
+
+.task-heading h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.task-heading span {
+  font-size: 13px;
+}
+
+.task-form,
+.edit-form {
+  display: flex;
+  gap: 8px;
+}
+
+.task-form input,
+.edit-form input {
+  width: 100%;
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid #000;
+  border-radius: 0;
+  background: #fff;
+  color: #000;
+}
+
+.task-form input::placeholder {
+  color: #000;
+  opacity: 0.55;
+}
+
+.task-form button,
+.edit-form button {
+  flex: 0 0 auto;
+  padding: 0 14px;
+  border: 1px solid #000;
+  border-radius: 0;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.task-form button:hover:not(:disabled),
+.edit-form button:hover:not(:disabled) {
+  background: #fff;
+  color: #000;
+}
+
+.task-form button:disabled,
+.edit-form button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.task-list {
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.task-row {
+  display: flex;
+  min-height: 56px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid rgb(0 0 0 / 25%);
+  font-size: 14px;
+}
+
+.task-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 6px;
+}
+
+.edit-form {
+  width: 100%;
+  padding: 8px 0;
+}
+
+.edit-form .secondary-button {
+  border: 1px solid #000;
+  background: #fff;
+  color: #000;
+}
+
+.empty-state {
+  padding: 28px 0;
+}
+
+.empty-state p {
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.empty-state p + p {
+  font-size: 13px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.page-footer {
+  margin-top: 28px;
+  padding: 14px 0;
+  border-top: 1px solid #000;
+  font-size: 12px;
+}
+
+@media (max-width: 520px) {
+  .page {
+    width: min(100% - 28px, 650px);
+  }
+
+  .page-header {
+    padding-top: 32px;
+  }
+
+  .date-section {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .date-tools {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .date-tools input {
+    max-width: 100%;
+  }
+
+  .task-row {
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10px 0;
+  }
+
+  .edit-form {
+    flex-wrap: wrap;
+  }
+
+  .edit-form input {
+    flex-basis: 100%;
+  }
+}
