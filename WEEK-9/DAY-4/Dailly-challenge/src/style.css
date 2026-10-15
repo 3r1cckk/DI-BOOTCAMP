@@ -1,0 +1,367 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
+
+:root {
+  font-family: 'DM Sans', sans-serif;
+  color: #25332f;
+  background: #f5f6f3;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-size: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(ellipse at 50% 45%, rgb(229 237 227 / 55%), transparent 55%),
+    #f5f6f3;
+}
+
+button,
+a {
+  font: inherit;
+}
+
+.page-shell {
+  width: min(100% - 64px, 1080px);
+  margin: 0 auto;
+}
+
+.topbar {
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e4e8e1;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  color: #27352e;
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.brand-mark {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #e4ede2;
+  color: #547c5d;
+  font-family: 'Manrope', sans-serif;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.topbar-note,
+.eyebrow,
+.section-label,
+.age-card-label {
+  color: #849088;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.content {
+  width: min(100%, 500px);
+  margin: 90px auto 72px;
+}
+
+.intro {
+  margin-bottom: 32px;
+}
+
+.eyebrow {
+  margin: 0 0 12px;
+  color: #718b71;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 10px;
+  color: #28362f;
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(38px, 6vw, 52px);
+  line-height: 1.08;
+  letter-spacing: -0.06em;
+}
+
+h1 span {
+  color: #86a17e;
+}
+
+.intro-copy {
+  margin-bottom: 0;
+  color: #7d8980;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.age-card {
+  position: relative;
+  overflow: hidden;
+  padding: 28px 30px 24px;
+  border: 1px solid #e5e9e1;
+  border-radius: 18px;
+  background: rgb(255 255 255 / 86%);
+  box-shadow: 0 18px 50px rgb(52 72 53 / 6%);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.age-card.is-loading {
+  border-color: #c9dac7;
+  box-shadow: 0 18px 50px rgb(52 95 62 / 10%);
+}
+
+.age-card-topline {
+  display: flex;
+  min-height: 22px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.age-card-label {
+  font-size: 10px;
+}
+
+.update-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #688268;
+  font-size: 11px;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.update-indicator.is-visible {
+  opacity: 1;
+}
+
+.spinner {
+  width: 13px;
+  height: 13px;
+  border: 2px solid #dfe9dc;
+  border-top-color: #73936d;
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+}
+
+.age-value-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 20px 0 21px;
+}
+
+.age-value {
+  color: #354b38;
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(82px, 17vw, 118px);
+  font-weight: 600;
+  line-height: 0.96;
+  letter-spacing: -0.09em;
+  font-variant-numeric: tabular-nums;
+  transition: opacity 150ms ease;
+}
+
+.is-loading .age-value {
+  opacity: 0.62;
+}
+
+.age-unit {
+  color: #8a958c;
+  font-size: 14px;
+}
+
+.age-progress {
+  height: 3px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: #edf0ea;
+}
+
+.age-progress span {
+  width: 38%;
+  height: 100%;
+  display: block;
+  border-radius: inherit;
+  background: #a7bd9e;
+  transition: width 250ms ease;
+}
+
+.is-loading .age-progress span {
+  width: 66%;
+  animation: progress 700ms ease-in-out infinite alternate;
+}
+
+.age-caption {
+  margin: 14px 0 0;
+  color: #9aa39a;
+  font-size: 12px;
+}
+
+.controls {
+  margin-top: 31px;
+}
+
+.section-label {
+  margin: 0 0 12px;
+  font-size: 10px;
+}
+
+.control-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 11px;
+}
+
+.age-button {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 18px;
+  border: 1px solid #dfe5db;
+  border-radius: 11px;
+  background: #fff;
+  color: #49594b;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
+}
+
+.age-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: #afc4a8;
+  background: #fbfdf9;
+}
+
+.age-button-up {
+  border-color: #6f9470;
+  background: #718f6e;
+  color: #fff;
+}
+
+.age-button-up:hover:not(:disabled) {
+  border-color: #587b5b;
+  background: #638363;
+}
+
+.age-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.button-icon {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.control-hint {
+  margin: 12px 0 0;
+  color: #9aa39a;
+  font-size: 11px;
+  text-align: center;
+}
+
+.page-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 44px;
+  color: #929d92;
+  font-size: 12px;
+}
+
+.footer-mark {
+  color: #8ca887;
+  font-size: 16px;
+}
+
+.age-button:focus-visible,
+.brand:focus-visible {
+  outline: 3px solid #9ab896;
+  outline-offset: 3px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes progress {
+  from {
+    transform: translateX(-45%);
+  }
+
+  to {
+    transform: translateX(105%);
+  }
+}
+
+@media (max-width: 600px) {
+  .page-shell {
+    width: min(100% - 36px, 1080px);
+  }
+
+  .topbar {
+    height: 72px;
+  }
+
+  .topbar-note {
+    font-size: 8px;
+  }
+
+  .content {
+    margin-top: 66px;
+  }
+
+  .age-card {
+    padding: 24px 21px 21px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
