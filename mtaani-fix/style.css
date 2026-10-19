@@ -1,0 +1,836 @@
+/* ================================
+   MTAAFİX - MAIN STYLES
+   ================================ */
+
+:root {
+    --green: #168a4a;
+    --dark-green: #0d6335;
+    --light-green: #eaf7ef;
+    --text: #17231c;
+    --muted: #68756d;
+    --white: #ffffff;
+    --background: #f8fbf9;
+    --border: #e1e9e4;
+    --shadow: 0 12px 35px rgba(20, 70, 40, 0.10);
+}
+
+
+/* ================================
+   GENERAL
+   ================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--text);
+    background: var(--background);
+    line-height: 1.6;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+
+/* ================================
+   NAVIGATION
+   ================================ */
+
+.navbar {
+    width: 100%;
+    padding: 20px 7%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: 800;
+    color: var(--dark-green);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.navbar nav {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.navbar nav a {
+    color: #536159;
+    font-size: 15px;
+    font-weight: 600;
+    transition: 0.3s ease;
+}
+
+.navbar nav a:hover {
+    color: var(--green);
+}
+
+.navbar nav a.active {
+    color: var(--green);
+}
+
+.login-btn {
+    background: var(--green);
+    color: var(--white) !important;
+    padding: 10px 22px;
+    border-radius: 8px;
+}
+
+.login-btn:hover {
+    background: var(--dark-green);
+    transform: translateY(-2px);
+}
+
+
+/* ================================
+   HERO SECTION
+   ================================ */
+
+.hero {
+    min-height: 650px;
+    padding: 80px 7%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 60px;
+    background:
+        radial-gradient(
+            circle at 90% 20%,
+            #e4f5ea 0,
+            transparent 35%
+        ),
+        var(--background);
+}
+
+.hero-content {
+    max-width: 600px;
+}
+
+.welcome {
+    color: var(--green);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 18px;
+}
+
+.hero h1 {
+    font-size: clamp(45px, 6vw, 72px);
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin-bottom: 25px;
+}
+
+.hero-text {
+    max-width: 520px;
+    color: var(--muted);
+    font-size: 18px;
+    margin-bottom: 35px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-block;
+    padding: 14px 24px;
+    border-radius: 9px;
+    font-weight: 700;
+    transition: 0.3s ease;
+}
+
+.primary-btn {
+    background: var(--green);
+    color: var(--white);
+    box-shadow: 0 8px 20px rgba(22, 138, 74, 0.20);
+}
+
+.primary-btn:hover {
+    background: var(--dark-green);
+    transform: translateY(-3px);
+}
+
+.secondary-btn {
+    background: var(--white);
+    color: var(--green);
+    border: 1px solid var(--green);
+}
+
+.secondary-btn:hover {
+    background: var(--light-green);
+    transform: translateY(-3px);
+}
+
+
+/* ================================
+   COMMUNITY MAP
+   ================================ */
+
+.hero-visual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.map-card {
+    width: min(100%, 500px);
+    background: var(--white);
+    border-radius: 22px;
+    padding: 18px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    transform: rotate(1deg);
+}
+
+.map-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px 15px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--dark-green);
+}
+
+.map {
+    height: 360px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 15px;
+    background:
+        linear-gradient(25deg, transparent 45%, #dce8e0 46%, #dce8e0 49%, transparent 50%),
+        linear-gradient(145deg, transparent 47%, #dce8e0 48%, #dce8e0 51%, transparent 52%),
+        #eef6f0;
+}
+
+/* Roads */
+
+.road {
+    position: absolute;
+    background: #ffffff;
+    box-shadow: 0 0 0 1px #d9e5dc;
+}
+
+.road-one {
+    width: 120%;
+    height: 42px;
+    top: 42%;
+    left: -10%;
+    transform: rotate(-18deg);
+}
+
+.road-two {
+    width: 42px;
+    height: 120%;
+    top: -10%;
+    left: 55%;
+    transform: rotate(25deg);
+}
+
+/* Map pins */
+
+.map-pin {
+    position: absolute;
+    font-size: 30px;
+    filter: drop-shadow(0 4px 5px rgba(0, 0, 0, 0.15));
+    animation: floatPin 3s ease-in-out infinite;
+}
+
+.pin-one {
+    top: 20%;
+    left: 20%;
+}
+
+.pin-two {
+    top: 28%;
+    right: 20%;
+    animation-delay: 0.5s;
+}
+
+.pin-three {
+    bottom: 18%;
+    left: 38%;
+    animation-delay: 1s;
+}
+
+.pin-four {
+    bottom: 25%;
+    right: 15%;
+    animation-delay: 1.5s;
+}
+
+@keyframes floatPin {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-7px);
+    }
+}
+
+
+/* ================================
+   PROBLEMS SECTION
+   ================================ */
+
+.problems {
+    padding: 90px 7%;
+    background: var(--white);
+}
+
+.section-heading {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.section-heading p {
+    color: var(--green);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+}
+
+.section-heading h2 {
+    font-size: 38px;
+    line-height: 1.2;
+}
+
+.problem-grid {
+    max-width: 1100px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+}
+
+.problem-card {
+    padding: 30px;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    transition: 0.3s ease;
+}
+
+.problem-card:hover {
+    transform: translateY(-7px);
+    box-shadow: var(--shadow);
+    border-color: #c9dfd0;
+}
+
+.problem-icon {
+    width: 55px;
+    height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--light-green);
+    border-radius: 12px;
+    font-size: 27px;
+    margin-bottom: 20px;
+}
+
+.problem-card h3 {
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+.problem-card p {
+    color: var(--muted);
+    font-size: 15px;
+}
+
+
+/* ================================
+   HOW IT WORKS
+   ================================ */
+
+.how-it-works {
+    padding: 90px 7%;
+    background: var(--light-green);
+}
+
+.steps {
+    max-width: 1000px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+.step {
+    text-align: center;
+    padding: 25px;
+}
+
+.step-number {
+    width: 65px;
+    height: 65px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--green);
+    color: var(--white);
+    border-radius: 50%;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.step h3 {
+    font-size: 21px;
+    margin-bottom: 8px;
+}
+
+.step p {
+    color: var(--muted);
+    font-size: 15px;
+}
+
+
+/* ================================
+   FOOTER
+   ================================ */
+
+footer {
+    padding: 45px 7%;
+    text-align: center;
+    background: #10271a;
+    color: var(--white);
+}
+
+.footer-logo {
+    font-size: 23px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+footer p {
+    color: #b8c9bd;
+}
+
+.copyright {
+    margin-top: 20px;
+    font-size: 13px;
+}
+
+
+/* ================================
+   RESPONSIVE DESIGN
+   ================================ */
+
+@media (max-width: 900px) {
+
+    .hero {
+        grid-template-columns: 1fr;
+        text-align: center;
+        padding-top: 60px;
+    }
+
+    .hero-content {
+        margin: auto;
+    }
+
+    .hero-text {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-buttons {
+        justify-content: center;
+    }
+
+    .hero-visual {
+        margin-top: 20px;
+    }
+
+    .problem-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+@media (max-width: 650px) {
+
+    .navbar {
+        padding: 16px 5%;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .navbar nav {
+        gap: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .navbar nav a {
+        font-size: 13px;
+    }
+
+    .hero {
+        padding: 55px 5%;
+        min-height: auto;
+    }
+
+    .hero h1 {
+        font-size: 45px;
+        letter-spacing: -1px;
+    }
+
+    .hero-text {
+        font-size: 16px;
+    }
+
+    .map {
+        height: 280px;
+    }
+
+    .problems,
+    .how-it-works {
+        padding: 65px 5%;
+    }
+
+    .section-heading h2 {
+        font-size: 30px;
+    }
+
+    .problem-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .steps {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    footer {
+        padding: 40px 5%;
+    }
+}
+/* ================================
+   REPORT PAGE
+   ================================ */
+
+.report-page {
+    min-height: 750px;
+    padding: 80px 7%;
+    background: var(--background);
+}
+
+.report-container {
+    max-width: 800px;
+    margin: auto;
+}
+
+.report-heading {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.report-heading > p:first-child {
+    color: var(--green);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.report-heading h1 {
+    font-size: 45px;
+    margin: 10px 0 15px;
+}
+
+.report-description {
+    max-width: 600px;
+    margin: auto;
+    color: var(--muted);
+}
+
+.report-form {
+    background: var(--white);
+    padding: 40px;
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.form-group label span {
+    color: var(--muted);
+    font-weight: 400;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 14px 15px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: #fbfdfc;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 15px;
+    outline: none;
+    transition: 0.3s ease;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(22, 138, 74, 0.10);
+}
+
+.form-group input[type="file"] {
+    padding: 11px;
+    background: var(--white);
+}
+
+.form-group small {
+    display: block;
+    margin-top: 7px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.report-submit {
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+
+/* Report page mobile */
+
+@media (max-width: 650px) {
+
+    .report-page {
+        padding: 55px 5%;
+    }
+
+    .report-heading h1 {
+        font-size: 36px;
+    }
+
+    .report-form {
+        padding: 25px;
+    }
+}
+/* ================================
+   REPORTS PAGE
+   ================================ */
+
+.reports-page {
+    min-height: 750px;
+    padding: 80px 7%;
+    background: var(--background);
+}
+
+.reports-heading {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 35px;
+}
+
+.reports-heading p:first-child {
+    color: var(--green);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.reports-heading h1 {
+    font-size: 45px;
+    margin: 10px 0 15px;
+}
+
+.reports-heading p:last-child {
+    color: var(--muted);
+}
+
+
+/* Filters */
+
+.report-filters {
+    max-width: 1000px;
+    margin: 0 auto 35px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--white);
+    color: var(--muted);
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.filter-btn:hover {
+    color: var(--green);
+    border-color: var(--green);
+}
+
+.active-filter {
+    background: var(--green);
+    color: var(--white);
+    border-color: var(--green);
+}
+
+
+/* Reports Grid */
+
+.reports-grid {
+    max-width: 1100px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+}
+
+.report-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 25px;
+    transition: 0.3s ease;
+}
+
+.report-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow);
+}
+
+.report-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.category-badge {
+    padding: 7px 11px;
+    background: var(--light-green);
+    color: var(--dark-green);
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.status {
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.status.reported {
+    background: #fff4d6;
+    color: #8a6500;
+}
+
+.status.progress {
+    background: #e7f0ff;
+    color: #315fa5;
+}
+
+.status.solved {
+    background: #e5f7eb;
+    color: #168a4a;
+}
+
+.report-card h2 {
+    font-size: 21px;
+    margin-bottom: 7px;
+}
+
+.report-location {
+    color: var(--green);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.report-card-description {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+.report-card-bottom {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 15px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+}
+
+
+/* Reports mobile */
+
+@media (max-width: 700px) {
+
+    .reports-page {
+        padding: 55px 5%;
+    }
+
+    .reports-heading h1 {
+        font-size: 36px;
+    }
+
+    .reports-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .report-card-top {
+        align-items: flex-start;
+    }
+}

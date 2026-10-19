@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f7f8f3">
+    <meta name="description" content="Follow neighbourhood updates on the MtaaFix community board.">
+    <title>Community board — MtaaFix</title>
+    <link rel="stylesheet" href="../app.css">
+</head>
+<body class="unity-backdrop">
+    <header class="site-header">
+        <a class="brand" href="../index.html" aria-label="MtaaFix home">
+            <span class="brand-mark" aria-hidden="true">M</span>
+            <span>Mtaa<span class="brand-accent">Fix</span></span>
+        </a>
+        <nav class="site-nav" aria-label="Main navigation">
+            <a class="nav-link" href="../index.html">Home</a>
+            <a class="nav-link is-active" href="reports.html" aria-current="page">Community board</a>
+            <a class="nav-link" href="../index.html#how-it-works">How it works</a>
+            <a class="nav-link" href="login.html">Sign in</a>
+            <a class="button button-small button-dark" href="report.html">Share an issue <span aria-hidden="true">↗</span></a>
+        </nav>
+    </header>
+
+    <main class="board-page page-wrap">
+        <div class="board-heading">
+            <div>
+                <p class="eyebrow"><span class="eyebrow-dot"></span> NEIGHBOURS KEEPING NEIGHBOURS IN THE LOOP</p>
+                <h1>The community<br><em>board.</em></h1>
+                <p class="board-description">A place to see what your neighbours have noticed and follow the conversation. Every update starts with someone who cares.</p>
+            </div>
+            <a class="button button-primary" href="report.html">Share an issue <span aria-hidden="true">→</span></a>
+        </div>
+
+        <div class="board-notice" role="note">
+            <span class="notice-icon" aria-hidden="true">ⓘ</span>
+            <p><strong>Local community updates:</strong> Reports and notices are shared with neighbours in your administrative area. Please keep personal details private.</p>
+        </div>
+        <section class="community-statistics" aria-labelledby="community-statistics-title">
+            <p class="eyebrow">A QUICK LOOK AT YOUR AREA</p>
+            <h2 id="community-statistics-title">Your neighbourhood</h2>
+            <p id="community-statistics-area"></p>
+            <div class="community-statistics-totals">
+                <span><strong id="community-statistics-reports">—</strong> reports</span>
+                <span><strong id="community-statistics-solved">—</strong> solved</span>
+                <span><strong id="community-statistics-progress">—</strong> in progress</span>
+                <span><strong id="community-statistics-reported">—</strong> newly reported</span>
+            </div>
+        </section>
+        <section class="local-updates" aria-labelledby="local-updates-title">
+            <div class="local-updates-heading">
+                <p class="eyebrow">FROM YOUR LOCAL ADMINISTRATION</p>
+                <h2 id="local-updates-title">Notices for your area</h2>
+            </div>
+            <div class="announcement-list" id="local-announcement-list"></div>
+            <p class="announcement-empty" id="local-announcement-empty">Sign in to see notices for your neighbourhood.</p>
+        </section>
+        <p class="board-feedback form-feedback is-error" id="board-feedback" role="status" aria-live="polite"></p>
+
+        <section class="board-tools" aria-label="Find a community report">
+            <label class="search-box">
+                <span class="search-icon" aria-hidden="true">⌕</span>
+                <span class="sr-only">Search by issue or location</span>
+                <input type="search" id="report-search" placeholder="Search an issue or neighbourhood…" autocomplete="off">
+            </label>
+            <div class="filter-list" role="group" aria-label="Filter reports by status">
+                <button class="filter-btn is-selected" type="button" data-filter="all" aria-pressed="true">Everything</button>
+                <button class="filter-btn" type="button" data-filter="reported" aria-pressed="false">Just reported</button>
+                <button class="filter-btn" type="button" data-filter="progress" aria-pressed="false">Being worked on</button>
+                <button class="filter-btn" type="button" data-filter="solved" aria-pressed="false">Resolved</button>
+            </div>
+            <div class="report-search-filters" aria-label="More report filters">
+                <label>
+                    Category
+                    <select id="report-category-filter">
+                        <option value="">All categories</option>
+                        <option value="garbage">Waste &amp; litter</option>
+                        <option value="roads">Roads &amp; paths</option>
+                        <option value="streetlights">Streetlights</option>
+                        <option value="water">Water &amp; drainage</option>
+                        <option value="sanitation">Clean &amp; safe spaces</option>
+                        <option value="environment">Green spaces &amp; environment</option>
+                    </select>
+                </label>
+                <label>
+                    Priority
+                    <select id="report-priority-filter">
+                        <option value="">All priorities</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                </label>
+                <label>
+                    From
+                    <input id="report-date-from" type="date">
+                </label>
+                <label>
+                    To
+                    <input id="report-date-to" type="date">
+                </label>
+            </div>
+        </section>
+
+        <p class="results-count" id="results-count" aria-live="polite"></p>
+        <section class="reports-grid" id="reports-grid" aria-label="Community reports"></section>
+        <div class="empty-state" id="empty-state" hidden>
+            <strong>No neighbourhood reports yet</strong>
+            <span>Sign in to share something your neighbours should know about.</span>
+            <a href="login.html">Sign in to get started →</a>
+        </div>
+    </main>
+    <dialog class="report-details-dialog" id="report-details-dialog" aria-labelledby="report-details-title">
+        <form method="dialog"><button class="dialog-close" aria-label="Close report details">×</button></form>
+        <p class="eyebrow">REPORT DETAILS</p>
+        <h2 id="report-details-title"></h2>
+        <p id="report-details-feedback" role="status" aria-live="polite"></p>
+        <div id="report-details-content"></div>
+    </dialog>
+
+    <footer class="site-footer">
+        <div class="page-wrap footer-inner">
+            <a class="brand brand-footer" href="../index.html">
+                <span class="brand-mark" aria-hidden="true">M</span>
+                <span>Mtaa<span class="brand-accent">Fix</span></span>
+            </a>
+            <p>Looking out for the places we call home.</p>
+            <a class="footer-link" href="report.html">Share an issue <span aria-hidden="true">↗</span></a>
+            <a class="footer-link admin-dashboard-link" href="admin.html" hidden>Administrator dashboard <span aria-hidden="true">↗</span></a>
+            <small>© 2026 MtaaFix · A community project prototype</small>
+        </div>
+    </footer>
+    <script src="../script.js"></script>
+</body>
+</html>

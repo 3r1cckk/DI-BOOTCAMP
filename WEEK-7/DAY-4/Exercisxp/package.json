@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "react-responsive-carousel": "^3.2.23"
   },
   "devDependencies": {
     "@types/react": "^19.2.18",

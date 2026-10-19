@@ -1,0 +1,395 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Akiba | Chama Dashboard</title>
+  <link rel="stylesheet" href="style.css?v=workspace-designs">
+  <link rel="stylesheet" href="loading.css?v=workspace-designs">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+  <div class="app-loader" id="appLoader" role="status" aria-live="polite">
+    <div class="loading-content">
+      <div class="loader" aria-hidden="true">
+        <div class="ground"><div></div></div>
+        <div class="box box0"><div></div></div>
+        <div class="box box1"><div></div></div>
+        <div class="box box2"><div></div></div>
+        <div class="box box3"><div></div></div>
+        <div class="box box4"><div></div></div>
+        <div class="box box5"><div></div></div>
+        <div class="box box6"><div></div></div>
+        <div class="box box7"><div></div></div>
+      </div>
+      <span class="loading-label">Loading your chama dashboard</span>
+    </div>
+  </div>
+
+  <div class="app-layout">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar">
+      <a href="#" class="brand">
+        <i class="fa-solid fa-shapes"></i>
+        <span>Akiba</span>
+      </a>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-link active" data-page="Dashboard">
+          <i class="fa-solid fa-house"></i><span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-link" data-page="Members">
+          <i class="fa-solid fa-user"></i><span>Members</span>
+        </a>
+        <a href="#" class="nav-link" data-page="Contributions">
+          <i class="fa-solid fa-circle-plus"></i><span>Contributions</span>
+        </a>
+        <a href="#" class="nav-link" data-page="Loans">
+          <i class="fa-solid fa-wallet"></i><span>Loans</span>
+        </a>
+        <a href="#" class="nav-link" data-page="Transactions">
+          <i class="fa-solid fa-arrow-right-arrow-left"></i><span>Transactions</span>
+        </a>
+        <a href="#" class="nav-link" data-page="Reports">
+          <i class="fa-solid fa-chart-simple"></i><span>Reports</span>
+        </a>
+        <a href="#" class="nav-link" data-page="Settings">
+          <i class="fa-solid fa-gear"></i><span>Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <i class="fa-solid fa-people-group"></i>
+        <strong>Together We Grow</strong>
+        <span>Akiba Chama Management</span>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+      <!-- TOP BAR -->
+      <header class="topbar">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="search" id="globalSearch" placeholder="Search anything...">
+        </div>
+
+        <div class="topbar-right">
+          <button class="notification-button" id="notificationButton" aria-label="Notifications">
+            <i class="fa-regular fa-bell"></i>
+            <span class="notification-dot"></span>
+          </button>
+
+          <button class="profile-button" id="profileButton">
+            <span class="avatar">CA</span>
+            <span>Chama Admin</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- PAGE CONTENT -->
+      <div class="dashboard-content">
+        <div id="dashboardHome">
+
+        <!-- WELCOME SECTION -->
+        <section class="welcome-row">
+          <div>
+            <h1>Welcome back, Chama Admin! <span>👋</span></h1>
+            <p>Manage your chama, track savings, and grow together.</p>
+          </div>
+
+          <div class="date-card">
+            <i class="fa-regular fa-calendar-days"></i>
+            <div>
+              <strong id="currentDate">Today</strong>
+              <span>Good morning!</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- FINANCIAL SUMMARY -->
+        <section class="summary-grid">
+
+          <article class="summary-card members-card">
+            <div class="summary-icon blue-icon">
+              <i class="fa-solid fa-users"></i>
+            </div>
+            <div class="summary-info">
+              <p>Total Members</p>
+              <h2 id="totalMembers">0</h2>
+              <span class="growth"><i class="fa-solid fa-arrow-up"></i> +0 this month</span>
+            </div>
+          </article>
+
+          <article class="summary-card contributions-card">
+            <div class="summary-icon green-icon">
+              <i class="fa-solid fa-coins"></i>
+            </div>
+            <div class="summary-info">
+              <p>Total Contributions</p>
+              <h2 id="totalContributions">KES 0.00</h2>
+              <span class="growth"><i class="fa-solid fa-arrow-up"></i> +0% this month</span>
+            </div>
+          </article>
+
+          <article class="summary-card expenses-card">
+            <div class="summary-icon red-icon">
+              <i class="fa-solid fa-wallet"></i>
+            </div>
+            <div class="summary-info">
+              <p>Total Expenses</p>
+              <h2 id="totalExpenses">KES 0.00</h2>
+              <span class="growth red-growth"><i class="fa-solid fa-arrow-up"></i> +0% this month</span>
+            </div>
+          </article>
+
+          <article class="summary-card balance-card">
+            <div class="summary-icon purple-icon">
+              <i class="fa-solid fa-money-bill-transfer"></i>
+            </div>
+            <div class="summary-info">
+              <p>Available Balance</p>
+              <h2 id="availableBalance">KES 0.00</h2>
+              <span class="growth"><i class="fa-solid fa-arrow-up"></i> +0% this month</span>
+            </div>
+          </article>
+
+        </section>
+
+        <!-- QUICK ACTIONS -->
+        <section class="quick-actions-section">
+          <div class="section-heading">
+            <div>
+              <h2>Quick Actions</h2>
+              <p>Get things done quickly and easily.</p>
+            </div>
+            <a href="#" class="view-all" id="viewActions">View all <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+
+          <div class="actions-grid">
+
+            <button class="action-card action-blue" data-action="Manage Members">
+              <span class="action-icon"><i class="fa-solid fa-users"></i></span>
+              <span class="action-copy">
+                <strong>Manage Members</strong>
+                <small>Add, view and manage chama members</small>
+              </span>
+              <span class="action-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+            </button>
+
+            <button class="action-card action-green" data-action="Record Contribution">
+              <span class="action-icon"><i class="fa-solid fa-coins"></i></span>
+              <span class="action-copy">
+                <strong>Record Contribution</strong>
+                <small>Add member contributions</small>
+              </span>
+              <span class="action-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+            </button>
+
+            <button class="action-card action-purple" data-action="Manage Loans">
+              <span class="action-icon"><i class="fa-solid fa-landmark"></i></span>
+              <span class="action-copy">
+                <strong>Manage Loans</strong>
+                <small>Process and track loans</small>
+              </span>
+              <span class="action-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+            </button>
+
+            <button class="action-card action-orange" data-action="Record Transaction">
+              <span class="action-icon"><i class="fa-solid fa-arrow-right-arrow-left"></i></span>
+              <span class="action-copy">
+                <strong>Record Transaction</strong>
+                <small>Income, expenses and transfers</small>
+              </span>
+              <span class="action-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+            </button>
+
+            <button class="action-card action-pink" data-action="View Reports">
+              <span class="action-icon"><i class="fa-solid fa-chart-simple"></i></span>
+              <span class="action-copy">
+                <strong>View Reports</strong>
+                <small>Financial reports and summaries</small>
+              </span>
+              <span class="action-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+            </button>
+
+            <button class="action-card action-cyan" data-action="Chama Settings">
+              <span class="action-icon"><i class="fa-solid fa-gear"></i></span>
+              <span class="action-copy">
+                <strong>Chama Settings</strong>
+                <small>Configure your chama</small>
+              </span>
+              <span class="action-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+            </button>
+
+          </div>
+        </section>
+
+        <!-- BOTTOM PANELS -->
+        <section class="bottom-grid">
+
+          <article class="panel">
+            <div class="panel-heading">
+              <div class="panel-title">
+                <span class="panel-icon"><i class="fa-solid fa-arrow-right-arrow-left"></i></span>
+                <h3>Recent Transactions</h3>
+              </div>
+              <a href="#" class="view-all" data-page-link="Transactions">
+                View all <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+
+            <div class="empty-state" id="transactionsEmpty">
+              <span class="empty-icon"><i class="fa-solid fa-list-alt"></i></span>
+              <strong>No transactions yet</strong>
+              <p>Transactions will appear here once you start using the system.</p>
+            </div>
+
+            <div id="transactionsList" class="transactions-list"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-heading">
+              <div class="panel-title">
+                <span class="panel-icon"><i class="fa-solid fa-chart-simple"></i></span>
+                <h3>Monthly Summary</h3>
+              </div>
+              <a href="#" class="view-all" data-page-link="Reports">
+                View all <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+
+            <div class="empty-state">
+              <span class="empty-icon chart-empty-icon">
+                <i class="fa-solid fa-chart-simple"></i>
+              </span>
+              <strong id="monthlySummaryTitle">No data available</strong>
+              <p id="monthlySummaryDescription">Your monthly summary will appear here once you have recorded contributions and transactions.</p>
+            </div>
+          </article>
+
+        </section>
+
+        <footer class="dashboard-footer">
+          <span>© 2026 Akiba Chama Management</span>
+          <span>Manage together. Grow together.</span>
+        </footer>
+
+        </div>
+
+        <section class="members-page" id="membersPage" aria-labelledby="membersPageTitle" hidden>
+          <div class="members-page-heading">
+            <div>
+              <p class="members-eyebrow">Your chama community</p>
+              <h1 id="membersPageTitle">Members</h1>
+              <p>View and manage the people growing your chama together.</p>
+            </div>
+            <button class="members-add-button" id="addMemberButton" type="button">
+              <i class="fa-solid fa-plus" aria-hidden="true"></i>
+              Add member
+            </button>
+          </div>
+
+          <section class="member-stat-grid" aria-label="Member summary">
+            <article class="member-stat-card">
+              <span class="member-stat-icon member-stat-blue"><i class="fa-solid fa-users" aria-hidden="true"></i></span>
+              <div><span>Total members</span><strong id="membersPageTotal">0</strong></div>
+            </article>
+            <article class="member-stat-card">
+              <span class="member-stat-icon member-stat-purple"><i class="fa-solid fa-user-tie" aria-hidden="true"></i></span>
+              <div><span>Leadership</span><strong id="membersPageLeadership">0</strong></div>
+            </article>
+            <article class="member-stat-card">
+              <span class="member-stat-icon member-stat-green"><i class="fa-solid fa-layer-group" aria-hidden="true"></i></span>
+              <div><span>Roles represented</span><strong id="membersPageRoles">0</strong></div>
+            </article>
+          </section>
+
+          <section class="members-list-panel" aria-labelledby="memberListTitle">
+            <div class="members-list-heading">
+              <div>
+                <h2 id="memberListTitle">Member directory</h2>
+                <p><span id="memberResultCount">0</span> members in your chama</p>
+              </div>
+              <div class="member-filters">
+                <label class="member-search">
+                  <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                  <span class="visually-hidden">Search members</span>
+                  <input id="memberSearch" type="search" placeholder="Search members...">
+                </label>
+                <label>
+                  <span class="visually-hidden">Filter by role</span>
+                  <select id="memberRoleFilter">
+                    <option value="all">All roles</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+
+            <div class="members-table-wrap" id="membersTableWrap">
+              <table class="members-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Member</th>
+                    <th scope="col">Role</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Email</th>
+                    <th scope="col"><span class="visually-hidden">Actions</span></th>
+                  </tr>
+                </thead>
+                <tbody id="membersTableBody"></tbody>
+              </table>
+            </div>
+
+            <div class="members-empty-state" id="membersEmptyState" hidden>
+              <span class="members-empty-icon"><i class="fa-solid fa-user-group" aria-hidden="true"></i></span>
+              <strong id="membersEmptyTitle">No members yet</strong>
+              <p id="membersEmptyDescription">Add your first member to start building your chama directory.</p>
+              <button class="members-add-button members-empty-add" id="emptyAddMemberButton" type="button">
+                <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                Add a member
+              </button>
+            </div>
+          </section>
+        </section>
+
+        <section class="workspace-page" id="workspacePage" aria-live="polite" hidden></section>
+
+      </div>
+    </main>
+  </div>
+
+<!-- ADD MEMBER MODAL -->
+<div class="modal-overlay" id="memberModal">
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-heading">
+      <div>
+      <h2 id="modalTitle">Add Chama Member</h2>
+      <p id="modalDescription">Enter the new member's details below.</p>
+      </div>
+      <button type="button" class="modal-close" id="closeMemberModal" aria-label="Close">&times;</button>
+    </div>
+
+    <form id="memberForm">
+      <div id="modalFields"></div>
+      <div class="modal-actions">
+        <button type="button" class="cancel-button" id="cancelMemberModal">Cancel</button>
+        <button type="submit" class="save-button">Save Member</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js?v=workspace-designs"></script>
+</body>
+</html>

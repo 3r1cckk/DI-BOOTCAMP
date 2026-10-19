@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f7f8f3">
+    <meta name="description" content="Manage your MtaaFix profile and see the neighbourhood reports you have shared.">
+    <title>My profile — MtaaFix</title>
+    <link rel="stylesheet" href="../app.css">
+</head>
+<body class="unity-backdrop">
+    <header class="site-header">
+        <a class="brand" href="../index.html" aria-label="MtaaFix home">
+            <span class="brand-mark" aria-hidden="true">M</span>
+            <span>Mtaa<span class="brand-accent">Fix</span></span>
+        </a>
+        <nav class="site-nav" aria-label="Main navigation">
+            <a class="nav-link" href="../index.html">Home</a>
+            <a class="nav-link" href="reports.html">Community board</a>
+            <a class="nav-link" href="login.html">Sign in</a>
+            <a class="button button-small button-dark" href="report.html">Share an issue <span aria-hidden="true">↗</span></a>
+        </nav>
+    </header>
+
+    <main class="profile-page page-wrap">
+        <div class="profile-heading">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> YOUR MTAAFIX SPACE</p>
+            <h1>My <em>profile.</em></h1>
+            <p class="board-description">Keep your details current and find the updates you’ve shared with your neighbours.</p>
+        </div>
+        <p class="profile-access-notice" id="profile-access-notice" role="status" aria-live="polite" hidden></p>
+        <section class="profile-admin-details" id="profile-admin-details" hidden>
+            <p class="eyebrow">VERIFIED LOCAL ADMINISTRATOR</p>
+            <h2 id="profile-admin-title"></h2>
+            <p id="profile-admin-area"></p>
+            <small id="profile-admin-approval"></small>
+            <p id="profile-admin-metrics">Loading your area’s report summary…</p>
+        </section>
+        <div class="profile-layout">
+            <section class="profile-card">
+                <p class="eyebrow">YOUR DETAILS</p>
+                <h2>Profile information</h2>
+                <form id="profile-form">
+                    <div class="form-group">
+                        <label for="profile-name">Name</label>
+                        <input id="profile-name" name="name" maxlength="80" autocomplete="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="profile-phone">Phone number <span class="optional-label">optional</span></label>
+                        <input id="profile-phone" name="phone" type="tel" maxlength="24" autocomplete="tel" placeholder="+254 700 000 000">
+                    </div>
+                    <div class="form-group">
+                        <label>Email address</label>
+                            <p class="profile-readonly" id="profile-email" aria-label="Email address is read only">Your sign-in email is kept private and cannot be changed here.</p>
+                    </div>
+                    <button class="button button-primary" type="submit">Save my details <span aria-hidden="true">→</span></button>
+                    <p class="form-feedback" id="profile-feedback" role="status" aria-live="polite"></p>
+                </form>
+            </section>
+            <section class="profile-card">
+                <p class="eyebrow">WHERE YOU LIVE</p>
+                <h2>Neighbourhood</h2>
+                <p class="profile-current-area" id="profile-current-area"></p>
+                <p>Changing your area affects which local reports and notices you see. Your earlier reports keep their original area.</p>
+                <form id="profile-location-form">
+                    <div class="location-fields" id="profile-location-fields"></div>
+                    <p class="location-feedback form-feedback" id="profile-location-feedback" role="status" aria-live="polite">Loading Kenya locations…</p>
+                    <input type="hidden" name="locationUnitId" id="profile-location-unit-id">
+                    <div class="form-group">
+                        <label for="profile-area">Neighbourhood or local area</label>
+                        <input id="profile-area" name="area" maxlength="120" autocomplete="address-level3" placeholder="Your local area" required>
+                    </div>
+                    <button class="button button-outline" type="submit">Update my area</button>
+                </form>
+            </section>
+        </div>
+        <section class="profile-reports" aria-labelledby="profile-reports-title">
+            <div class="admin-panel-heading">
+                <div>
+                    <p class="eyebrow">YOUR COMMUNITY CONTRIBUTIONS</p>
+                    <h2 id="profile-reports-title">Reports I’ve shared</h2>
+                </div>
+                <a class="button button-outline" href="report.html">Share another issue <span aria-hidden="true">→</span></a>
+            </div>
+            <p class="profile-reports-count" id="profile-reports-count"></p>
+            <div class="reports-grid" id="profile-reports"></div>
+            <p class="announcement-empty" id="profile-reports-empty">Loading your reports…</p>
+        </section>
+    </main>
+    <dialog class="report-details-dialog" id="report-details-dialog" aria-labelledby="report-details-title">
+        <form method="dialog"><button class="dialog-close" aria-label="Close report details">×</button></form>
+        <p class="eyebrow">REPORT DETAILS</p>
+        <h2 id="report-details-title"></h2>
+        <p id="report-details-feedback" role="status" aria-live="polite"></p>
+        <div id="report-details-content"></div>
+    </dialog>
+
+    <footer class="site-footer">
+        <div class="page-wrap footer-inner">
+            <a class="brand brand-footer" href="../index.html">
+                <span class="brand-mark" aria-hidden="true">M</span>
+                <span>Mtaa<span class="brand-accent">Fix</span></span>
+            </a>
+            <p>Looking out for the places we call home.</p>
+            <a class="footer-link" href="reports.html">Community board <span aria-hidden="true">↗</span></a>
+            <small>© 2026 MtaaFix · A community project prototype</small>
+        </div>
+    </footer>
+    <script src="../script.js"></script>
+</body>
+</html>

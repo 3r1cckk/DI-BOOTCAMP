@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f7f8f3">
+    <meta name="description" content="Review and update neighbourhood reports on the MtaaFix administrator dashboard.">
+    <title>Administrator dashboard — MtaaFix</title>
+    <link rel="stylesheet" href="../app.css">
+</head>
+<body class="unity-backdrop">
+    <header class="site-header">
+        <a class="brand" href="../index.html" aria-label="MtaaFix home">
+            <span class="brand-mark" aria-hidden="true">M</span>
+            <span>Mtaa<span class="brand-accent">Fix</span></span>
+        </a>
+        <nav class="site-nav" aria-label="Main navigation">
+            <a class="nav-link" href="../index.html">Home</a>
+            <a class="nav-link" href="reports.html">Community board</a>
+            <a class="nav-link" href="login.html">Sign in</a>
+            <a class="button button-small button-dark" href="report.html">Share an issue <span aria-hidden="true">↗</span></a>
+        </nav>
+    </header>
+
+    <main class="admin-page page-wrap">
+        <div class="admin-heading">
+            <div>
+                <p class="eyebrow"><span class="eyebrow-dot"></span> A CLEARER VIEW OF WHAT NEEDS ATTENTION</p>
+                <h1>Neighbourhood<br><em>dashboard.</em></h1>
+                <p class="board-description">A simple overview of issues shared by this community. Small updates help everyone know what’s happening.</p>
+            </div>
+            <a class="button button-primary" href="reports.html">View community board <span aria-hidden="true">→</span></a>
+        </div>
+
+        <div class="dashboard-notice board-notice" role="note">
+            <span class="notice-icon" aria-hidden="true">ⓘ</span>
+            <p><strong>Administrator workspace.</strong> You can review and update reports from your assigned area. Your notices go only to residents within that area.</p>
+        </div>
+
+        <section class="admin-area-card" id="admin-area-card" hidden aria-labelledby="admin-area-title">
+            <div>
+                <p class="eyebrow">YOUR RESPONSIBILITY</p>
+                <h2 id="admin-area-title">My administrative area</h2>
+                <p class="admin-area-path" id="admin-area-path"></p>
+            </div>
+            <span class="admin-area-title" id="admin-area-role"></span>
+            <p class="admin-area-approval" id="admin-area-approval"></p>
+        </section>
+
+        <section class="admin-statistics" id="admin-statistics" aria-labelledby="admin-statistics-title" hidden>
+            <div class="admin-panel-heading">
+                <div>
+                    <p class="eyebrow">A PRACTICAL PICTURE OF YOUR AREA</p>
+                    <h2 id="admin-statistics-title">Community patterns</h2>
+                </div>
+                <p class="admin-statistics-feedback" role="status" aria-live="polite"></p>
+            </div>
+            <div class="statistics-columns">
+                <section>
+                    <h3>Reports by issue type</h3>
+                    <ul id="admin-category-stats"></ul>
+                </section>
+                <section>
+                    <h3>Current priority levels</h3>
+                    <ul id="admin-priority-stats"></ul>
+                </section>
+                <section>
+                    <h3>Reports by month and status · last 12 months</h3>
+                    <ul id="admin-month-stats"></ul>
+                </section>
+                <section>
+                    <h3>Reports by location</h3>
+                    <ul id="admin-location-stats"></ul>
+                </section>
+                <section>
+                    <h3>Recurring problem hotspots · last 30 days</h3>
+                    <ul id="admin-hotspot-stats"></ul>
+                    <p>Hotspots show at least 3 reports for the same issue type and area.</p>
+                </section>
+            </div>
+        </section>
+
+        <section class="admin-access-gate" id="admin-access-gate" aria-live="polite">
+            <span class="admin-empty-mark" aria-hidden="true">✳</span>
+            <h2>Admin access is required</h2>
+            <p>Sign in with an administrator account to review and manage community reports.</p>
+            <a class="button button-primary" href="login.html">Sign in <span aria-hidden="true">→</span></a>
+            <a class="admin-gate-home" href="../index.html" hidden>Back to MtaaFix home</a>
+        </section>
+
+        <section class="admin-overview" aria-label="Report overview" hidden>
+            <article class="metric-card">
+                <span class="metric-icon metric-icon-green" aria-hidden="true">▤</span>
+                <span class="metric-label">All community reports</span>
+                <strong class="metric-value" id="metric-total">0</strong>
+                <small>Shared through this server</small>
+            </article>
+            <article class="metric-card">
+                <span class="metric-icon metric-icon-peach" aria-hidden="true">◷</span>
+                <span class="metric-label">New reports</span>
+                <strong class="metric-value" id="metric-new">0</strong>
+                <small>Ready for a first look</small>
+            </article>
+            <article class="metric-card">
+                <span class="metric-icon metric-icon-blue" aria-hidden="true">↗</span>
+                <span class="metric-label">Being worked on</span>
+                <strong class="metric-value" id="metric-progress">0</strong>
+                <small>Updates marked in progress</small>
+            </article>
+            <article class="metric-card">
+                <span class="metric-icon metric-icon-lilac" aria-hidden="true">✓</span>
+                <span class="metric-label">Resolved</span>
+                <strong class="metric-value" id="metric-solved">0</strong>
+                <small>Issues marked as resolved</small>
+            </article>
+            <article class="metric-card">
+                <span class="metric-icon metric-icon-green" aria-hidden="true">♡</span>
+                <span class="metric-label">Residents connected to this area</span>
+                <strong class="metric-value" id="metric-residents">0</strong>
+                <small>Registered neighbourhood members</small>
+            </article>
+            <article class="metric-card">
+                <span class="metric-icon metric-icon-peach" aria-hidden="true">!</span>
+                <span class="metric-label">Overdue reports</span>
+                <strong class="metric-value" id="metric-overdue">0</strong>
+                <small>Unresolved for more than 14 days</small>
+            </article>
+            <article class="metric-card">
+                <span class="metric-icon metric-icon-blue" aria-hidden="true">◷</span>
+                <span class="metric-label">Average resolution</span>
+                <strong class="metric-value" id="metric-resolution-time">—</strong>
+                <small>Days from report to resolution</small>
+            </article>
+        </section>
+
+        <section class="admin-announcements" aria-labelledby="admin-announcements-title" hidden>
+            <div class="admin-announcement-form">
+                <p class="eyebrow">KEEP NEIGHBOURS INFORMED</p>
+                <h2 id="admin-announcements-title">Share a local update</h2>
+                <p>Important notices are sent to residents in your assigned area.</p>
+                <form id="admin-announcement-form">
+                    <div class="form-group">
+                        <label for="announcement-title">Update title</label>
+                        <input id="announcement-title" name="title" maxlength="90" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="announcement-body">Message for residents</label>
+                        <textarea id="announcement-body" name="body" rows="4" maxlength="600" required></textarea>
+                    </div>
+                    <button class="button button-primary" type="submit">Share with my area <span aria-hidden="true">→</span></button>
+                    <p class="admin-announcement-feedback form-feedback" id="admin-announcement-feedback" role="status" aria-live="polite"></p>
+                </form>
+            </div>
+            <div class="admin-announcement-history">
+                <p class="eyebrow">RECENT NOTES</p>
+                <h3>Updates you’ve shared</h3>
+                <div class="announcement-list" id="admin-announcement-list"></div>
+                <p class="announcement-empty" id="admin-announcement-empty">Your local updates will appear here.</p>
+            </div>
+        </section>
+
+        <section class="admin-flags" aria-labelledby="admin-flags-title" hidden>
+            <div class="admin-panel-heading">
+                <div>
+                    <p class="eyebrow">COMMUNITY MODERATION</p>
+                    <h2 id="admin-flags-title">Report flags</h2>
+                    <p>Review resident reports of fake, spam, inappropriate, or duplicate content.</p>
+                </div>
+            </div>
+            <div class="admin-flag-list" id="admin-flag-list"></div>
+            <p class="admin-flag-empty" id="admin-flag-empty">No flags have been submitted for your area.</p>
+            <p class="admin-flag-feedback form-feedback" id="admin-flag-feedback" role="status" aria-live="polite"></p>
+        </section>
+
+        <section class="admin-report-panel" aria-labelledby="admin-reports-title" hidden>
+            <div class="admin-panel-heading">
+                <div>
+                    <p class="eyebrow">THE LATEST FROM YOUR MTAA</p>
+                    <h2 id="admin-reports-title">Shared reports</h2>
+                </div>
+                <label class="admin-search">
+                    <span aria-hidden="true">⌕</span>
+                    <span class="sr-only">Search reports</span>
+                    <input id="admin-search" type="search" placeholder="Search reports…" autocomplete="off">
+                </label>
+            </div>
+            <div class="admin-table-wrap">
+                <div class="admin-report-filters" aria-label="Filter reports">
+                    <label>
+                        Category
+                        <select id="admin-category-filter">
+                            <option value="">All categories</option>
+                            <option value="garbage">Waste &amp; litter</option>
+                            <option value="roads">Roads &amp; paths</option>
+                            <option value="streetlights">Streetlights</option>
+                            <option value="water">Water &amp; drainage</option>
+                            <option value="sanitation">Clean &amp; safe spaces</option>
+                            <option value="environment">Green spaces &amp; environment</option>
+                        </select>
+                    </label>
+                    <label>
+                        Priority
+                        <select id="admin-priority-filter">
+                            <option value="">All priorities</option>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </label>
+                    <label>
+                        Status
+                        <select id="admin-status-filter">
+                            <option value="">All reports</option>
+                            <option value="reported">Just reported</option>
+                            <option value="progress">Being worked on</option>
+                            <option value="solved">Resolved</option>
+                            <option value="overdue">Overdue</option>
+                        </select>
+                    </label>
+                    <label>From <input id="admin-date-from" type="date"></label>
+                    <label>To <input id="admin-date-to" type="date"></label>
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Issue</th>
+                            <th scope="col">Ward and local area</th>
+                            <th scope="col">Shared</th>
+                            <th scope="col">Priority</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-report-list"></tbody>
+                </table>
+                <div class="admin-empty" id="admin-empty">
+                    <span class="admin-empty-mark" aria-hidden="true">✳</span>
+                    <strong>No community reports yet</strong>
+                    <p>When a neighbour shares an issue, it will appear here.</p>
+                    <a href="reports.html">Visit the community board <span aria-hidden="true">→</span></a>
+                </div>
+            </div>
+            <p class="admin-feedback form-feedback" id="admin-feedback" role="status" aria-live="polite"></p>
+        </section>
+    </main>
+    <dialog class="report-details-dialog" id="report-details-dialog" aria-labelledby="report-details-title">
+        <form method="dialog"><button class="dialog-close" aria-label="Close report details">×</button></form>
+        <p class="eyebrow">REPORT DETAILS</p>
+        <h2 id="report-details-title"></h2>
+        <p id="report-details-feedback" role="status" aria-live="polite"></p>
+        <div id="report-details-content"></div>
+    </dialog>
+
+    <footer class="site-footer">
+        <div class="page-wrap footer-inner">
+            <a class="brand brand-footer" href="../index.html">
+                <span class="brand-mark" aria-hidden="true">M</span>
+                <span>Mtaa<span class="brand-accent">Fix</span></span>
+            </a>
+            <p>Looking out for the places we call home.</p>
+            <a class="footer-link" href="reports.html">Community board <span aria-hidden="true">↗</span></a>
+            <small>© 2026 MtaaFix · A community project prototype</small>
+        </div>
+    </footer>
+    <script src="../script.js"></script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f7f8f3">
+    <meta name="description" content="See updates about your neighbourhood reports and local notices.">
+    <title>Notifications — MtaaFix</title>
+    <link rel="stylesheet" href="../app.css">
+</head>
+<body class="unity-backdrop">
+    <header class="site-header">
+        <a class="brand" href="../index.html" aria-label="MtaaFix home">
+            <span class="brand-mark" aria-hidden="true">M</span>
+            <span>Mtaa<span class="brand-accent">Fix</span></span>
+        </a>
+        <nav class="site-nav" aria-label="Main navigation">
+            <a class="nav-link" href="../index.html">Home</a>
+            <a class="nav-link" href="reports.html">Community board</a>
+            <a class="nav-link" href="login.html">Sign in</a>
+            <a class="button button-small button-dark" href="report.html">Share an issue <span aria-hidden="true">↗</span></a>
+        </nav>
+    </header>
+
+    <main class="notifications-page page-wrap">
+        <div class="profile-heading">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> A LITTLE NEWS FROM YOUR MTAA</p>
+            <h1>Your <em>updates.</em></h1>
+            <p class="board-description">Report progress and local notices from your neighbourhood, all in one place.</p>
+        </div>
+        <p class="form-feedback" id="notification-feedback" role="status" aria-live="polite"></p>
+        <div class="notification-list" id="notification-list" aria-live="polite"></div>
+        <p class="announcement-empty" id="notification-empty">Loading your notifications…</p>
+    </main>
+
+    <footer class="site-footer">
+        <div class="page-wrap footer-inner">
+            <a class="brand brand-footer" href="../index.html">
+                <span class="brand-mark" aria-hidden="true">M</span>
+                <span>Mtaa<span class="brand-accent">Fix</span></span>
+            </a>
+            <p>Looking out for the places we call home.</p>
+            <a class="footer-link" href="reports.html">Community board <span aria-hidden="true">↗</span></a>
+            <small>© 2026 MtaaFix · A community project prototype</small>
+        </div>
+    </footer>
+    <script src="../script.js"></script>
+</body>
+</html>

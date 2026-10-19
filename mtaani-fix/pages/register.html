@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f7f8f3">
+    <meta name="description" content="Join the MtaaFix community.">
+    <title>Join the community — MtaaFix</title>
+    <link rel="stylesheet" href="../app.css">
+</head>
+<body class="unity-backdrop">
+    <header class="site-header">
+        <a class="brand" href="../index.html" aria-label="MtaaFix home">
+            <span class="brand-mark" aria-hidden="true">M</span>
+            <span>Mtaa<span class="brand-accent">Fix</span></span>
+        </a>
+        <nav class="site-nav" aria-label="Main navigation">
+            <a class="nav-link" href="../index.html">Home</a>
+            <a class="nav-link" href="reports.html">Community board</a>
+            <a class="nav-link" href="login.html">Sign in</a>
+            <a class="button button-small button-dark" href="register.html" aria-current="page">Join the community <span aria-hidden="true">↗</span></a>
+        </nav>
+    </header>
+
+    <main class="auth-page page-wrap">
+        <a class="back-link" href="../index.html"><span aria-hidden="true">←</span> Back home</a>
+        <div class="auth-layout">
+            <section class="auth-welcome">
+                <p class="eyebrow"><span class="eyebrow-dot"></span> THERE’S ROOM FOR YOU HERE</p>
+                <h1>Better,<br><em>together.</em></h1>
+                <p class="auth-description">Join neighbours who care about the small things that make a big difference to everyday life.</p>
+                <div class="auth-benefits">
+                    <p><span aria-hidden="true">✓</span> Follow neighbourhood updates</p>
+                    <p><span aria-hidden="true">✓</span> Keep track of issues you’ve shared</p>
+                    <p><span aria-hidden="true">✓</span> Be part of a kinder conversation</p>
+                </div>
+                <div class="auth-local-note"><span aria-hidden="true">ⓘ</span> Your name and email are stored in the MtaaFix database. Your password is saved only as a one-way hash.</div>
+            </section>
+
+            <section class="auth-card" aria-labelledby="register-title">
+                <div class="auth-card-heading">
+                    <span class="auth-card-mark" aria-hidden="true">M</span>
+                    <p class="eyebrow">A BETTER MTAA STARTS WITH US</p>
+                    <h2 id="register-title">Create an account</h2>
+                    <p>We’ll keep it simple.</p>
+                </div>
+                <form class="auth-form" data-auth-form="register">
+                    <div class="form-group">
+                        <label for="name">What should we call you?</label>
+                        <input type="text" id="name" name="name" autocomplete="name" placeholder="Your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email address</label>
+                        <input type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone number <span class="optional-label">optional</span></label>
+                        <input type="tel" id="phone" name="phone" autocomplete="tel" placeholder="+254 700 000 000">
+                    </div>
+                    <div class="location-fields" id="registration-location-fields"></div>
+                    <p class="location-feedback form-feedback" id="location-feedback" role="status" aria-live="polite">Loading Kenya locations…</p>
+                    <input type="hidden" name="locationUnitId" id="location-unit-id">
+                    <div class="form-group">
+                        <label for="area">Neighbourhood or local area</label>
+                        <input type="text" id="area" name="area" maxlength="120" autocomplete="address-level3" placeholder="e.g. near the market or main road" required>
+                        <small>Your county, sub-county and ward are selected above.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Create a password</label>
+                        <input type="password" id="password" name="password" autocomplete="new-password" minlength="12" placeholder="At least 12 characters" required>
+                        <small>Use at least 12 characters.</small>
+                    </div>
+                    <button class="button button-primary auth-submit" type="submit" disabled>Create my account <span aria-hidden="true">→</span></button>
+                    <p class="auth-feedback form-feedback" role="status" aria-live="polite"></p>
+                </form>
+                <p class="auth-switch">Already part of the neighbourhood? <a href="login.html">Sign in</a></p>
+                <p class="auth-demo-note">By joining, your account details are saved in this app’s database.</p>
+            </section>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="page-wrap footer-inner">
+            <a class="brand brand-footer" href="../index.html">
+                <span class="brand-mark" aria-hidden="true">M</span>
+                <span>Mtaa<span class="brand-accent">Fix</span></span>
+            </a>
+            <p>Looking out for the places we call home.</p>
+            <a class="footer-link" href="reports.html">Community board <span aria-hidden="true">↗</span></a>
+            <small>© 2026 MtaaFix · A community project prototype</small>
+        </div>
+    </footer>
+    <script src="../script.js"></script>
+</body>
+</html>

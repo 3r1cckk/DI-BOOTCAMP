@@ -7,7 +7,7 @@
       name="description"
       content="Build language skills with friendly vocabulary, speaking, and conversation practice."
     />
-    <title>LingoQuest — Your language adventure</title>
+    <title>Word Garden — A little language practice</title>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -36,6 +36,8 @@
         min-height: 100vh;
         margin: 0;
       }
+
+      #root { min-height: 100vh; background: #f6f4eb; }
 
       button,
       select {
@@ -396,7 +398,7 @@
         }
       }
 
-      .lq-app { display: grid; min-height: 100vh; grid-template-columns: 230px minmax(0, 1fr); background: radial-gradient(ellipse at 85% 0%, #eef3e8 0, transparent 35%), #f6f7f4; }
+      .lq-app { display: grid; min-height: 100vh; grid-template-columns: 230px minmax(0, 1fr); background: #f5f3e9; color: #243b31; }
       .lq-sidebar { position: sticky; top: 0; display: flex; height: 100vh; padding: 27px 17px 19px; flex-direction: column; border-right: 1px solid #e8ece6; background: rgb(255 254 250 / 94%); }
       .lq-brand { display: flex; margin: 0 0 27px; align-items: center; gap: 10px; color: #29372f; font-family: Fraunces, Georgia, serif; font-size: 1.2rem; font-weight: 700; }
       .lq-brand-mark { display: grid; width: 37px; height: 37px; border-radius: 13px; background: #e6f1df; color: #518363; font-family: "DM Sans", sans-serif; font-size: 1.2rem; place-items: center; }
@@ -553,6 +555,236 @@
         .lq-stat-top { font-size: .65rem; }
         .lq-activity-grid, .lq-preference-grid { grid-template-columns: 1fr; }
       }
+
+      .lq-app { background: #f4f2e8; color: #243b31; }
+      .lq-sidebar { border-color: #e3e4d9; background: #fbfaf4; }
+      .lq-brand { color: #263e32; font-size: 1.28rem; letter-spacing: -.035em; }
+      .lq-brand-mark { width: 35px; height: 35px; border: 1px solid #d5e0cc; border-radius: 10px; background: #eaf0e2; color: #315f46; }
+      .lq-nav { gap: 2px; }
+      .lq-nav-button { min-height: 40px; border-radius: 7px; color: #647167; font-weight: 600; }
+      .lq-nav-button:hover, .lq-nav-button.active { background: #eaf0e5; color: #244e38; }
+      .lq-nav-icon, .lq-activity-icon, .lq-game-icon { color: #38684b; }
+      .lq-nav-icon .wg-icon, .lq-stat-icon { display: block; }
+      .lq-sidebar-card { border-color: #e2e4d6; border-radius: 8px; background: #f3f3e9; }
+      .lq-sidebar-card-title, .lq-card-title { color: #304639; }
+      .lq-sidebar-link { color: #386b4b; }
+      .lq-sidebar-link:hover { color: #244d35; text-decoration: underline; text-underline-offset: 3px; }
+      .lq-avatar { border-color: #d7dfcf; background: #eaf0e5; color: #38684b; }
+      .lq-main { background: #f4f2e8; }
+      .lq-topbar { margin-bottom: 24px; }
+      .lq-pill { border-color: #e0e2d8; border-radius: 6px; background: #fbfaf4; color: #526458; }
+      .lq-welcome { min-height: 180px; margin-bottom: 19px; padding: 27px 30px; border: 0; border-left: 3px solid #a4b58d; border-radius: 2px; background: #fbfaf4; box-shadow: none; }
+      .lq-kicker { color: #687c55; letter-spacing: .14em; }
+      .lq-title, .lq-section-heading h2, .lq-practice-card h2 { color: #263e32; font-family: Fraunces, Georgia, serif; }
+      .lq-subtitle, .lq-muted { color: #68756b; }
+      .lq-primary, .lq-secondary, .lq-danger { border-radius: 5px; }
+      .lq-primary { background: #315c43; }
+      .lq-primary:hover:not(:disabled) { background: #244a35; box-shadow: none; }
+      .lq-secondary { border-color: #d9dfd4; background: #fbfaf4; color: #355d43; }
+      .lq-secondary:hover { border-color: #9dae91; background: #f0f3e9; }
+      .lq-card, .lq-stat, .lq-activity, .lq-game-card { border-color: #e1e3d9; border-radius: 7px; background: #fbfaf4; box-shadow: none; }
+      .lq-card { padding: 20px; }
+      .lq-stat { border-width: 0 0 0 1px; border-radius: 0; background: transparent; }
+      .lq-stat:first-child { border-left: 0; }
+      .lq-stat-icon { color: #70845f; }
+      .lq-stat-value { color: #263e32; }
+      .lq-stat-foot { color: #68756b; }
+      .lq-dashboard-grid { margin-top: 18px; }
+      .lq-level-card { border-color: #dfe4d6; border-radius: 7px; background: #edf0e4; }
+      .lq-level-mark { width: 39px; height: 39px; border: 0; border-radius: 0; background: transparent; color: #47714f; }
+      .lq-progress-track { border-radius: 2px; background: #dfe4d7; }
+      .lq-progress-fill { border-radius: 2px; background: #63835c; }
+      .lq-activity { min-height: 132px; padding: 16px 15px; gap: 3px; text-align: left; transition: background-color .16s ease, border-color .16s ease, transform .16s ease; }
+      .lq-activity:hover { transform: translateY(-2px); border-color: #bac8b0; background: #f4f5ec; box-shadow: none; }
+      .lq-activity-icon { width: 29px; height: 29px; margin-bottom: 7px; border-radius: 0; background: transparent; }
+      .lq-activity-title { color: #304639; font-weight: 700; }
+      .lq-activity-copy { color: #68756b; line-height: 1.5; }
+      .lq-featured-activity { display: flex; width: 100%; min-height: 126px; padding: 22px 24px; align-items: center; gap: 19px; border: 0; border-radius: 6px; background: #254a37; color: #fbfaf4; cursor: pointer; font: inherit; text-align: left; transition: background-color .16s ease, transform .16s ease; }
+      .lq-featured-activity:hover { transform: translateY(-2px); background: #1e402f; }
+      .lq-featured-activity:focus-visible { outline: 3px solid #a46e4f; outline-offset: 3px; }
+      .lq-featured-icon { display: grid; width: 54px; height: 54px; flex: 0 0 auto; border: 1px solid rgb(255 255 255 / 27%); border-radius: 50%; color: #e8d4bc; place-items: center; }
+      .lq-featured-copy { display: grid; gap: 5px; }
+      .lq-featured-kicker { color: #c6d2be; font-size: .68rem; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; }
+      .lq-featured-copy strong { font-family: Fraunces, Georgia, serif; font-size: 1.36rem; font-weight: 600; }
+      .lq-featured-copy > span:last-child { color: #d9e0d4; font-size: .8rem; line-height: 1.45; }
+      .lq-featured-action { display: inline-flex; margin-left: auto; align-items: center; gap: 7px; color: #f0dbc2; font-size: .8rem; font-weight: 700; white-space: nowrap; }
+      .lq-earned-list { display: flex; flex-wrap: wrap; gap: 10px; }
+      .lq-earned-item { display: inline-flex; align-items: center; gap: 7px; color: #3e5f47; font-size: .8rem; font-weight: 650; }
+      .lq-wins-card { min-height: 62px; display: flex; align-items: center; }
+      .lq-badge { border-radius: 7px; }
+      .lq-badge-icon { color: #54764f; }
+      .lq-toast { background: #254a37; }
+      .lq-app button, .lq-app a, .lq-app select, .lq-app input, .lq-app textarea { -webkit-tap-highlight-color: transparent; }
+      .lq-app button:focus-visible, .lq-app a:focus-visible, .lq-app select:focus-visible, .lq-app input:focus-visible, .lq-app textarea:focus-visible { outline: 3px solid #a46e4f; outline-offset: 3px; }
+
+      .wg-landing { --wg-ivory: #f6f4eb; --wg-paper: #fffdf7; --wg-forest: #264a37; --wg-ink: #263b30; --wg-body: #606d62; --wg-sage: #e9ede2; --wg-border: #e3e3d9; --wg-terracotta: #a66b4c; min-height: 100vh; overflow: hidden; background: var(--wg-ivory); color: var(--wg-ink); font-family: "DM Sans", sans-serif; }
+      .wg-landing-header, .wg-landing main, .wg-landing-footer { width: min(1120px, calc(100% - 64px)); margin: 0 auto; }
+      .wg-landing-header { display: flex; min-height: 76px; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--wg-border); }
+      .wg-landing-brand { display: inline-flex; align-items: center; gap: 10px; color: var(--wg-forest); font-family: Fraunces, Georgia, serif; font-size: 1.1rem; font-weight: 700; letter-spacing: -.03em; text-decoration: none; }
+      .wg-wordmark em { color: #748363; font-weight: 500; }
+      .wg-landing-mark { display: grid; width: 34px; height: 34px; border: 1px solid #d8e1d0; border-radius: 50%; background: #edf1e5; color: #3e6848; place-items: center; }
+      .wg-landing-nav { display: flex; align-items: center; gap: 30px; }
+      .wg-landing-nav a, .wg-landing-footer button { color: var(--wg-body); font-size: .79rem; font-weight: 600; text-decoration: none; }
+      .wg-landing-nav a:hover, .wg-landing-footer button:hover { color: var(--wg-forest); }
+      .wg-landing-login, .wg-landing-cta { display: inline-flex; min-height: 44px; padding: 0 17px; align-items: center; justify-content: center; gap: 10px; border: 0; border-radius: 4px; background: var(--wg-forest); color: var(--wg-paper); cursor: pointer; font: 600 .82rem "DM Sans", sans-serif; transition: background-color .16s ease, transform .16s ease; }
+      .wg-landing-login:hover, .wg-landing-cta:hover { transform: translateY(-1px); background: #1f3d2e; }
+      .wg-landing-hero { display: grid; min-height: 492px; padding: 50px 0 44px; align-items: center; grid-template-columns: minmax(300px, .83fr) minmax(0, 1.17fr); gap: clamp(34px, 6vw, 74px); }
+      .wg-landing-intro { position: relative; z-index: 1; }
+      .wg-landing-eyebrow { display: flex; margin: 0 0 15px; align-items: center; gap: 9px; color: #697c59; font-size: .65rem; font-weight: 750; letter-spacing: .13em; text-transform: uppercase; }
+      .wg-eyebrow-line { width: 21px; height: 1px; flex: 0 0 auto; background: var(--wg-terracotta); }
+      .wg-landing-intro h1 { margin: 0; color: var(--wg-ink); font-family: Fraunces, Georgia, serif; font-size: clamp(3rem, 4.6vw, 4.35rem); font-weight: 600; letter-spacing: -.055em; line-height: 1.04; }
+      .wg-landing-intro h1 em, .wg-section-intro h2 em, .wg-journey-heading h2 em { color: #718161; font-weight: 500; }
+      .wg-landing-lede { max-width: 410px; margin: 18px 0 0; color: var(--wg-body); font-size: .91rem; line-height: 1.72; }
+      .wg-landing-actions { display: flex; margin-top: 23px; align-items: center; flex-wrap: wrap; gap: 18px; }
+      .wg-landing-cta { min-height: 46px; padding: 0 19px; }
+      .wg-landing-secondary { color: #536b57; font-size: .77rem; font-weight: 650; text-decoration-color: #b4bdac; text-underline-offset: 5px; }
+      .wg-landing-secondary:hover { color: #254a37; }
+      .wg-landing-note { display: flex; margin: 15px 0 0; align-items: center; gap: 6px; color: #727e73; font-size: .66rem; }
+      .wg-landing-note .wg-icon { color: #79896a; }
+      .wg-product-preview { min-width: 0; }
+      .wg-preview-window { overflow: hidden; border: 1px solid #dedfd5; background: var(--wg-paper); box-shadow: 0 13px 32px rgb(40 54 43 / 7%); }
+      .wg-preview-topbar { display: flex; min-height: 42px; padding: 0 17px; align-items: center; justify-content: space-between; border-bottom: 1px solid #e7e7de; background: #fbfaf5; }
+      .wg-preview-brand { display: inline-flex; align-items: center; gap: 7px; color: #425b48; font-family: Fraunces, Georgia, serif; font-size: .75rem; font-weight: 700; }
+      .wg-preview-brand-mark { display: grid; color: #53714f; place-items: center; }
+      .wg-preview-language { color: #69766a; font-size: .67rem; }
+      .wg-preview-language span { margin-left: 4px; color: #8a9488; }
+      .wg-preview-body { padding: 19px 20px 12px; }
+      .wg-preview-greeting { display: flex; margin-bottom: 15px; align-items: center; justify-content: space-between; gap: 12px; }
+      .wg-preview-overline { color: #788470; font-size: .54rem; font-weight: 750; letter-spacing: .11em; }
+      .wg-preview-greeting h2 { margin: 4px 0 0; color: #304638; font-family: Fraunces, Georgia, serif; font-size: 1.17rem; font-weight: 600; }
+      .wg-preview-date { padding: 5px 7px; border: 1px solid #e2e4da; color: #778172; font-size: .52rem; font-weight: 700; letter-spacing: .08em; }
+      .wg-preview-columns { display: grid; grid-template-columns: minmax(0, 1.03fr) minmax(0, .97fr); gap: 11px; }
+      .wg-vocab-preview, .wg-dialogue-preview { min-width: 0; border: 1px solid #e3e4db; background: #fffefa; }
+      .wg-vocab-preview { display: flex; min-height: 194px; padding: 13px 14px 11px; flex-direction: column; }
+      .wg-preview-section-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; color: #76816e; font-size: .52rem; font-weight: 750; letter-spacing: .1em; }
+      .wg-preview-section-head .wg-icon { color: #68805d; }
+      .wg-preview-word { margin-top: 16px; color: #2d4837; font-family: Fraunces, Georgia, serif; font-size: 2rem; line-height: 1.06; }
+      .wg-preview-meaning { margin-top: 3px; color: #5c695f; font-size: .75rem; }
+      .wg-preview-word-tools { display: flex; margin-top: auto; padding-top: 11px; align-items: center; justify-content: space-between; gap: 5px; border-bottom: 1px solid #ecece4; color: #7d877b; font-size: .59rem; }
+      .wg-preview-word-tools button, .wg-preview-word-foot button, .wg-speech-foot button { display: inline-flex; padding: 4px; align-items: center; gap: 4px; border: 0; background: transparent; color: #42674b; cursor: pointer; font: 600 .63rem "DM Sans", sans-serif; }
+      .wg-preview-word-foot { display: flex; padding-top: 8px; align-items: center; justify-content: space-between; color: #6c7c64; font-size: .58rem; }
+      .wg-preview-word-foot > span, .wg-preview-footer > span, .wg-speech-foot > span { display: inline-flex; align-items: center; gap: 4px; }
+      .wg-preview-side { display: grid; min-width: 0; grid-template-rows: minmax(0, 1fr) auto; gap: 9px; }
+      .wg-dialogue-preview { padding: 13px 13px 10px; }
+      .wg-dialogue-line { display: -webkit-box; margin: 13px 0 0; overflow: hidden; color: #314839; font-family: Fraunces, Georgia, serif; font-size: .97rem; line-height: 1.32; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+      .wg-dialogue-hint { margin: 6px 0 0; color: #7a847a; font-size: .59rem; }
+      .wg-dialogue-preview > button { display: inline-flex; margin-top: 10px; padding: 0; align-items: center; gap: 5px; border: 0; background: transparent; color: #43694b; cursor: pointer; font: 650 .62rem "DM Sans", sans-serif; }
+      .wg-goal-preview { padding: 10px 12px; border: 1px solid #e3e4db; background: #edf0e6; }
+      .wg-goal-preview-head { display: flex; justify-content: space-between; color: #65735e; font-size: .53rem; font-weight: 750; letter-spacing: .06em; }
+      .wg-goal-track { height: 4px; margin-top: 7px; background: #d9dfd2; }
+      .wg-goal-track span { display: block; height: 100%; background: #69845f; transition: width .2s ease; }
+      .wg-goal-caption { display: block; margin-top: 6px; color: #788273; font-size: .55rem; }
+      .wg-preview-footer { display: flex; margin-top: 10px; justify-content: space-between; color: #778174; font-size: .57rem; }
+      .wg-preview-footer .wg-icon { color: #997150; }
+      .wg-preview-caption { display: block; margin-top: 8px; color: #7a8479; font-size: .63rem; text-align: right; }
+      .wg-experience-section { display: grid; padding: 43px 0 48px; align-items: start; grid-template-columns: minmax(220px, .72fr) minmax(0, 1.28fr); gap: clamp(38px, 7vw, 96px); border-top: 1px solid var(--wg-border); }
+      .wg-section-intro h2, .wg-journey-heading h2, .wg-practice-copy h2, .wg-landing-close h2 { margin: 0; color: var(--wg-ink); font-family: Fraunces, Georgia, serif; font-size: clamp(1.85rem, 3vw, 2.6rem); font-weight: 600; letter-spacing: -.045em; line-height: 1.13; }
+      .wg-section-intro > p:last-child, .wg-practice-copy > p:not(.wg-landing-eyebrow) { max-width: 310px; margin: 13px 0 0; color: var(--wg-body); font-size: .81rem; line-height: 1.7; }
+      .wg-experience-list { border-top: 1px solid #dedfd5; }
+      .wg-experience-item { display: grid; width: 100%; min-height: 80px; padding: 11px 2px; align-items: center; grid-template-columns: 33px 38px minmax(0, 1fr) 23px; gap: 12px; border: 0; border-bottom: 1px solid #dedfd5; background: transparent; color: inherit; cursor: pointer; font-family: inherit; text-align: left; transition: background-color .15s ease; }
+      .wg-experience-item:hover { background: #efefe5; }
+      .wg-experience-number { color: #9a8067; font-size: .62rem; font-weight: 700; }
+      .wg-experience-icon { display: grid; width: 34px; height: 34px; color: #3d6848; place-items: center; }
+      .wg-experience-copy { display: grid; gap: 4px; }
+      .wg-experience-copy strong { color: #304638; font-family: Fraunces, Georgia, serif; font-size: 1rem; font-weight: 600; }
+      .wg-experience-copy > span { color: #69766b; font-size: .7rem; line-height: 1.45; }
+      .wg-experience-arrow { color: #78876d; }
+      .wg-journey-section { display: grid; padding: 43px 0 48px; grid-template-columns: minmax(225px, .72fr) minmax(0, 1.28fr); gap: clamp(38px, 7vw, 96px); background: #eeefe5; }
+      .wg-journey-heading { padding-left: 22px; }
+      .wg-journey-steps { display: grid; margin: 0; padding: 0 22px 0 0; grid-template-columns: repeat(3, minmax(0, 1fr)); list-style: none; }
+      .wg-journey-steps li { display: grid; padding-right: 14px; align-content: start; grid-template-columns: 26px 1fr; column-gap: 7px; }
+      .wg-step-number { color: #9a7458; font-size: .63rem; font-weight: 750; }
+      .wg-step-line { height: 1px; margin-top: 7px; background: #bdc6b5; }
+      .wg-journey-steps li > div { grid-column: 1 / -1; padding-top: 11px; }
+      .wg-journey-steps strong { color: #354a3a; font-family: Fraunces, Georgia, serif; font-size: .9rem; font-weight: 600; line-height: 1.35; }
+      .wg-journey-steps p { margin: 6px 0 0; color: #6b776d; font-size: .68rem; line-height: 1.55; }
+      .wg-practice-section { display: grid; padding: 52px 0; align-items: center; grid-template-columns: minmax(250px, .8fr) minmax(0, 1.2fr); gap: clamp(35px, 8vw, 110px); border-bottom: 1px solid var(--wg-border); }
+      .wg-practice-copy h2 { font-size: clamp(1.85rem, 3vw, 2.55rem); }
+      .wg-text-action { display: inline-flex; margin-top: 19px; padding: 0; align-items: center; gap: 7px; border: 0; border-bottom: 1px solid #c5cbbd; background: transparent; color: #3e6547; cursor: pointer; font: 650 .75rem "DM Sans", sans-serif; line-height: 1.8; }
+      .wg-speech-preview { padding: 19px 21px 12px; border: 1px solid #dedfd5; background: var(--wg-paper); }
+      .wg-speech-preview-top { display: flex; padding-bottom: 12px; align-items: center; justify-content: space-between; border-bottom: 1px solid #e6e7de; color: #687762; font-size: .58rem; font-weight: 750; letter-spacing: .08em; }
+      .wg-speech-preview-top > span:first-child { display: inline-flex; align-items: center; gap: 7px; }
+      .wg-speech-preview-top .wg-icon { color: #456a4d; }
+      .wg-speech-prompt { margin: 15px 0 4px; color: #758074; font-size: .68rem; }
+      .wg-speech-phrase { margin: 0; color: #2d4837; font-family: Fraunces, Georgia, serif; font-size: clamp(1.35rem, 2.5vw, 1.8rem); line-height: 1.32; }
+      .wg-speech-translation { margin: 4px 0 0; color: #717d72; font-size: .76rem; }
+      .wg-speech-controls { display: flex; margin-top: 16px; align-items: center; gap: 12px; }
+      .wg-listen-button { display: inline-flex; min-height: 35px; padding: 0 11px; align-items: center; gap: 6px; border: 1px solid #dfe2d8; background: #f9f9f2; color: #3e6347; cursor: pointer; font: 650 .67rem "DM Sans", sans-serif; }
+      .wg-speech-controls > span { color: #7d877e; font-size: .64rem; }
+      .wg-speech-foot { display: flex; margin-top: 14px; padding-top: 8px; align-items: center; justify-content: space-between; border-top: 1px solid #e7e8df; color: #6e7d67; font-size: .61rem; }
+      .wg-landing-close { display: flex; margin: 0 0 47px; padding: 28px 30px; align-items: center; justify-content: space-between; gap: 24px; background: #e9ede2; }
+      .wg-landing-close .wg-landing-eyebrow { margin-bottom: 8px; }
+      .wg-landing-close h2 { font-size: 1.85rem; }
+      .wg-landing-close p:last-child { margin: 7px 0 0; color: #657267; font-size: .76rem; }
+      .wg-landing-footer { display: flex; min-height: 70px; align-items: center; justify-content: space-between; border-top: 1px solid var(--wg-border); }
+      .wg-landing-footer .wg-landing-brand { font-size: .9rem; }
+      .wg-landing-footer .wg-landing-mark { width: 28px; height: 28px; }
+      .wg-landing-footer > span { color: #7a857b; font-size: .68rem; }
+      .wg-landing-footer button { padding: 0; border: 0; background: transparent; cursor: pointer; font-family: inherit; }
+      .wg-landing :focus-visible { outline: 3px solid var(--wg-terracotta); outline-offset: 3px; }
+
+      @media (max-width: 980px) {
+        .wg-landing-header, .wg-landing main, .wg-landing-footer { width: min(100% - 48px, 740px); }
+        .wg-landing-hero { min-height: 0; padding: 44px 0 36px; grid-template-columns: 1fr; gap: 28px; }
+        .wg-landing-intro h1 { font-size: clamp(3rem, 7vw, 4rem); }
+        .wg-product-preview { width: 100%; max-width: 650px; margin: 0 auto; }
+        .wg-experience-section, .wg-journey-section { grid-template-columns: 1fr; gap: 23px; }
+        .wg-journey-heading { padding-left: 22px; }
+        .wg-practice-section { grid-template-columns: .75fr 1.25fr; gap: 28px; }
+      }
+      @media (max-width: 700px) {
+        .lq-main { background: #f4f2e8; }
+        .lq-featured-activity { padding: 19px; gap: 13px; }
+        .lq-featured-icon { width: 46px; height: 46px; }
+        .lq-featured-copy strong { font-size: 1.15rem; }
+        .lq-featured-action { font-size: .72rem; }
+        .lq-stat { border: 1px solid #e1e3d9; border-radius: 6px; background: #fbfaf4; }
+        .lq-nav-button { border-radius: 5px; }
+        .lq-sidebar { background: #fbfaf4; }
+        .wg-landing-header, .wg-landing main, .wg-landing-footer { width: min(100% - 36px, 560px); }
+        .wg-landing-header { min-height: 72px; }
+        .wg-landing-nav { gap: 14px; }
+        .wg-landing-nav > a { display: none; }
+        .wg-landing-login { min-height: 39px; padding: 0 11px; font-size: .72rem; }
+        .wg-landing-hero { padding: 43px 0 35px; gap: 23px; }
+        .wg-landing-intro h1 { font-size: clamp(2.8rem, 11vw, 3.8rem); }
+        .wg-landing-lede { font-size: .86rem; }
+        .wg-preview-body { padding: 15px 13px 10px; }
+        .wg-preview-columns { gap: 7px; }
+        .wg-vocab-preview { padding: 11px 10px 9px; }
+        .wg-dialogue-preview { padding: 11px 10px 9px; }
+        .wg-experience-section { padding: 34px 0 37px; }
+        .wg-journey-section { padding: 32px 0 35px; gap: 21px; }
+        .wg-journey-heading { padding-left: 17px; }
+        .wg-journey-steps { padding: 0 17px; grid-template-columns: 1fr; gap: 17px; }
+        .wg-journey-steps li { grid-template-columns: 28px 24px 1fr; align-items: start; }
+        .wg-step-line { width: 22px; }
+        .wg-journey-steps li > div { padding-top: 0; grid-column: 3; }
+        .wg-practice-section { padding: 37px 0; grid-template-columns: 1fr; gap: 21px; }
+        .wg-landing-close { margin-bottom: 34px; padding: 23px 18px; align-items: flex-start; flex-direction: column; gap: 17px; }
+        .wg-landing-close h2 { font-size: 1.65rem; }
+        .wg-landing-footer { min-height: 66px; }
+        .wg-landing-footer > span { display: none; }
+      }
+      @media (max-width: 420px) {
+        .lq-featured-activity { flex-wrap: wrap; }
+        .lq-featured-action { width: 100%; margin-left: 59px; }
+        .wg-landing-header, .wg-landing main, .wg-landing-footer { width: calc(100% - 30px); }
+        .wg-landing-brand { gap: 7px; font-size: .98rem; }
+        .wg-landing-mark { width: 30px; height: 30px; }
+        .wg-landing-login { gap: 4px; }
+        .wg-preview-columns { grid-template-columns: 1fr; }
+        .wg-preview-side { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+        .wg-dialogue-preview { min-height: 151px; }
+        .wg-goal-preview { align-self: start; }
+        .wg-preview-word { margin-top: 12px; }
+        .wg-preview-footer { font-size: .53rem; }
+        .wg-experience-item { grid-template-columns: 23px 31px minmax(0, 1fr) 18px; gap: 8px; }
+        .wg-experience-copy strong { font-size: .91rem; }
+        .wg-experience-copy > span { font-size: .66rem; }
+        .wg-speech-preview { padding: 16px 14px 10px; }
+        .wg-landing-footer .wg-landing-brand { font-size: .87rem; }
+      }
     </style>
   </head>
   <body>
@@ -590,15 +822,15 @@
       const questionCount = 5;
 
       const languageNames = [
-        { name: "Spanish", flag: "🇪🇸", locale: "es-ES" },
-        { name: "French", flag: "🇫🇷", locale: "fr-FR" },
-        { name: "German", flag: "🇩🇪", locale: "de-DE" },
-        { name: "Italian", flag: "🇮🇹", locale: "it-IT" },
-        { name: "Portuguese", flag: "🇵🇹", locale: "pt-PT" },
-        { name: "Japanese", flag: "🇯🇵", locale: "ja-JP" },
-        { name: "Korean", flag: "🇰🇷", locale: "ko-KR" },
-        { name: "Mandarin", flag: "🇨🇳", locale: "zh-CN" },
-        { name: "Arabic", flag: "🇸🇦", locale: "ar-SA" },
+        { name: "Spanish", locale: "es-ES" },
+        { name: "French", locale: "fr-FR" },
+        { name: "German", locale: "de-DE" },
+        { name: "Italian", locale: "it-IT" },
+        { name: "Portuguese", locale: "pt-PT" },
+        { name: "Japanese", locale: "ja-JP" },
+        { name: "Korean", locale: "ko-KR" },
+        { name: "Mandarin", locale: "zh-CN" },
+        { name: "Arabic", locale: "ar-SA" },
       ];
 
       const vocabularyData = {
@@ -811,25 +1043,73 @@
       const levelNames = ["Beginner", "Explorer", "Speaker", "Communicator", "Fluent", "Language Master"];
       const levelThresholds = [0, 250, 600, 1100, 1800, 2800];
       const activityItems = [
-        { id: "speak", icon: "🎙️", title: "Speak & repeat", copy: "Say a phrase and get gentle feedback." },
-        { id: "conversation", icon: "💬", title: "Conversation", copy: "Practice a friendly real-life chat." },
-        { id: "quiz", icon: "🧩", title: "Quick quiz", copy: "Choose the right meaning." },
-        { id: "match", icon: "🧷", title: "Match words", copy: "Pair new words with their meanings." },
-        { id: "fill", icon: "✍️", title: "Fill the blank", copy: "Recall a word from its meaning." },
-        { id: "flashcards", icon: "🗂️", title: "Flashcards", copy: "Turn a card and see what you know." },
-        { id: "listening", icon: "🔊", title: "Listen & choose", copy: "Listen closely, then pick a meaning." },
-        { id: "order", icon: "🔤", title: "Build a sentence", copy: "Put the words in a helpful order." },
-        { id: "translate", icon: "🌍", title: "Translate a phrase", copy: "Try a short everyday translation." },
+        { id: "speak", icon: "speak", title: "Speak & repeat", copy: "Get comfortable saying everyday phrases aloud." },
+        { id: "conversation", icon: "conversation", title: "Conversation", copy: "Practise keeping a friendly chat going." },
+        { id: "quiz", icon: "quiz", title: "Quick quiz", copy: "Build recall with a few familiar words." },
+        { id: "match", icon: "match", title: "Match words", copy: "Connect new words to what they mean." },
+        { id: "fill", icon: "fill", title: "Fill the blank", copy: "Find the right word from memory." },
+        { id: "flashcards", icon: "flashcards", title: "Flashcards", copy: "Review words and see what has stuck." },
+        { id: "listening", icon: "audio", title: "Listen & choose", copy: "Listen for a word, then find its meaning." },
+        { id: "order", icon: "order", title: "Build a sentence", copy: "Put the words in a natural order." },
+        { id: "translate", icon: "translate", title: "Translate a phrase", copy: "Try putting an everyday phrase into English." },
       ];
       const navItems = [
-        { id: "home", icon: "⌂", label: "Home" },
-        { id: "learn", icon: "✦", label: "Learn" },
-        { id: "speak", icon: "◉", label: "Speak" },
-        { id: "challenges", icon: "☑", label: "Daily goals" },
-        { id: "progress", icon: "↗", label: "Progress" },
-        { id: "more", icon: "•••", label: "More" },
+        { id: "home", icon: "home", label: "Home" },
+        { id: "learn", icon: "leaf", label: "Learn" },
+        { id: "speak", icon: "speak", label: "Speak" },
+        { id: "challenges", icon: "check", label: "Daily goals" },
+        { id: "progress", icon: "progress", label: "Progress" },
+        { id: "more", icon: "more", label: "More" },
       ];
-      activityItems.push({ id: "grammar", icon: "🧱", title: "Grammar", copy: "Build a sentence one piece at a time." });
+      activityItems.push({ id: "grammar", icon: "grammar", title: "Grammar", copy: "See how words fit together in a sentence." });
+
+      const iconShapes = {
+        brand: <><path d="M12 18.5V7.5" /><path d="M12 12C8.8 12 6.4 9.9 6.2 6.6c3.7-.1 5.8 1.6 5.8 5.4Z" /><path d="M12 9.5c.2-3.4 2.5-5.6 6-5.5-.1 3.5-2.2 5.6-6 5.5Z" /><path d="M4 17.5c2.9-.9 5.5-.5 8 1.3 2.5-1.8 5.1-2.2 8-1.3" /><path d="M4 17.5V20c3-.8 5.6-.3 8 1.5 2.4-1.8 5-2.3 8-1.5v-2.5" /></>,
+        home: <><path d="m3.5 10 8.5-7 8.5 7" /><path d="M5.5 9v11h13V9" /><path d="M9.5 20v-6h5v6" /></>,
+        leaf: <><path d="M20.5 3.5C11 3.5 5 5.8 5 12a5 5 0 0 0 5 5c6.3 0 8.7-6 10.5-13.5Z" /><path d="M3.5 21c2.8-5.1 6.3-8.8 12-12" /></>,
+        speak: <><path d="M4 10v4" /><path d="M8 7v10" /><path d="M12 4v16" /><path d="M16 8v8" /><path d="M20 10v4" /></>,
+        conversation: <><path d="M4 5.5h11a3 3 0 0 1 3 3v5a3 3 0 0 1-3 3H9l-4.5 3v-3.2A3 3 0 0 1 2 13.5v-5a3 3 0 0 1 2-3Z" /><path d="M9 5.5V4.8A2.8 2.8 0 0 1 11.8 2h6.4A2.8 2.8 0 0 1 21 4.8v5.4a2.8 2.8 0 0 1-2.8 2.8H18" /></>,
+        quiz: <><path d="M6 3.5h9l4 4V20H6z" /><path d="M15 3.5V8h4" /><path d="m8.5 14 2 2 4.5-4.5" /></>,
+        match: <><rect x="3.5" y="5" width="8" height="8" rx="1.5" /><rect x="12.5" y="11" width="8" height="8" rx="1.5" /><path d="M11.5 9h2M10 13v2" /></>,
+        fill: <><path d="M4 6h16" /><path d="M4 11h5" /><path d="M15 11h5" /><rect x="9.5" y="9" width="5" height="4" rx="1" /><path d="M4 17h16" /></>,
+        flashcards: <><path d="M7 4h12a2 2 0 0 1 2 2v11" /><rect x="3" y="7" width="14" height="14" rx="2" /><path d="M6.5 11h7M6.5 14h5" /></>,
+        audio: <><path d="M4 10v4" /><path d="M8 7v10" /><path d="M12 10v4" /><path d="M16 8a6 6 0 0 1 0 8" /><path d="M19 5a10 10 0 0 1 0 14" /></>,
+        order: <><path d="M8 6h12M8 12h12M8 18h12" /><path d="M4 5v14" /><path d="m2.5 17 1.5 2 1.5-2" /></>,
+        translate: <><path d="M4 6h10M9 4v2M6 6c.4 3.6 2.6 6 5.5 7.5M11 6c-.8 3-2.8 5.5-6 7" /><path d="M13 20 17 11l4 9M14.5 17h5" /></>,
+        grammar: <><path d="M5 5h14M5 10h9M5 15h6" /><path d="m14 16 2 2 4-5" /></>,
+        check: <><rect x="4" y="4" width="16" height="16" rx="3" /><path d="m8 12 2.5 2.5L16.5 9" /></>,
+        progress: <><path d="M4 19V5M4 19h17" /><path d="m7 15 4-4 3 2 5-6" /><path d="M16 7h3v3" /></>,
+        more: <><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /></>,
+        clock: <><circle cx="12" cy="12" r="8.5" /><path d="M12 7v5l3.5 2" /></>,
+        words: <><path d="M3 5.5c3.3-1.4 6.3-1 9 1v13c-2.7-2-5.7-2.4-9-1z" /><path d="M21 5.5c-3.3-1.4-6.3-1-9 1v13c2.7-2 5.7-2.4 9-1z" /><path d="M6 9h3M6 12h3M15 9h3M15 12h3" /></>,
+        medal: <><circle cx="12" cy="10" r="6.5" /><path d="m8 15-1 7 5-2.5 5 2.5-1-7" /><path d="m12 6.5 1 2 2.2.3-1.6 1.5.4 2.2-2-1.1-2 1.1.4-2.2-1.6-1.5 2.2-.3z" /></>,
+        profile: <><circle cx="12" cy="8" r="3.5" /><path d="M4.5 20a7.5 7.5 0 0 1 15 0" /></>,
+        spark: <><path d="m12 2 1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8z" /><path d="m19 15 .8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" /></>,
+        arrow: <><path d="M4 12h15" /><path d="m13 6 6 6-6 6" /></>,
+        checkmark: <><path d="m5 12 4 4L19 6" /></>,
+        audioPlay: <><path d="M4 10v4" /><path d="M8 7v10" /><path d="M12 10v4" /><path d="M16 8a6 6 0 0 1 0 8" /><path d="M19 5a10 10 0 0 1 0 14" /></>,
+      };
+
+      function Icon({ name, size = 20, className = "" }) {
+        return (
+          <svg
+            className={`wg-icon${className ? ` ${className}` : ""}`}
+            width={size}
+            height={size}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.7"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            {iconShapes[name] || iconShapes.leaf}
+          </svg>
+        );
+      }
+
 
       function makeVocabulary(language) {
         return vocabularyData[language].map(([word, hint, meaning]) => ({
@@ -869,6 +1149,7 @@
           lastPractice: "",
           wordsLearned: 0,
           knownWords: [],
+          mistakes: [],
           lessons: 0,
           speakingExercises: 0,
           pronunciationScores: [],
@@ -898,6 +1179,7 @@
             ...fallback,
             ...parsed,
             language: validLanguage ? parsed.language : fallback.language,
+            mistakes: Array.isArray(parsed.mistakes) ? parsed.mistakes : fallback.mistakes,
             daily,
           };
         } catch {
@@ -1042,7 +1324,7 @@
             <section className="game" aria-labelledby="game-title">
               <div className="topline">
                 <div className="brand">
-                  <span className="brand-icon" aria-hidden="true">✿</span>
+                  <span className="brand-icon" aria-hidden="true"><Icon name="brand" size={22} /></span>
                   Little Word Club
                 </div>
                 <label>
@@ -1053,8 +1335,8 @@
                     onChange={handleLanguageChange}
                     aria-label="Choose a language"
                   >
-                    <option value="Spanish">🇪🇸 Spanish</option>
-                    <option value="French">🇫🇷 French</option>
+                    <option value="Spanish">Spanish</option>
+                    <option value="French">French</option>
                   </select>
                 </label>
               </div>
@@ -1074,7 +1356,7 @@
                     <span>
                       Word {questionIndex + 1} of {questions.length}
                     </span>
-                    <span>★ {score} {score === 1 ? "point" : "points"}</span>
+                    <span><Icon name="spark" size={14} /> {score} {score === 1 ? "point" : "points"}</span>
                   </div>
                   <div
                     className="progress-track"
@@ -1135,7 +1417,7 @@
                     {selectedAnswer === null
                       ? "Take your time—you've got this."
                       : isCorrect
-                        ? "Lovely! You got it. ✨"
+                        ? "Lovely! You got it."
                         : `Not quite! “${currentQuestion.word}” means “${currentQuestion.meaning}.”`}
                   </p>
 
@@ -1152,9 +1434,7 @@
                 </>
               ) : (
                 <section className="score-card" aria-live="polite">
-                  <p className="score-emoji" aria-hidden="true">
-                    {score === questions.length ? "🌟" : score >= 3 ? "🌼" : "🌱"}
-                  </p>
+                  <p className="score-emoji" aria-hidden="true"><Icon name={score === questions.length ? "medal" : score >= 3 ? "spark" : "leaf"} size={34} /></p>
                   <h2 className="score-title">Nice work showing up!</h2>
                   <p className="score-copy">
                     You got{" "}
@@ -1184,20 +1464,20 @@
       }
 
       const badgeCatalog = [
-        { id: "first-words", icon: "📚", title: "First Words", text: "Learn 10 new words.", unlocked: (p) => p.wordsLearned >= 10 },
-        { id: "first-chat", icon: "💬", title: "First Conversation", text: "Finish a guided conversation.", unlocked: (p) => p.conversations > 0 },
-        { id: "clear-speech", icon: "🎙️", title: "Clear Speaker", text: "Reach an 90% speech match.", unlocked: (p) => p.pronunciationScores.some((score) => score >= 90) },
-        { id: "week-streak", icon: "🔥", title: "A Week of Words", text: "Practice seven days in a row.", unlocked: (p) => p.streak >= 7 },
-        { id: "word-collector", icon: "🌱", title: "Word Collector", text: "Learn 25 new words.", unlocked: (p) => p.wordsLearned >= 25 },
-        { id: "fearless-speaker", icon: "🗣️", title: "Fearless Speaker", text: "Complete 10 speaking attempts.", unlocked: (p) => p.speakingExercises >= 10 },
-        { id: "perfect-match", icon: "✨", title: "Perfect Match", text: "Get a 100% speech-to-text match.", unlocked: (p) => p.pronunciationScores.includes(100) },
-        { id: "lesson-learner", icon: "🏅", title: "Lesson Learner", text: "Complete five activities.", unlocked: (p) => p.lessons >= 5 },
-        { id: "curious-mind", icon: "🌍", title: "Curious Mind", text: "Try a second language.", unlocked: (p) => p.language !== "Spanish" },
+        { id: "first-words", icon: "words", title: "First Words", text: "Learn 10 new words.", unlocked: (p) => p.wordsLearned >= 10 },
+        { id: "first-chat", icon: "conversation", title: "First Conversation", text: "Finish a guided conversation.", unlocked: (p) => p.conversations > 0 },
+        { id: "clear-speech", icon: "speak", title: "Clear Speaker", text: "Reach an 90% speech match.", unlocked: (p) => p.pronunciationScores.some((score) => score >= 90) },
+        { id: "week-streak", icon: "clock", title: "A Week of Words", text: "Practice seven days in a row.", unlocked: (p) => p.streak >= 7 },
+        { id: "word-collector", icon: "leaf", title: "Word Collector", text: "Learn 25 new words.", unlocked: (p) => p.wordsLearned >= 25 },
+        { id: "fearless-speaker", icon: "conversation", title: "Fearless Speaker", text: "Complete 10 speaking attempts.", unlocked: (p) => p.speakingExercises >= 10 },
+        { id: "perfect-match", icon: "medal", title: "Perfect Match", text: "Get a 100% speech-to-text match.", unlocked: (p) => p.pronunciationScores.includes(100) },
+        { id: "lesson-learner", icon: "medal", title: "Lesson Learner", text: "Complete five activities.", unlocked: (p) => p.lessons >= 5 },
+        { id: "curious-mind", icon: "words", title: "Curious Mind", text: "Try a second language.", unlocked: (p) => p.language !== "Spanish" },
       ];
 
       function App() {
         const [profile, setProfile] = useState(readProfile);
-        const [tab, setTab] = useState("home");
+        const [tab, setTab] = useState("landing");
         const [toast, setToast] = useState("");
         const [storageNotice, setStorageNotice] = useState("");
         const [gameMode, setGameMode] = useState("quiz");
@@ -1242,6 +1522,9 @@
         ));
         const nextLevelXp = levelThresholds[levelIndex + 1] ?? levelThresholds[levelIndex];
         const currentLevelXp = levelThresholds[levelIndex];
+        const languageMistakes = profile.mistakes
+          .filter((item) => item.language === language)
+          .sort((left, right) => right.missCount - left.missCount);
         const levelProgress = levelIndex === levelNames.length - 1
           ? 100
           : Math.min(100, Math.round(((profile.xp - currentLevelXp) / (nextLevelXp - currentLevelXp)) * 100));
@@ -1337,6 +1620,52 @@
           });
         }
 
+        function updateMistake(item, gotItRight) {
+          if (!item.word || !item.meaning) return;
+          const normalizedWord = normalizeWords(item.word).join(" ");
+          setProfile((current) => {
+            const mistakes = Array.isArray(current.mistakes) ? current.mistakes : [];
+            const index = mistakes.findIndex((mistake) =>
+              mistake.language === language &&
+              mistake.kind === item.kind &&
+              normalizeWords(mistake.word).join(" ") === normalizedWord,
+            );
+            if (gotItRight) {
+              if (index < 0) return current;
+              const existing = mistakes[index];
+              if ((existing.correctStreak || 0) + 1 >= 2) {
+                return { ...current, mistakes: mistakes.filter((_, mistakeIndex) => mistakeIndex !== index) };
+              }
+              return {
+                ...current,
+                mistakes: mistakes.map((mistake, mistakeIndex) =>
+                  mistakeIndex === index
+                    ? { ...mistake, correctStreak: (mistake.correctStreak || 0) + 1 }
+                    : mistake,
+                ),
+              };
+            }
+
+            if (index < 0) {
+              return {
+                ...current,
+                mistakes: [
+                  ...mistakes,
+                  { ...item, language, missCount: 1, correctStreak: 0, lastSeen: today },
+                ],
+              };
+            }
+            return {
+              ...current,
+              mistakes: mistakes.map((mistake, mistakeIndex) =>
+                mistakeIndex === index
+                  ? { ...mistake, meaning: item.meaning, missCount: (mistake.missCount || 0) + 1, correctStreak: 0, lastSeen: today }
+                  : mistake,
+              ),
+            };
+          });
+        }
+
         function changeTab(nextTab) {
           if (recognitionRef.current && nextTab !== "speak" && nextTab !== "conversation") {
             recognitionRef.current.stop();
@@ -1375,6 +1704,11 @@
           const feedback = compareSpeech(target, heard);
           setSpeechFeedback({ ...feedback, target, heard });
           setSpeechState("idle");
+          const phrase = phrases.find((item) => item.target === target);
+          updateMistake(
+            { word: target, meaning: phrase?.english || target, kind: "phrase" },
+            feedback.score >= 80,
+          );
           setProfile((current) => ({
             ...current,
             speakingExercises: current.speakingExercises + 1,
@@ -1476,6 +1810,40 @@
           window.scrollTo({ top: 0, behavior: "smooth" });
         }
 
+        function beginMistakeReview() {
+          const entries = profile.mistakes
+            .filter((item) => item.language === language)
+            .sort((left, right) => right.missCount - left.missCount)
+            .slice(0, 5);
+          const round = entries.map((entry) => {
+            const isPhrase = entry.kind === "phrase";
+            const choices = isPhrase
+              ? phraseData[language].map((phrase) => phrase.english)
+              : vocabulary.map((item) => item.meaning);
+            return {
+              ...(isPhrase ? { target: entry.word, english: entry.meaning } : { word: entry.word, meaning: entry.meaning }),
+              memoryKind: entry.kind,
+              choices: shuffle([entry.meaning, ...shuffle([...new Set(choices.filter((choice) => choice !== entry.meaning))]).slice(0, 3)]),
+            };
+          });
+          setGameMode("mistakes");
+          setGameRound(round);
+          setGameIndex(0);
+          setGameScore(0);
+          setGameAnswer("");
+          setTypedAnswer("");
+          setGameDone(false);
+          setFlashRevealed(false);
+          setSentenceParts([]);
+          setGameNote("");
+          setMatchedPairs([]);
+          setMatchLeft("");
+          setMatchRight("");
+          setMatchOptions([]);
+          setTab("learn");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
         function finishGame(finalScore) {
           setGameDone(true);
           setProfile((current) => ({ ...current, lessons: current.lessons + 1 }));
@@ -1500,14 +1868,21 @@
         function selectAnswer(answer) {
           if (gameAnswer) return;
           setGameAnswer(answer);
+          const isPhrase = gameMode === "translate" || currentQuestion.memoryKind === "phrase";
+          const expected = isPhrase ? currentQuestion.english : currentQuestion.meaning;
           const correct = gameMode === "translate"
-            ? normalizeWords(answer).join(" ") === normalizeWords(currentQuestion.english).join(" ")
-            : answer === currentQuestion.meaning;
+            ? normalizeWords(answer).join(" ") === normalizeWords(expected).join(" ")
+            : answer === expected;
+          updateMistake({
+            word: currentQuestion.word || currentQuestion.target,
+            meaning: expected,
+            kind: currentQuestion.memoryKind || (isPhrase ? "phrase" : "word"),
+          }, correct);
           if (correct) {
             const nextScore = gameScore + 1;
             setGameScore(nextScore);
-            if (currentQuestion.word) rememberWord(currentQuestion.word);
-            setGameNote("That's right! Lovely work. ✨");
+            if (currentQuestion.word && currentQuestion.memoryKind !== "phrase") rememberWord(currentQuestion.word);
+            setGameNote("That's right! Lovely work.");
             awardXp(5, "Correct answer");
           } else {
             setGameNote(`Not quite—“${currentQuestion.word || currentQuestion.target}” means “${currentQuestion.meaning || currentQuestion.english}.”`);
@@ -1524,12 +1899,17 @@
               : currentQuestion.english;
           const submitted = gameMode === "order" ? sentenceParts.join(" ") : typedAnswer;
           const correct = normalizeWords(submitted).join(" ") === normalizeWords(expected).join(" ");
+          updateMistake({
+            word: currentQuestion.word || currentQuestion.target,
+            meaning: expected,
+            kind: gameMode === "translate" || gameMode === "order" ? "phrase" : "word",
+          }, correct);
           setGameAnswer(submitted);
           if (correct) {
             const nextScore = gameScore + 1;
             setGameScore(nextScore);
             if (currentQuestion.word) rememberWord(currentQuestion.word);
-            setGameNote("You got it! Every word is a little win. 🌱");
+            setGameNote("You got it! Every word is a little win.");
             awardXp(5, "Correct answer");
           } else {
             setGameNote(`The answer is “${expected}.” Keep it in your growing word bank.`);
@@ -1537,6 +1917,10 @@
         }
 
         function markFlashcard(known) {
+          updateMistake(
+            { word: currentQuestion.word, meaning: currentQuestion.meaning, kind: "word" },
+            known,
+          );
           if (known) {
             setGameScore((score) => score + 1);
             rememberWord(currentQuestion.word);
@@ -1563,6 +1947,13 @@
             awardXp(5, "Word match");
             if (nextMatched.length === gameRound.length) finishGame(nextScore);
           } else {
+            const missedWord = gameRound.find((item) => item.meaning === nextLeft);
+            if (missedWord) {
+              updateMistake(
+                { word: missedWord.word, meaning: missedWord.meaning, kind: "word" },
+                false,
+              );
+            }
             setGameNote("Not a pair just yet—try another combination.");
             window.setTimeout(() => {
               setMatchLeft("");
@@ -1617,6 +2008,10 @@
           const reply = conversationAnswer.trim() || transcript.trim();
           if (!reply || !activeTurn) return;
           const feedback = compareSpeech(activeTurn.target, reply);
+          updateMistake(
+            { word: activeTurn.target, meaning: activeTurn.translation, kind: "phrase" },
+            feedback.score >= 80,
+          );
           const nextMessages = [
             ...conversationMessages,
             { from: "you", text: reply },
@@ -1660,6 +2055,137 @@
           );
         }
 
+        function renderLanding() {
+          const previewWord = vocabulary[0];
+          const completedGoals = Object.values(daily.checks).filter(Boolean).length;
+          const goalProgress = Math.round((completedGoals / tasks.length) * 100);
+          return (
+            <div className="wg-landing">
+              <header className="wg-landing-header">
+                <a className="wg-landing-brand" href="#top" aria-label="Word Garden home">
+                  <span className="wg-landing-mark"><Icon name="brand" size={23} /></span>
+                  <span className="wg-wordmark"><span>word</span> <em>garden</em></span>
+                </a>
+                <nav className="wg-landing-nav" aria-label="Landing page navigation">
+                  <a href="#experience">The experience</a>
+                  <a href="#journey">How it works</a>
+                  <button className="wg-landing-login" onClick={() => setTab("home")} type="button">Open your garden <Icon name="arrow" size={16} /></button>
+                </nav>
+              </header>
+
+              <main id="top">
+                <section className="wg-landing-hero">
+                  <div className="wg-landing-intro">
+                    <p className="wg-landing-eyebrow"><span className="wg-eyebrow-line" />A language-learning garden</p>
+                    <h1>Learn words.<br /><em>Find your voice.</em></h1>
+                    <p className="wg-landing-lede">Build your vocabulary, practise real conversations, and grow your confidence one phrase at a time.</p>
+                    <div className="wg-landing-actions">
+                      <button className="wg-landing-cta" onClick={() => setTab("home")} type="button">Start learning <Icon name="arrow" size={18} /></button>
+                      <a className="wg-landing-secondary" href="#experience">Explore the experience</a>
+                    </div>
+                    <p className="wg-landing-note"><Icon name="profile" size={15} /> No account needed · Your progress stays on this device</p>
+                  </div>
+                  <div className="wg-product-preview" aria-label="Preview of Word Garden learning activities">
+                    <div className="wg-preview-window">
+                      <div className="wg-preview-topbar"><span className="wg-preview-brand"><span className="wg-preview-brand-mark"><Icon name="brand" size={16} /></span>word garden</span><span className="wg-preview-language">{language} <span aria-hidden="true">⌄</span></span></div>
+                      <div className="wg-preview-body">
+                        <div className="wg-preview-greeting"><div><span className="wg-preview-overline">A MOMENT TO PRACTISE</span><h2>Your {language} garden</h2></div><span className="wg-preview-date">TODAY</span></div>
+                        <div className="wg-preview-columns">
+                          <section className="wg-vocab-preview" aria-label="Vocabulary preview">
+                            <div className="wg-preview-section-head"><span>WORD TO KEEP</span><Icon name="leaf" size={16} /></div>
+                            <div className="wg-preview-word" lang={languageInfo.locale}>{previewWord?.word || "hola"}</div>
+                            <div className="wg-preview-meaning">{previewWord?.meaning || "hello"}</div>
+                            <div className="wg-preview-word-tools"><span>{previewWord?.hint || "oh-lah"}</span><button type="button" aria-label={`Listen to ${previewWord?.word || "hola"}`} onClick={() => playAudio(previewWord?.word || "hola")}><Icon name="audio" size={17} /> Listen</button></div>
+                            <div className="wg-preview-word-foot"><span><Icon name="checkmark" size={14} /> Ready to practise</span><button type="button" aria-label="Open vocabulary practice" onClick={() => beginGame("flashcards")}><Icon name="arrow" size={16} /></button></div>
+                          </section>
+                          <div className="wg-preview-side">
+                            <section className="wg-dialogue-preview">
+                              <div className="wg-preview-section-head"><span>CONVERSATION</span><Icon name="conversation" size={16} /></div>
+                              <p className="wg-dialogue-line wg-dialogue-prompt" lang={languageInfo.locale}>{conversationTurns[0]?.guide || phrases[0]?.target}</p>
+                              <p className="wg-dialogue-hint">Your turn: practise a natural reply</p>
+                              <button type="button" onClick={startConversation}>Try a conversation <Icon name="arrow" size={15} /></button>
+                            </section>
+                            <section className="wg-goal-preview" aria-label={`${completedGoals} of ${tasks.length} daily goals complete`}>
+                              <div className="wg-goal-preview-head"><span>DAILY GARDEN</span><span>{completedGoals}/{tasks.length}</span></div>
+                              <div className="wg-goal-track" role="progressbar" aria-label="Today's goal progress" aria-valuenow={goalProgress} aria-valuemin="0" aria-valuemax="100"><span style={{ width: `${goalProgress}%` }} /></div>
+                              <span className="wg-goal-caption">{dailyComplete ? "All today's goals are complete" : "A little progress, at your pace"}</span>
+                            </section>
+                          </div>
+                        </div>
+                        <div className="wg-preview-footer"><span><Icon name="spark" size={15} /> Small steps count</span><span>{profile.xp} XP collected</span></div>
+                      </div>
+                    </div>
+                    <span className="wg-preview-caption">A glimpse inside your daily practice</span>
+                  </div>
+                </section>
+
+                <section className="wg-experience-section" id="experience">
+                  <div className="wg-section-intro">
+                    <p className="wg-landing-eyebrow"><span className="wg-eyebrow-line" />Choose your way in</p>
+                    <h2>Language is for <em>living.</em></h2>
+                    <p>Start with the kind of practice that feels useful today. Your garden will be here when you come back.</p>
+                  </div>
+                  <div className="wg-experience-list">
+                    <button className="wg-experience-item" onClick={() => setTab("speak")} type="button">
+                      <span className="wg-experience-number">01</span><span className="wg-experience-icon"><Icon name="speak" size={23} /></span>
+                      <span className="wg-experience-copy"><strong>Speak &amp; Repeat</strong><span>Listen to a phrase, then say or type it in your own time.</span></span>
+                      <span className="wg-experience-arrow"><Icon name="arrow" size={18} /></span>
+                    </button>
+                    <button className="wg-experience-item" onClick={startConversation} type="button">
+                      <span className="wg-experience-number">02</span><span className="wg-experience-icon"><Icon name="conversation" size={23} /></span>
+                      <span className="wg-experience-copy"><strong>Conversation</strong><span>Practise a friendly, guided dialogue one turn at a time.</span></span>
+                      <span className="wg-experience-arrow"><Icon name="arrow" size={18} /></span>
+                    </button>
+                    <button className="wg-experience-item" onClick={() => changeTab("vocabulary")} type="button">
+                      <span className="wg-experience-number">03</span><span className="wg-experience-icon"><Icon name="words" size={23} /></span>
+                      <span className="wg-experience-copy"><strong>Vocabulary Garden</strong><span>Collect useful words, hear them aloud, and revisit what you know.</span></span>
+                      <span className="wg-experience-arrow"><Icon name="arrow" size={18} /></span>
+                    </button>
+                  </div>
+                </section>
+
+                <section className="wg-journey-section" id="journey">
+                  <div className="wg-journey-heading">
+                    <p className="wg-landing-eyebrow"><span className="wg-eyebrow-line" />A natural learning rhythm</p>
+                    <h2>Small steps. <em>Real progress.</em></h2>
+                  </div>
+                  <ol className="wg-journey-steps">
+                    <li><span className="wg-step-number">01</span><span className="wg-step-line" /><div><strong>Discover useful words</strong><p>Meet practical vocabulary with a meaning and a pronunciation hint.</p></div></li>
+                    <li><span className="wg-step-number">02</span><span className="wg-step-line" /><div><strong>Practise in context</strong><p>Use new language in speaking exercises and guided conversations.</p></div></li>
+                    <li><span className="wg-step-number">03</span><span className="wg-step-line" /><div><strong>Revisit and notice progress</strong><p>Review tricky words and see your practice add up over time.</p></div></li>
+                  </ol>
+                </section>
+
+                <section className="wg-practice-section" aria-labelledby="wg-practice-title">
+                  <div className="wg-practice-copy">
+                    <p className="wg-landing-eyebrow"><span className="wg-eyebrow-line" />See how it feels</p>
+                    <h2 id="wg-practice-title">One phrase at a time.</h2>
+                    <p>Hear a phrase in {language}, try it aloud, and get a gentle word-match to guide your next attempt. You can always type instead.</p>
+                    <button className="wg-text-action" onClick={() => changeTab("speak")} type="button">Explore speaking practice <Icon name="arrow" size={17} /></button>
+                  </div>
+                  <div className="wg-speech-preview">
+                    <div className="wg-speech-preview-top"><span><Icon name="speak" size={17} /> SPEAK &amp; REPEAT</span><span>{language}</span></div>
+                    <p className="wg-speech-prompt">Try saying</p>
+                    <p className="wg-speech-phrase" lang={languageInfo.locale}>{currentPhrase.target}</p>
+                    <p className="wg-speech-translation">{currentPhrase.english}</p>
+                    <div className="wg-speech-controls">
+                      <button className="wg-listen-button" type="button" onClick={() => playAudio(currentPhrase.target)}><Icon name="audio" size={18} /> Listen first</button>
+                      <span>or use your microphone</span>
+                    </div>
+                    <div className="wg-speech-foot"><span><Icon name="checkmark" size={14} /> Gentle feedback, not a grade</span><button type="button" aria-label="Start this speaking activity" onClick={() => changeTab("speak")}><Icon name="arrow" size={18} /></button></div>
+                  </div>
+                </section>
+
+                <section className="wg-landing-close">
+                  <div><p className="wg-landing-eyebrow"><span className="wg-eyebrow-line" />Your next word is waiting</p><h2>Begin wherever you are.</h2><p>Choose a language, find a phrase, and take your first small step.</p></div>
+                  <button className="wg-landing-cta" onClick={() => setTab("home")} type="button">Start learning <Icon name="arrow" size={18} /></button>
+                </section>
+              </main>
+              <footer className="wg-landing-footer"><a className="wg-landing-brand" href="#top"><span className="wg-landing-mark"><Icon name="brand" size={19} /></span><span className="wg-wordmark"><span>word</span> <em>garden</em></span></a><span>A little practice, a lot of possibility.</span><button onClick={() => setTab("profile")} type="button">Language settings</button></footer>
+            </div>
+          );
+        }
+
         function renderHome() {
           const recommendations = profile.speakingExercises > 0 && averagePronunciation < 80
             ? "Some words take a few tries. A short speaking round can help them feel more familiar."
@@ -1667,28 +2193,37 @@
           return (
             <>
               <PageHeader
-                kicker={`${languageInfo.flag} ${language} · ${profile.difficulty}`}
-                title={`Hi, ${profile.name || "friend"}. Ready to explore?`}
-                copy="No need to rush. A few minutes of practice is a lovely place to start."
-                action={<button className="lq-primary" onClick={() => changeTab("learn")} type="button">Choose an activity <span aria-hidden="true">→</span></button>}
+                kicker={`${language} · ${profile.difficulty}`}
+                title={`Good to see you, ${profile.name || "friend"}.`}
+                copy="A few thoughtful minutes can help new words take root."
+                action={<button className="lq-primary" onClick={() => changeTab("speak")} type="button">Start speaking <Icon name="arrow" size={17} /></button>}
               />
               <div className="lq-stat-grid">
                 {[
-                  ["XP earned", profile.xp, "✦", "A little progress adds up"],
-                  ["Practice streak", profile.streak, "🔥", profile.streak === 1 ? "day in a row" : "days in a row"],
-                  ["Words picked up", profile.wordsLearned, "📚", "Ready when you are"],
-                  ["Speaking practice", averagePronunciation ? `${averagePronunciation}%` : "—", "🎙️", "Approximate word match"],
+                  ["XP earned", profile.xp, "spark", "A little progress adds up"],
+                  ["Practice streak", profile.streak, "clock", profile.streak === 1 ? "day in a row" : "days in a row"],
+                  ["Words learned", profile.wordsLearned, "words", "Ready when you are"],
+                  ["Speaking match", averagePronunciation ? `${averagePronunciation}%` : "—", "speak", "Approximate word match"],
                 ].map(([label, value, icon, foot]) => (
                   <div className="lq-stat" key={label}>
-                    <div className="lq-stat-top"><span>{label}</span><span className="lq-stat-icon">{icon}</span></div>
+                    <div className="lq-stat-top"><span>{label}</span><Icon name={icon} className="lq-stat-icon" size={18} /></div>
                     <strong className="lq-stat-value">{value}</strong>
                     <span className="lq-stat-foot">{foot}</span>
                   </div>
                 ))}
               </div>
+              <button className="lq-featured-activity" onClick={() => changeTab("speak")} type="button">
+                <span className="lq-featured-icon"><Icon name="speak" size={29} /></span>
+                <span className="lq-featured-copy">
+                  <span className="lq-featured-kicker">A good place to begin</span>
+                  <strong>Speak a phrase, your way</strong>
+                  <span>Listen, repeat, and build confidence at your own pace.</span>
+                </span>
+                <span className="lq-featured-action">Practise <Icon name="arrow" size={18} /></span>
+              </button>
               <div className="lq-dashboard-grid">
                 <section className="lq-level-card">
-                  <span className="lq-level-mark" aria-hidden="true">🌿</span>
+                  <span className="lq-level-mark" aria-hidden="true"><Icon name="leaf" size={21} /></span>
                   <div className="lq-card-heading">
                     <h2 className="lq-card-title">Your progress so far</h2>
                     <span className="lq-pill">Level {levelIndex + 1}</span>
@@ -1702,7 +2237,7 @@
                 <section className="lq-card">
                   <div className="lq-card-heading">
                     <h2 className="lq-card-title">A gentle goal for today</h2>
-                    <span aria-hidden="true">☀️</span>
+                    <Icon name="spark" size={20} />
                   </div>
                   <p className="lq-muted">{dailyComplete ? "You finished today's goals. Nice work!" : "Try a few small activities today to earn 50 bonus XP. There's no need to do them all at once."}</p>
                   <div className="lq-challenge-list">
@@ -1716,19 +2251,21 @@
                   <button className="lq-sidebar-link" style={{ marginTop: 13 }} onClick={() => changeTab("challenges")} type="button">See today's goals →</button>
                 </section>
               </div>
-              <div className="lq-section-heading"><h2>What sounds fun?</h2><button className="lq-sidebar-link" onClick={() => changeTab("learn")} type="button">Browse activities →</button></div>
+              <div className="lq-section-heading"><h2>Choose how to grow</h2><button className="lq-sidebar-link" onClick={() => changeTab("learn")} type="button">Browse all activities <Icon name="arrow" size={15} /></button></div>
               <div className="lq-activity-grid">
-                {activityItems.slice(0, 6).map((item) => (
+                {activityItems.slice(1, 6).map((item) => (
                   <button className="lq-activity" key={item.id} onClick={() => item.id === "speak" ? changeTab("speak") : item.id === "conversation" ? startConversation() : beginGame(item.id)} type="button">
-                    <span className="lq-activity-icon" aria-hidden="true">{item.icon}</span>
+                    <span className="lq-activity-icon" aria-hidden="true"><Icon name={item.icon} size={22} /></span>
                     <span className="lq-activity-title">{item.title}</span>
                     <span className="lq-activity-copy">{item.copy}</span>
                   </button>
                 ))}
               </div>
               <div className="lq-section-heading"><h2>Little wins</h2><button className="lq-sidebar-link" onClick={() => changeTab("achievements")} type="button">See all achievements →</button></div>
-              <section className="lq-card">
-                <p className="lq-muted">{earnedBadges.length ? earnedBadges.slice(-3).map((badge) => `${badge.icon} ${badge.title}`).join("   ·   ") : recommendations}</p>
+              <section className="lq-card lq-wins-card">
+                {earnedBadges.length
+                  ? <div className="lq-earned-list">{earnedBadges.slice(-3).map((badge) => <span className="lq-earned-item" key={badge.id}><Icon name={badge.icon} size={17} />{badge.title}</span>)}</div>
+                  : <p className="lq-muted">{recommendations}</p>}
               </section>
             </>
           );
@@ -1743,7 +2280,7 @@
                   <section className="lq-practice-card">
                     <h2>Want to practise speaking?</h2>
                     <p>Listen to a phrase, then try saying it. You can use your microphone or type what you said—either way, this is just practice.</p>
-                    <button className="lq-primary" onClick={() => changeTab("speak")} type="button">Try a speaking exercise 🎙️</button>
+                    <button className="lq-primary" onClick={() => changeTab("speak")} type="button">Try a speaking exercise</button>
                   </section>
                   <section className="lq-card">
                     <h2 className="lq-card-title">Not sure where to start?</h2>
@@ -1755,7 +2292,7 @@
                 <div className="lq-activity-grid">
                   {activityItems.map((item) => (
                     <button className="lq-activity" key={item.id} onClick={() => item.id === "speak" ? changeTab("speak") : item.id === "conversation" ? startConversation() : beginGame(item.id)} type="button">
-                      <span className="lq-activity-icon" aria-hidden="true">{item.icon}</span>
+                      <span className="lq-activity-icon" aria-hidden="true"><Icon name={item.icon} size={22} /></span>
                       <span className="lq-activity-title">{item.title}</span>
                       <span className="lq-activity-copy">{item.copy}</span>
                     </button>
@@ -1776,7 +2313,7 @@
                 <section className="lq-card" style={{ maxWidth: 600 }}>
                   <div className="lq-stat-value">{gameScore} / {gameRound.length}</div>
                   <p className="lq-muted">You earned some XP and made progress on today's goal. If a few answers were tricky, you can always come back to them.</p>
-                  <button className="lq-primary" onClick={() => beginGame(gameMode)} type="button">Play another round →</button>
+                  <button className="lq-primary" onClick={() => gameMode === "mistakes" ? beginMistakeReview() : beginGame(gameMode)} type="button">Play another round →</button>
                   <button className="lq-secondary" style={{ marginLeft: 8 }} onClick={() => { setGameRound([]); setGameDone(false); }} type="button">Choose another activity</button>
                 </section>
               </>
@@ -1812,14 +2349,21 @@
 
           const isTextMode = ["fill", "order", "translate"].includes(gameMode);
           const orderTokens = currentQuestion.tokens || [];
+          const expectedChoice = currentQuestion.memoryKind === "phrase"
+            ? currentQuestion.english
+            : currentQuestion.meaning;
           return (
             <>
-              <PageHeader kicker={`Vocabulary · ${activityItems.find((item) => item.id === gameMode)?.title || "Practice"}`} title={gameMode === "fill" ? "Can you remember the word?" : gameMode === "order" ? "Put the sentence together." : gameMode === "translate" ? "What does this phrase mean?" : "Pick the meaning that fits."} copy={`Question ${gameIndex + 1} of ${gameRound.length} · ${gameScore} correct so far`} action={<button className="lq-secondary" onClick={() => { setGameRound([]); setGameDone(false); }} type="button">Exit activity</button>} />
+              <PageHeader kicker={gameMode === "mistakes" ? "A little review, just for you" : `Vocabulary · ${activityItems.find((item) => item.id === gameMode)?.title || "Practice"}`} title={gameMode === "mistakes" ? "Let's revisit this one." : gameMode === "fill" ? "Can you remember the word?" : gameMode === "order" ? "Put the sentence together." : gameMode === "translate" ? "What does this phrase mean?" : "Pick the meaning that fits."} copy={gameMode === "mistakes" ? `Question ${gameIndex + 1} of ${gameRound.length} · These are words and phrases you've wanted to practise again.` : `Question ${gameIndex + 1} of ${gameRound.length} · ${gameScore} correct so far`} action={<button className="lq-secondary" onClick={() => { setGameRound([]); setGameDone(false); }} type="button">Leave activity</button>} />
               <section className="lq-speak-target" style={{ maxWidth: 720, margin: "0 auto" }}>
-                {gameMode === "translate" ? <>
+                {gameMode === "mistakes" ? <>
+                  <p className="lq-target-label">{currentQuestion.memoryKind === "phrase" ? "What does this phrase mean?" : "What does this word mean?"}</p>
+                  <h2 className="lq-target-text" lang={languageInfo.locale}>{currentQuestion.word || currentQuestion.target}</h2>
+                  {currentQuestion.memoryKind === "phrase" && <div className="lq-audio-row"><button className="lq-secondary" onClick={() => playAudio(currentQuestion.target)} type="button"><Icon name="audio" size={17} /> Listen</button></div>}
+                </> : gameMode === "translate" ? <>
                   <p className="lq-target-label">Translate this into English</p>
                   <h2 className="lq-target-text">{currentQuestion.target}</h2>
-                  <div className="lq-audio-row"><button className="lq-secondary" onClick={() => playAudio(currentQuestion.target)} type="button">🔊 Listen</button></div>
+                  <div className="lq-audio-row"><button className="lq-secondary" onClick={() => playAudio(currentQuestion.target)} type="button"><Icon name="audio" size={17} /> Listen</button></div>
                 </> : gameMode === "order" ? <>
                   <p className="lq-target-label">Build this phrase in {language}</p>
                   <h2 className="lq-target-text">{currentQuestion.english}</h2>
@@ -1829,7 +2373,7 @@
                   <p className="lq-target-label">{gameMode === "fill" ? `How do you say “${currentQuestion.meaning}” in ${language}?` : gameMode === "listening" ? "Listen to the word, then choose its meaning." : "What does this word mean in English?"}</p>
                   <h2 className="lq-target-text">{currentQuestion.word}</h2>
                   {profile.difficulty === "Beginner" && <p className="lq-target-translation">Pronunciation hint: {currentQuestion.hint}</p>}
-                  <div className="lq-audio-row"><button className="lq-secondary" onClick={() => playAudio(currentQuestion.word, profile.difficulty === "Beginner" ? .78 : 1)} type="button">🔊 Listen</button></div>
+                  <div className="lq-audio-row"><button className="lq-secondary" onClick={() => playAudio(currentQuestion.word, profile.difficulty === "Beginner" ? .78 : 1)} type="button"><Icon name="audio" size={17} /> Listen</button></div>
                 </>}
               </section>
               {gameMode === "match" ? null : isTextMode ? (
@@ -1841,9 +2385,9 @@
                 </form>
               ) : (
                 <>
-                  <p className="lq-muted" style={{ margin: "17px 0 9px" }}>Choose the meaning that feels right.</p>
+                  <p className="lq-muted" style={{ margin: "17px 0 9px" }}>{gameMode === "mistakes" ? "Take a moment, then choose the answer that makes sense." : "Choose the meaning that feels right."}</p>
                   <div className="lq-game-list">
-                    {currentQuestion.choices.map((choice) => <button className="lq-game-card" style={{ minHeight: 55, borderColor: gameAnswer === choice ? (choice === currentQuestion.meaning ? "#85b58e" : "#e4a7a0") : undefined, background: gameAnswer === choice ? (choice === currentQuestion.meaning ? "#eef7ee" : "#fff1ee") : undefined }} key={choice} onClick={() => selectAnswer(choice)} disabled={Boolean(gameAnswer)} type="button">{choice}</button>)}
+                    {currentQuestion.choices.map((choice) => <button className="lq-game-card" style={{ minHeight: 55, borderColor: gameAnswer === choice ? (choice === expectedChoice ? "#85b58e" : "#e4a7a0") : undefined, background: gameAnswer === choice ? (choice === expectedChoice ? "#eef7ee" : "#fff1ee") : undefined }} key={choice} onClick={() => selectAnswer(choice)} disabled={Boolean(gameAnswer)} type="button">{choice}</button>)}
                   </div>
                   {gameNote && <p className="lq-muted" role="status">{gameNote}</p>}
                   {gameAnswer && <button className="lq-primary" style={{ marginTop: 13 }} onClick={() => advanceGame(gameScore)} type="button">Next →</button>}
@@ -1869,14 +2413,14 @@
                   <h2 className="lq-target-text" lang={languageInfo.locale}>{currentPhrase.target}</h2>
                   {profile.difficulty === "Beginner" && <p className="lq-target-translation">{currentPhrase.english}</p>}
                   <div className="lq-audio-row">
-                    <button className="lq-secondary" onClick={() => playAudio(currentPhrase.target, slowSpeech ? .72 : 1)} type="button">🔊 {slowSpeech ? "Slow replay" : "Listen first"}</button>
+                    <button className="lq-secondary" onClick={() => playAudio(currentPhrase.target, slowSpeech ? .72 : 1)} type="button"><Icon name="audio" size={17} /> {slowSpeech ? "Slow replay" : "Listen first"}</button>
                     <button className="lq-secondary" onClick={() => setSlowSpeech((value) => !value)} type="button">{slowSpeech ? "Normal speed" : "Slow it down"}</button>
                     {window.speechSynthesis && <button className="lq-secondary" onClick={() => window.speechSynthesis.paused ? window.speechSynthesis.resume() : window.speechSynthesis.pause()} type="button">Pause / resume</button>}
                     <button className="lq-secondary" onClick={() => { setPhraseIndex((index) => (index + 1) % phrases.length); setSpeechFeedback(null); setTranscript(""); }} type="button">Another phrase ↻</button>
                   </div>
                 </section>
                 <section className="lq-mic-panel">
-                  <button className={`lq-mic-button${speechState === "listening" ? " listening" : ""}`} onClick={() => startListening(currentPhrase.target)} type="button" aria-label={speechState === "listening" ? "Stop recording" : "Start speaking"}>🎙️</button>
+                  <button className={`lq-mic-button${speechState === "listening" ? " listening" : ""}`} onClick={() => startListening(currentPhrase.target)} type="button" aria-label={speechState === "listening" ? "Stop recording" : "Start speaking"}><Icon name="speak" size={23} /></button>
                   <p className="lq-mic-title">{speechState === "listening" ? "I'm listening…" : speechState === "analyzing" ? "One moment…" : "Tap the microphone when you're ready"}</p>
                   <p className="lq-mic-hint">{speechSupported ? "Your browser may ask to use your microphone. Prefer not to? You can type instead." : "Your browser doesn't offer speech recognition here, but you can still listen and type."}</p>
                   <label className="lq-transcript-label" htmlFor="speak-transcript">Type what you said</label>
@@ -1938,8 +2482,8 @@
                   <p className="lq-target-label">Your reply in {language}</p>
                   <h2 className="lq-target-text" lang={languageInfo.locale} style={{ fontSize: "1.55rem" }}>{activeTurn.target}</h2>
                   <p className="lq-target-translation">{activeTurn.translation}</p>
-                  <div className="lq-audio-row"><button className="lq-secondary" onClick={() => playAudio(activeTurn.target)} type="button">🔊 Hear a reply</button></div>
-                  <button className={`lq-mic-button${speechState === "listening" ? " listening" : ""}`} style={{ width: 64, height: 64, marginTop: 12, fontSize: "1.45rem" }} onClick={() => startListening(activeTurn.target)} type="button" aria-label="Speak your conversation reply">🎙️</button>
+                  <div className="lq-audio-row"><button className="lq-secondary" onClick={() => playAudio(activeTurn.target)} type="button"><Icon name="audio" size={17} /> Hear a reply</button></div>
+                  <button className={`lq-mic-button${speechState === "listening" ? " listening" : ""}`} style={{ width: 64, height: 64, marginTop: 12, fontSize: "1.45rem" }} onClick={() => startListening(activeTurn.target)} type="button" aria-label="Speak your conversation reply"><Icon name="speak" size={23} /></button>
                   {speechMessage && <p className="lq-muted" role="status">{speechMessage}</p>}
                   <form style={{ width: "100%", marginTop: 4 }} onSubmit={sendConversationReply}>
                     <label className="lq-transcript-label" htmlFor="conversation-reply">Or type your reply</label>
@@ -1973,18 +2517,18 @@
               <PageHeader kicker="Your progress" title="Look how far you've come." copy="A gentle record of your practice. Speech scores are approximate matches from browser recognition." />
               <div className="lq-stat-grid">
                 {[
-                  ["Words learned", profile.wordsLearned, "📚", "unique words"],
-                  ["Activities", profile.lessons, "✦", "rounds completed"],
-                  ["Speaking tries", profile.speakingExercises, "🎙️", "practice attempts"],
-                  ["Practice time", `${profile.minutes}m`, "⏱️", "time in practice"],
-                ].map(([label, value, icon, foot]) => <div className="lq-stat" key={label}><div className="lq-stat-top"><span>{label}</span><span>{icon}</span></div><strong className="lq-stat-value">{value}</strong><span className="lq-stat-foot">{foot}</span></div>)}
+                  ["Words learned", profile.wordsLearned, "words", "unique words"],
+                  ["Activities", profile.lessons, "spark", "rounds completed"],
+                  ["Speaking tries", profile.speakingExercises, "speak", "practice attempts"],
+                  ["Practice time", `${profile.minutes}m`, "clock", "time in practice"],
+                ].map(([label, value, icon, foot]) => <div className="lq-stat" key={label}><div className="lq-stat-top"><span>{label}</span><Icon name={icon} className="lq-stat-icon" size={18} /></div><strong className="lq-stat-value">{value}</strong><span className="lq-stat-foot">{foot}</span></div>)}
               </div>
               <div className="lq-two-col">
                 <section className="lq-card">
                   <div className="lq-card-heading"><h2 className="lq-card-title">Recent speech-to-text matches</h2>{averagePronunciation > 0 && <span className="lq-pill">{averagePronunciation}% average</span>}</div>
                   {weekScores.length ? <div className="lq-chart" aria-label="Recent approximate speech matching scores">{weekScores.map((score, index) => <div className="lq-chart-column" key={`${index}-${score}`}><span className="lq-chart-value">{score}%</span><div className="lq-chart-bar" style={{ height: `${Math.max(4, score)}%` }} /><span className="lq-chart-label">Try {index + 1}</span></div>)}</div> : <p className="lq-muted">Your first speaking attempt will start this chart. These are approximate transcript matches, not scientific pronunciation measurements.</p>}
                 </section>
-                <section className="lq-card"><h2 className="lq-card-title">A few more ways to grow</h2><div className="lq-challenge-list" style={{ marginTop: 13 }}>{[["Vocabulary", Math.min(100, profile.wordsLearned * 4)], ["Lessons", Math.min(100, profile.lessons * 10)], ["Conversation", Math.min(100, profile.conversations * 20)]].map(([label, value]) => <div key={label}><div className="lq-progress-meta"><span>{label}</span><span>{value}%</span></div><div className="lq-progress-track"><div className="lq-progress-fill" style={{ width: `${value}%` }} /></div></div>)}</div><p className="lq-muted">Current streak: 🔥 {profile.streak} {profile.streak === 1 ? "day" : "days"}</p></section>
+                <section className="lq-card"><h2 className="lq-card-title">A few more ways to grow</h2><div className="lq-challenge-list" style={{ marginTop: 13 }}>{[["Vocabulary", Math.min(100, profile.wordsLearned * 4)], ["Lessons", Math.min(100, profile.lessons * 10)], ["Conversation", Math.min(100, profile.conversations * 20)]].map(([label, value]) => <div key={label}><div className="lq-progress-meta"><span>{label}</span><span>{value}%</span></div><div className="lq-progress-track"><div className="lq-progress-fill" style={{ width: `${value}%` }} /></div></div>)}</div><p className="lq-muted">Current streak: {profile.streak} {profile.streak === 1 ? "day" : "days"}</p></section>
               </div>
             </>
           );
@@ -1995,7 +2539,50 @@
             <>
               <PageHeader kicker="Little milestones" title="Every step deserves a badge." copy="Keep learning your way. These badges unlock naturally as you practise." />
               <section className="lq-card" style={{ marginBottom: 15 }}><strong>{earnedBadges.length} of {badgeCatalog.length} badges collected</strong><div className="lq-progress-track"><div className="lq-progress-fill" style={{ width: `${earnedBadges.length / badgeCatalog.length * 100}%` }} /></div></section>
-              <div className="lq-badge-grid">{badgeCatalog.map((badge) => <article className={`lq-badge${currentBadgeNames.has(badge.id) ? "" : " locked"}`} key={badge.id}><div className="lq-badge-icon" aria-hidden="true">{badge.icon}</div><div className="lq-badge-title">{badge.title}</div><p className="lq-badge-copy">{badge.text}</p><span className="lq-badge-copy">{currentBadgeNames.has(badge.id) ? "Collected ✓" : "Keep practising"}</span></article>)}</div>
+              <div className="lq-badge-grid">{badgeCatalog.map((badge) => <article className={`lq-badge${currentBadgeNames.has(badge.id) ? "" : " locked"}`} key={badge.id}><div className="lq-badge-icon" aria-hidden="true"><Icon name={badge.icon} size={23} /></div><div className="lq-badge-title">{badge.title}</div><p className="lq-badge-copy">{badge.text}</p><span className="lq-badge-copy">{currentBadgeNames.has(badge.id) ? "Collected ✓" : "Keep practising"}</span></article>)}</div>
+            </>
+          );
+        }
+
+        function renderMistakes() {
+          return (
+            <>
+              <PageHeader
+                kicker={`${language} · Personal review`}
+                title="Your tricky words and phrases."
+                copy="When an answer takes a few tries, we save it here so you can revisit it. No grades and no judgement—just practice that fits you."
+                action={languageMistakes.length > 0 && <button className="lq-primary" onClick={beginMistakeReview} type="button">Practise these →</button>}
+              />
+              {languageMistakes.length === 0 ? (
+                <section className="lq-practice-card" style={{ maxWidth: 700 }}>
+                  <h2>Nothing to review just yet.</h2>
+                  <p>As you practise, we'll keep track of words and phrases that take a little extra effort. You can find them here whenever you want another go.</p>
+                  <button className="lq-primary" onClick={() => changeTab("learn")} type="button">Choose an activity →</button>
+                </section>
+              ) : (
+                <>
+                  <section className="lq-card" style={{ maxWidth: 760, marginBottom: 14 }}>
+                    <div className="lq-card-heading">
+                      <h2 className="lq-card-title">{languageMistakes.length} {languageMistakes.length === 1 ? "thing" : "things"} to practise</h2>
+                      <span className="lq-pill">Picked for you</span>
+                    </div>
+                    <p className="lq-muted" style={{ marginBottom: 0 }}>We’ll bring these back in a short review. Get one right twice in a row and it will leave your list.</p>
+                  </section>
+                  <div className="lq-challenge-list" style={{ maxWidth: 760 }}>
+                    {languageMistakes.map((item) => (
+                      <article className="lq-card" key={`${item.language}-${item.kind}-${item.word}`}>
+                        <div className="lq-card-heading">
+                          <h2 className="lq-card-title" lang={languageInfo.locale}>{item.word}</h2>
+                          <span className="lq-pill">{item.correctStreak ? "Getting there" : `${item.missCount} ${item.missCount === 1 ? "retry" : "retries"}`}</span>
+                        </div>
+                        <p className="lq-muted" style={{ margin: 0 }}>{item.meaning}</p>
+                        <span className="lq-stat-foot">{item.kind === "phrase" ? "Phrase practice" : "Vocabulary"} · {item.correctStreak ? "One more correct answer to move on" : "Ready for another try"}</span>
+                      </article>
+                    ))}
+                  </div>
+                  <p className="lq-muted" style={{ marginTop: 14 }}>This list stays on this device and is saved with your learning progress.</p>
+                </>
+              )}
             </>
           );
         }
@@ -2004,10 +2591,10 @@
           if (gameRound.length && gameMode === "flashcards") return renderLearn();
           return (
             <>
-              <PageHeader kicker={`${language} word garden`} title="Words you've met so far." copy={`${profile.wordsLearned} unique ${profile.wordsLearned === 1 ? "word" : "words"} learned. Tap a speaker to hear any word, or try the flashcards.`} action={<button className="lq-primary" onClick={() => beginGame("flashcards")} type="button">Study flashcards →</button>} />
+              <PageHeader kicker={`${language} word garden`} title="Words you've met so far." copy={`${profile.wordsLearned} unique ${profile.wordsLearned === 1 ? "word" : "words"} learned. Select listen to hear a word, or try the flashcards.`} action={<button className="lq-primary" onClick={() => beginGame("flashcards")} type="button">Study flashcards <Icon name="arrow" size={17} /></button>} />
               <div className="lq-activity-grid">{vocabulary.map((item) => {
                 const known = profile.knownWords.includes(`${language}:${item.word}`);
-                return <article className="lq-card" key={item.word}><div className="lq-card-heading"><h2 className="lq-card-title">{item.meaning}</h2><span>{known ? "✓" : ""}</span></div><p className="lq-target-text" lang={languageInfo.locale} style={{ fontSize: "1.55rem" }}>{item.word}</p><p className="lq-muted">Say it like: {item.hint}</p><button className="lq-secondary" onClick={() => playAudio(item.word)} type="button">🔊 Listen</button></article>;
+                return <article className="lq-card" key={item.word}><div className="lq-card-heading"><h2 className="lq-card-title">{item.meaning}</h2><span>{known ? "✓" : ""}</span></div><p className="lq-target-text" lang={languageInfo.locale} style={{ fontSize: "1.55rem" }}>{item.word}</p><p className="lq-muted">Say it like: {item.hint}</p><button className="lq-secondary" onClick={() => playAudio(item.word)} type="button"><Icon name="audio" size={17} /> Listen</button></article>;
               })}</div>
             </>
           );
@@ -2022,10 +2609,10 @@
                 <div className="lq-preference-grid">
                   <label className="lq-form-field"><span className="lq-form-label">What should we call you?</span><input className="lq-input" value={profile.name} maxLength="24" onChange={(event) => setProfile((current) => ({ ...current, name: event.target.value }))} /></label>
                   <label className="lq-form-field"><span className="lq-form-label">Your first language</span><select className="lq-select" value={profile.nativeLanguage} onChange={(event) => setProfile((current) => ({ ...current, nativeLanguage: event.target.value }))}>{["English", ...languageNames.map((item) => item.name)].map((name) => <option key={name}>{name}</option>)}</select></label>
-                  <label className="lq-form-field"><span className="lq-form-label">Language you're learning</span><select className="lq-select" value={language} onChange={(event) => setLanguage(event.target.value)}>{languageNames.map((item) => <option key={item.name} value={item.name}>{item.flag} {item.name}</option>)}</select></label>
+                  <label className="lq-form-field"><span className="lq-form-label">Language you're learning</span><select className="lq-select" value={language} onChange={(event) => setLanguage(event.target.value)}>{languageNames.map((item) => <option key={item.name} value={item.name}>{item.name}</option>)}</select></label>
                   <label className="lq-form-field"><span className="lq-form-label">Your comfort level</span><select className="lq-select" value={profile.difficulty} onChange={(event) => setProfile((current) => ({ ...current, difficulty: event.target.value }))}>{["Beginner", "Intermediate", "Advanced"].map((level) => <option key={level}>{level}</option>)}</select></label>
                 </div>
-                <div className="lq-level-card" style={{ marginTop: 7, maxWidth: 490 }}><span className="lq-level-mark" aria-hidden="true">🌿</span><h2 className="lq-card-title">Level {levelIndex + 1} · {levelNames[levelIndex]}</h2><div className="lq-progress-track"><div className="lq-progress-fill" style={{ width: `${levelProgress}%` }} /></div><div className="lq-progress-meta"><span>{profile.xp} XP</span><span>{nextLevelXp} XP next level</span></div></div>
+                <div className="lq-level-card" style={{ marginTop: 7, maxWidth: 490 }}><span className="lq-level-mark" aria-hidden="true"><Icon name="leaf" size={22} /></span><h2 className="lq-card-title">Level {levelIndex + 1} · {levelNames[levelIndex]}</h2><div className="lq-progress-track"><div className="lq-progress-fill" style={{ width: `${levelProgress}%` }} /></div><div className="lq-progress-meta"><span>{profile.xp} XP</span><span>{nextLevelXp} XP next level</span></div></div>
                 <div style={{ marginTop: 18 }}><button className="lq-sidebar-link" onClick={() => changeTab("achievements")} type="button">View your {earnedBadges.length} earned badges →</button></div>
               </section>
             </>
@@ -2038,15 +2625,18 @@
               <PageHeader kicker="Your learning space" title="What would you like to explore?" copy="Your words, conversations, milestones, and personal settings are all here." />
               <div className="lq-activity-grid">
                 {[
-                  ["vocabulary", "📚", "My vocabulary", `${profile.wordsLearned} words learned`],
-                  ["conversation", "💬", "Conversation room", "Practice a friendly chat"],
-                  ["achievements", "🏅", "Achievements", `${earnedBadges.length} badges collected`],
-                  ["profile", "👤", "My profile", "Language and level preferences"],
-                ].map(([id, icon, title, copy]) => <button className="lq-activity" key={id} onClick={() => id === "conversation" ? startConversation() : changeTab(id)} type="button"><span className="lq-activity-icon">{icon}</span><span className="lq-activity-title">{title}</span><span className="lq-activity-copy">{copy}</span></button>)}
+                  ["vocabulary", "words", "My vocabulary", `${profile.wordsLearned} words learned`],
+                  ["mistakes", "quiz", "Mistake memory", languageMistakes.length ? `${languageMistakes.length} to practise again` : "Your personal review list"],
+                  ["conversation", "conversation", "Conversation room", "Practise a friendly chat"],
+                  ["achievements", "medal", "Achievements", `${earnedBadges.length} badges collected`],
+                  ["profile", "profile", "My profile", "Language and level preferences"],
+                ].map(([id, icon, title, copy]) => <button className="lq-activity" key={id} onClick={() => id === "conversation" ? startConversation() : changeTab(id)} type="button"><span className="lq-activity-icon" aria-hidden="true"><Icon name={icon} size={22} /></span><span className="lq-activity-title">{title}</span><span className="lq-activity-copy">{copy}</span></button>)}
               </div>
             </>
           );
         }
+
+        if (tab === "landing") return renderLanding();
 
         let content;
         if (tab === "home") content = renderHome();
@@ -2058,24 +2648,25 @@
         else if (tab === "achievements") content = renderAchievements();
         else if (tab === "vocabulary") content = renderVocabulary();
         else if (tab === "profile") content = renderProfile();
+        else if (tab === "mistakes") content = renderMistakes();
         else content = renderMore();
 
         return (
           <div className="lq-app">
             <aside className="lq-sidebar">
-              <div className="lq-brand"><span className="lq-brand-mark" aria-hidden="true">✿</span>LingoQuest</div>
+              <div className="lq-brand"><span className="lq-brand-mark" aria-hidden="true"><Icon name="brand" size={23} /></span><span className="wg-wordmark"><span>word</span> <em>garden</em></span></div>
               <p className="lq-nav-label">Your space</p>
               <nav className="lq-nav" aria-label="Main navigation">
-                {navItems.map((item) => <button className={`lq-nav-button${tab === item.id ? " active" : ""}`} key={item.id} onClick={() => changeTab(item.id)} type="button"><span className="lq-nav-icon" aria-hidden="true">{item.icon}</span>{item.label}</button>)}
+                {navItems.map((item) => <button className={`lq-nav-button${tab === item.id ? " active" : ""}`} key={item.id} onClick={() => changeTab(item.id)} type="button"><span className="lq-nav-icon" aria-hidden="true"><Icon name={item.icon} size={19} /></span>{item.label}</button>)}
               </nav>
               <div className="lq-sidebar-spacer" />
               <section className="lq-sidebar-card"><h2 className="lq-sidebar-card-title">A small next step</h2><p className="lq-sidebar-card-copy">{profile.speakingExercises && averagePronunciation < 80 ? "Try a tricky phrase again, one word at a time." : "A little speaking practice can help today's words stick."}</p><button className="lq-sidebar-link" onClick={() => changeTab("speak")} type="button">Give it a try →</button></section>
-              <button className="lq-user" onClick={() => changeTab("profile")} type="button" style={{ width: "100%", border: 0, background: "transparent", textAlign: "left", cursor: "pointer" }}><span className="lq-avatar" aria-hidden="true">😊</span><span><span className="lq-user-name">{profile.name || "Learner"}</span><br /><span className="lq-user-level">Level {levelIndex + 1} · {levelNames[levelIndex]}</span></span></button>
+              <button className="lq-user" onClick={() => changeTab("profile")} type="button" style={{ width: "100%", border: 0, background: "transparent", textAlign: "left", cursor: "pointer" }}><span className="lq-avatar" aria-hidden="true"><Icon name="profile" size={19} /></span><span><span className="lq-user-name">{profile.name || "Learner"}</span><br /><span className="lq-user-level">Level {levelIndex + 1} · {levelNames[levelIndex]}</span></span></button>
             </aside>
             <main className="lq-main">
               <div className="lq-topbar">
-                <span className="lq-breadcrumb">Your space <span aria-hidden="true">/</span> {navItems.find((item) => item.id === tab)?.label || (tab === "conversation" ? "Conversation" : tab === "vocabulary" ? "Vocabulary" : tab === "achievements" ? "Achievements" : "Profile")}</span>
-                <div className="lq-top-actions"><span className="lq-pill">{languageInfo.flag} {language}</span><span className="lq-pill">✦ {profile.xp} XP</span><span className="lq-pill">🔥 {profile.streak}</span></div>
+                <span className="lq-breadcrumb">Your space <span aria-hidden="true">/</span> {navItems.find((item) => item.id === tab)?.label || (tab === "conversation" ? "Conversation" : tab === "vocabulary" ? "Vocabulary" : tab === "mistakes" ? "Mistake memory" : tab === "achievements" ? "Achievements" : "Profile")}</span>
+                <div className="lq-top-actions"><span className="lq-pill">{language}</span><span className="lq-pill"><Icon name="spark" size={15} /> {profile.xp} XP</span><span className="lq-pill"><Icon name="clock" size={15} /> {profile.streak}</span></div>
               </div>
               <div className="lq-content">
                 {storageNotice && tab !== "speak" && tab !== "profile" && <div className="lq-notice" role="status">{storageNotice}</div>}

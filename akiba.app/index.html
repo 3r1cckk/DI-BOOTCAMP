@@ -1,160 +1,153 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Akiba Chama Manager</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="description" content="Akiba helps chama groups organize members, track contributions, manage loans, and understand their finances in one simple workspace.">
+  <meta name="theme-color" content="#f7f9ff">
+  <title>Akiba — Grow your chama, together</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="landing.css?v=landing-1">
 </head>
 <body>
-
-  <header class="topbar">
-    <div>
-      <h1>Akiba</h1>
-      <p>Chama Management System</p>
-    </div>
-    <button id="logoutBtn" class="secondary hidden">Sign out</button>
+  <header class="site-header">
+    <nav class="navigation page-container" aria-label="Main navigation">
+      <a class="brand" href="#home" aria-label="Akiba home">
+        <span class="brand-mark"><i class="fa-solid fa-shapes" aria-hidden="true"></i></span>
+        <span>akiba<span class="brand-period">.</span></span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primaryNav" aria-label="Open navigation">
+        <i class="fa-solid fa-bars" aria-hidden="true"></i>
+      </button>
+      <div class="nav-links" id="primaryNav">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#about">Why Akiba</a>
+        <a class="nav-login" href="dashboard.html">Sign in</a>
+        <a class="button button-small" href="dashboard.html">Open dashboard <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+      </div>
+    </nav>
   </header>
 
-  <main class="container">
+  <main>
+    <section class="hero page-container" id="home">
+      <div class="hero-copy reveal">
+        <div class="eyebrow"><span class="eyebrow-dot"></span> A better way to grow together</div>
+        <h1>Your people.<br>Your plans.<br><span>Your progress.</span></h1>
+        <p class="hero-description">Bring your chama’s money story into focus. Akiba makes it easier to organize members, follow contributions, and keep every plan moving forward.</p>
+        <div class="hero-actions">
+          <a class="button" href="dashboard.html">Explore the dashboard <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+          <a class="text-link" href="#how-it-works"><span class="play-icon"><i class="fa-solid fa-play" aria-hidden="true"></i></span> See how it works</a>
+        </div>
+        <div class="hero-proof">
+          <div class="proof-avatars" aria-hidden="true">
+            <span>W</span><span>A</span><span>M</span><span><i class="fa-solid fa-plus"></i></span>
+          </div>
+          <p><strong>Built for groups that grow together</strong><br><span>Simple tools for your chama’s everyday work</span></p>
+        </div>
+      </div>
 
-    <section id="authSection" class="auth-card">
-      <h2>Welcome to Akiba</h2>
-      <p>Sign in to manage your Chama.</p>
-
-      <form id="authForm">
-        <input
-          type="email"
-          id="email"
-          placeholder="Email address"
-          required
-        >
-
-        <input
-          type="password"
-          id="password"
-          placeholder="Password"
-          minlength="6"
-          required
-        >
-
-        <button type="submit" id="authBtn">
-          Sign in
-        </button>
-      </form>
-
-      <button id="registerBtn" class="secondary full">
-        Create account
-      </button>
-
-      <p id="authMessage" class="message"></p>
+      <div class="hero-visual reveal" aria-label="Illustration of an Akiba chama dashboard">
+        <div class="decor decor-one"></div>
+        <div class="decor decor-two"></div>
+        <div class="floating-note note-top"><span class="note-icon note-green"><i class="fa-solid fa-arrow-trend-up"></i></span><span><small>Group progress</small><strong>Moving forward</strong></span><i class="fa-solid fa-ellipsis"></i></div>
+        <div class="preview-window">
+          <div class="preview-top">
+            <div class="preview-brand"><span class="preview-mark"><i class="fa-solid fa-shapes"></i></span><strong>akiba</strong></div>
+            <span class="preview-status"><i class="fa-solid fa-circle"></i> Your chama</span>
+            <span class="preview-avatar">AK</span>
+          </div>
+          <div class="preview-body">
+            <div class="preview-greeting"><span><small>YOUR OVERVIEW</small><strong>Good things grow together.</strong></span><span class="preview-date"><i class="fa-regular fa-calendar"></i> This month</span></div>
+            <div class="preview-stats">
+              <div class="preview-stat"><span class="preview-stat-icon stat-blue"><i class="fa-solid fa-users"></i></span><small>Members</small><strong>24</strong><span class="stat-foot">Your community</span></div>
+              <div class="preview-stat"><span class="preview-stat-icon stat-green"><i class="fa-solid fa-coins"></i></span><small>Contributions</small><strong>KES 86,500</strong><span class="stat-foot">Saved together</span></div>
+            </div>
+            <div class="preview-chart-card">
+              <div class="chart-title"><span><strong>Growing together</strong><small>Contribution activity</small></span><span class="chart-key"><i></i> Contributions</span></div>
+              <div class="mini-chart" aria-hidden="true">
+                <div class="chart-guides"><i></i><i></i><i></i></div>
+                <div class="chart-columns"><span style="--bar:35%"></span><span style="--bar:49%"></span><span style="--bar:43%"></span><span style="--bar:69%"></span><span style="--bar:57%"></span><span style="--bar:82%"></span><span style="--bar:73%"></span><span style="--bar:100%"></span></div>
+              </div>
+              <div class="chart-months"><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span></div>
+            </div>
+            <div class="preview-bottom"><span class="preview-check"><i class="fa-solid fa-check"></i></span><span><strong>Everything in one place</strong><small>Members, contributions and more</small></span><i class="fa-solid fa-arrow-right"></i></div>
+          </div>
+        </div>
+        <div class="floating-note note-bottom"><span class="note-icon note-purple"><i class="fa-solid fa-people-group"></i></span><span><small>Made for your chama</small><strong>Better, together</strong></span></div>
+      </div>
     </section>
 
-    <section id="appSection" class="hidden">
-
-      <nav class="navigation">
-        <button data-page="dashboard">Dashboard</button>
-        <button data-page="members">Members</button>
-        <button data-page="contributions">Contributions</button>
-        <button data-page="expenses">Expenses</button>
-        <button data-page="reports">Reports</button>
-      </nav>
-
-      <section id="dashboard" class="page">
-        <h2>Dashboard</h2>
-
-        <div class="stats">
-          <div class="stat">
-            <span>Total members</span>
-            <strong id="memberCount">0</strong>
-          </div>
-
-          <div class="stat">
-            <span>Contributions</span>
-            <strong id="contributionTotal">KSh 0</strong>
-          </div>
-
-          <div class="stat">
-            <span>Expenses</span>
-            <strong id="expenseTotal">KSh 0</strong>
-          </div>
-
-          <div class="stat">
-            <span>Balance</span>
-            <strong id="balanceTotal">KSh 0</strong>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>Welcome to Akiba</h3>
-          <p>Use the navigation to manage your Chama.</p>
-        </div>
-      </section>
-
-      <section id="members" class="page hidden">
-        <div class="page-header">
-          <div>
-            <h2>Members</h2>
-            <p>Manage Akiba members.</p>
-          </div>
-          <button id="showMemberForm">+ Add Member</button>
-        </div>
-
-        <form id="memberForm" class="card hidden">
-          <h3>New Member</h3>
-
-          <label for="memberName">Full name</label>
-          <input id="memberName" required>
-
-          <label for="memberPhone">Phone number</label>
-          <input id="memberPhone" type="tel">
-
-          <label for="memberJoinDate">Join date</label>
-          <input id="memberJoinDate" type="date" required>
-
-          <div class="form-actions">
-            <button type="submit">Save Member</button>
-            <button type="button" id="cancelMember" class="secondary">
-              Cancel
-            </button>
-          </div>
-        </form>
-
-        <div class="card">
-          <h3>Member List</h3>
-          <div id="memberList">
-            <p>No members yet.</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="contributions" class="page hidden">
-        <h2>Contributions</h2>
-        <div class="card">
-          <p>Contribution tracking will be added next.</p>
-        </div>
-      </section>
-
-      <section id="expenses" class="page hidden">
-        <h2>Expenses</h2>
-        <div class="card">
-          <p>Expense tracking will be added next.</p>
-        </div>
-      </section>
-
-      <section id="reports" class="page hidden">
-        <h2>Reports</h2>
-        <div class="card">
-          <p>Financial reports will be added next.</p>
-        </div>
-      </section>
-
+    <section class="trust-strip" aria-label="Akiba benefits">
+      <div class="page-container trust-inner">
+        <p>Less time chasing details.<br><strong>More time building together.</strong></p>
+        <div><i class="fa-solid fa-user-group"></i><span>People, organized</span></div>
+        <div><i class="fa-solid fa-arrows-rotate"></i><span>Progress, visible</span></div>
+        <div><i class="fa-solid fa-lock"></i><span>Your group, in control</span></div>
+      </div>
     </section>
 
+    <section class="features-section section-space" id="features">
+      <div class="page-container">
+        <div class="section-heading reveal">
+          <span class="section-kicker">A little more clarity</span>
+          <h2>All the moving parts.<br><span>Finally working together.</span></h2>
+          <p>Akiba gives your group a shared place to keep track of the details and stay focused on what you’re building.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card feature-card-large reveal">
+            <div class="feature-copy"><span class="feature-icon feature-blue"><i class="fa-solid fa-people-group"></i></span><span class="feature-label">THE PEOPLE</span><h3>Your whole chama,<br>on the same page.</h3><p>Keep member details and group roles together, so the right information is easy to find when you need it.</p><a href="dashboard.html">Meet the member directory <i class="fa-solid fa-arrow-right"></i></a></div>
+            <div class="people-illustration" aria-hidden="true"><span class="person person-one">JN</span><span class="person person-two">AW</span><span class="person person-three">KM</span><span class="person person-four"><i class="fa-solid fa-plus"></i></span><div class="people-ring"></div><span class="people-sparkle sparkle-one">✳</span><span class="people-sparkle sparkle-two">✦</span></div>
+          </article>
+          <article class="feature-card reveal">
+            <span class="feature-icon feature-green"><i class="fa-solid fa-coins"></i></span><span class="feature-label">THE CONTRIBUTIONS</span><h3>See every step<br>of your progress.</h3><p>Record contributions and understand how your group’s savings are adding up.</p><a href="dashboard.html">Explore contributions <i class="fa-solid fa-arrow-right"></i></a><div class="coins-art" aria-hidden="true"><span><i class="fa-solid fa-coins"></i></span><span><i class="fa-solid fa-coins"></i></span><span><i class="fa-solid fa-coins"></i></span></div>
+          </article>
+          <article class="feature-card reveal">
+            <span class="feature-icon feature-purple"><i class="fa-solid fa-hand-holding-dollar"></i></span><span class="feature-label">THE PLANS</span><h3>Keep the details.<br>Keep the trust.</h3><p>Track loans, due dates, and group transactions with a clear record everyone can refer to.</p><a href="dashboard.html">See the group workspace <i class="fa-solid fa-arrow-right"></i></a><div class="ledger-art" aria-hidden="true"><span><i class="fa-solid fa-circle-check"></i><i class="ledger-line"></i></span><span><i class="fa-solid fa-circle-check"></i><i class="ledger-line"></i></span><span><i class="fa-regular fa-clock"></i><i class="ledger-line short"></i></span></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="how-section section-space" id="how-it-works">
+      <div class="page-container how-layout">
+        <div class="how-intro reveal"><span class="section-kicker">Getting started is simple</span><h2>From “who has that list?”<br>to <span>“we’ve got this.”</span></h2><p>Set up your group’s workspace, bring your records together, and get back to growing with purpose.</p><a class="button" href="dashboard.html">Take a look inside <i class="fa-solid fa-arrow-right"></i></a></div>
+        <div class="steps">
+          <article class="step-card reveal"><span class="step-number">01</span><span class="step-icon step-blue"><i class="fa-solid fa-people-group"></i></span><div><h3>Bring your people together</h3><p>Start a member directory with the roles and details your group needs.</p></div></article>
+          <article class="step-card reveal"><span class="step-number">02</span><span class="step-icon step-green"><i class="fa-solid fa-list-check"></i></span><div><h3>Keep a clear record</h3><p>Log contributions, loans, and transactions as your chama moves forward.</p></div></article>
+          <article class="step-card reveal"><span class="step-number">03</span><span class="step-icon step-purple"><i class="fa-solid fa-chart-pie"></i></span><div><h3>See where you’re going</h3><p>Use summaries and reports to understand your group’s financial picture.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section section-space" id="about">
+      <div class="page-container about-card reveal">
+        <div class="about-art" aria-hidden="true"><span class="about-sun"></span><span class="about-person about-person-one"></span><span class="about-person about-person-two"></span><span class="about-person about-person-three"></span><span class="about-ground"></span><span class="about-leaf leaf-one"></span><span class="about-leaf leaf-two"></span></div>
+        <div class="about-copy"><span class="section-kicker">Why we’re here</span><h2>Chamas are built on trust.<br><span>Your tools should be, too.</span></h2><p>Akiba is designed around the way groups actually grow: together. It gives your chama a clearer view of its records, so members can spend less energy coordinating the details and more energy reaching shared goals.</p><a class="text-link" href="dashboard.html">See what Akiba can do <i class="fa-solid fa-arrow-right"></i></a></div>
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <div class="page-container cta-inner reveal">
+        <div><span class="section-kicker">Your next chapter starts together</span><h2>Ready to make room<br>for more growth?</h2><p>Open the Akiba workspace and see your chama’s tools in action.</p></div>
+        <a class="button button-light" href="dashboard.html">Open the dashboard <i class="fa-solid fa-arrow-right"></i></a>
+        <span class="cta-decoration cta-decoration-one"></span><span class="cta-decoration cta-decoration-two"></span>
+      </div>
+    </section>
   </main>
 
-  <script type="module" src="app.js"></script>
+  <footer class="site-footer">
+    <div class="page-container footer-inner">
+      <a class="brand footer-brand" href="#home"><span class="brand-mark"><i class="fa-solid fa-shapes"></i></span><span>akiba<span class="brand-period">.</span></span></a>
+      <p>Small steps. Shared dreams. Stronger together.</p>
+      <div class="footer-links"><a href="#features">Features</a><a href="#about">About Akiba</a><a href="dashboard.html">Dashboard</a></div>
+      <span class="copyright">© 2026 Akiba. Made for growing together.</span>
+    </div>
+  </footer>
 
+  <script src="landing.js?v=landing-1"></script>
 </body>
 </html>

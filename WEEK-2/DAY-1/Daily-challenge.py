@@ -12,8 +12,9 @@ class Farm:
 
     def get_info(self):
         info = f"{self.name}'s farm\n\n"
-        for animal, count in sorted(self.animals.items()):
-            info += f"{animal} : {count}\n"
+        animal_width = max((len(animal) for animal in self.animals), default=0)
+        for animal, count in self.animals.items():
+            info += f"{animal:<{animal_width}} : {count}\n"
         info += "\n    E-I-E-I-0!"
         return info
 

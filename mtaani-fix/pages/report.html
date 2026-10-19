@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f7f8f3">
+    <meta name="description" content="Share a neighbourhood issue with MtaaFix.">
+    <title>Share an issue — MtaaFix</title>
+    <link rel="stylesheet" href="../app.css">
+</head>
+<body class="unity-backdrop">
+    <header class="site-header">
+        <a class="brand" href="../index.html" aria-label="MtaaFix home">
+            <span class="brand-mark" aria-hidden="true">M</span>
+            <span>Mtaa<span class="brand-accent">Fix</span></span>
+        </a>
+        <nav class="site-nav" aria-label="Main navigation">
+            <a class="nav-link" href="../index.html">Home</a>
+            <a class="nav-link" href="reports.html">Community board</a>
+            <a class="nav-link" href="../index.html#how-it-works">How it works</a>
+            <a class="nav-link" href="login.html">Sign in</a>
+            <a class="button button-small button-dark" href="report.html" aria-current="page">Share an issue <span aria-hidden="true">↗</span></a>
+        </nav>
+    </header>
+
+    <main class="form-page page-wrap">
+        <a class="back-link" href="../index.html"><span aria-hidden="true">←</span> Back home</a>
+        <div class="form-layout">
+            <section class="form-intro">
+                <p class="eyebrow"><span class="eyebrow-dot"></span> THANKS FOR LOOKING OUT</p>
+                <h1>Let’s make<br><em>it better.</em></h1>
+                <p class="form-lead">You know your neighbourhood best. A few details can help others understand what’s happening and where.</p>
+                <div class="kind-note">
+                    <span class="kind-note-icon" aria-hidden="true">♡</span>
+                    <p><strong>Keep it kind and clear.</strong><br>Stick to what you’ve seen. Please don’t include anyone’s private information.</p>
+                </div>
+                <div class="emergency-note" role="note">
+                    <strong>Immediate emergency?</strong>
+                    <span>MtaaFix is not an emergency service. Contact the appropriate local emergency service for urgent danger or life-threatening situations.</span>
+                </div>
+                <div class="form-steps">
+                    <span><b>1</b> Describe the issue</span>
+                    <span><b>2</b> Pinpoint the place</span>
+                    <span><b>3</b> Share with neighbours</span>
+                </div>
+            </section>
+
+            <section class="form-panel" aria-labelledby="form-title">
+                <div class="form-panel-heading">
+                    <p class="eyebrow">A MINUTE IS ALL IT TAKES</p>
+                    <h2 id="form-title">What’s going on?</h2>
+                    <p>Required fields are marked with <span aria-hidden="true">*</span>.</p>
+                    <p class="report-area-summary" id="report-area-summary"></p>
+                </div>
+                <div class="report-login-required" id="report-login-required" hidden>
+                    <span class="report-login-icon" aria-hidden="true">♡</span>
+                    <h3>First, let’s get you signed in.</h3>
+                    <p>A free account helps us keep the community board useful and follow up on reports.</p>
+                    <a class="button button-primary" href="login.html">Sign in to continue <span aria-hidden="true">→</span></a>
+                    <a class="report-register-link" href="register.html">New to MtaaFix? Create an account</a>
+                </div>
+                <section class="location-setup" id="location-setup" hidden aria-labelledby="location-setup-title">
+                    <h3 id="location-setup-title">Connect your account to your neighbourhood</h3>
+                    <p>Choose your administrative area so reports reach the right local team.</p>
+                    <form id="profile-location-form">
+                        <div class="location-fields" id="profile-location-fields"></div>
+                        <p class="location-feedback form-feedback" id="profile-location-feedback" role="status" aria-live="polite">Loading Kenya locations…</p>
+                        <input type="hidden" name="locationUnitId" id="profile-location-unit-id">
+                        <div class="form-group">
+                            <label for="profile-area">Neighbourhood or local area</label>
+                            <input type="text" id="profile-area" name="area" maxlength="120" placeholder="e.g. near the market or main road" required>
+                        </div>
+                        <button class="button button-primary" type="submit" disabled>Save my neighbourhood <span aria-hidden="true">→</span></button>
+                    </form>
+                </section>
+                <form class="report-form" id="report-form" hidden>
+                    <div class="form-group">
+                        <label for="title">Give it a short title <span aria-hidden="true">*</span></label>
+                        <input type="text" id="title" name="title" maxlength="90" placeholder="e.g. Streetlight out near the bus stop" required>
+                        <small>A few words that tell neighbours what to expect.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">What kind of issue is it? <span aria-hidden="true">*</span></label>
+                        <select id="category" name="category" required>
+                            <option value="">Choose a category</option>
+                            <option value="garbage">Waste &amp; litter</option>
+                            <option value="roads">Roads &amp; paths</option>
+                            <option value="streetlights">Streetlights</option>
+                            <option value="water">Water &amp; drainage</option>
+                            <option value="sanitation">Clean &amp; safe spaces</option>
+                            <option value="environment">Green spaces &amp; environment</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">What did you notice? <span aria-hidden="true">*</span></label>
+                        <textarea id="description" name="description" rows="4" maxlength="600" placeholder="Share what happened, when you noticed it, or how it affects people nearby." required></textarea>
+                        <small>Helpful details make an issue easier to understand.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Which local area should neighbours look in? <span aria-hidden="true">*</span></label>
+                        <input type="text" id="location" name="location" maxlength="120" placeholder="Street, landmark or neighbourhood" required>
+                        <small>Your ward is connected to your account. Add a nearby landmark, not an exact home address.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="priority">How urgent is it?</label>
+                        <select id="priority" name="priority">
+                            <option value="low">Low — can wait</option>
+                            <option value="medium" selected>Medium — needs attention</option>
+                            <option value="high">High — needs prompt attention</option>
+                            <option value="urgent">Urgent — immediate safety concern</option>
+                        </select>
+                        <small>Administrators can review and adjust the priority.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="evidence">Photos (up to 3)</label>
+                        <input type="file" id="evidence" name="evidence" accept="image/jpeg,image/png,image/webp" multiple>
+                        <small>JPEG, PNG, or WebP; each photo is limited to 1.5 MB. Avoid including people or private details.</small>
+                    </div>
+                    <div class="form-group">
+                        <button class="button button-secondary" type="button" id="capture-location">Add my exact location</button>
+                        <small id="exact-location-feedback">Optional. Your coordinates are visible only to you and the assigned administrator.</small>
+                    </div>
+                    <div class="prototype-note">
+                        <span aria-hidden="true">ⓘ</span>
+                        <p>Reports are shared with everyone using this MtaaFix server. Please don’t include private or sensitive personal information.</p>
+                    </div>
+                    <button class="button button-primary form-submit" type="submit">Share with the community <span aria-hidden="true">→</span></button>
+                    <p class="form-feedback" id="form-feedback" role="status" aria-live="polite"></p>
+                </form>
+            </section>
+        </div>
+    </main>
+    <dialog class="report-details-dialog" id="report-details-dialog" aria-labelledby="report-details-title">
+        <form method="dialog"><button class="dialog-close" aria-label="Close report details">×</button></form>
+        <p class="eyebrow">REPORT DETAILS</p>
+        <h2 id="report-details-title"></h2>
+        <p id="report-details-feedback" role="status" aria-live="polite"></p>
+        <div id="report-details-content"></div>
+    </dialog>
+
+    <footer class="site-footer">
+        <div class="page-wrap footer-inner">
+            <a class="brand brand-footer" href="../index.html">
+                <span class="brand-mark" aria-hidden="true">M</span>
+                <span>Mtaa<span class="brand-accent">Fix</span></span>
+            </a>
+            <p>Looking out for the places we call home.</p>
+            <a class="footer-link" href="reports.html">Visit the community board <span aria-hidden="true">↗</span></a>
+            <a class="footer-link admin-dashboard-link" href="admin.html" hidden>Administrator dashboard <span aria-hidden="true">↗</span></a>
+            <small>© 2026 MtaaFix · A community project prototype</small>
+        </div>
+    </footer>
+    <script src="../script.js"></script>
+</body>
+</html>
