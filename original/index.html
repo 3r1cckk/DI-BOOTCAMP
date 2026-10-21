@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A personal collection of recipes worth coming back to."
+    />
+    <meta name="theme-color" content="#faf7f0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap"
+      rel="stylesheet"
+    />
+    <title>Gather &amp; Thyme — recipes worth keeping</title>
+  </head>
+  <body>
+    <div class="site-shell" id="home">
+      <header class="site-header">
+        <a class="wordmark" href="#home" aria-label="Gather and Thyme home">
+          Gather <span>&amp;</span> Thyme
+        </a>
+
+        <nav class="main-nav" aria-label="Main navigation">
+          <a class="nav-link is-current" href="#home" data-view="home">Home</a>
+          <a class="nav-link" href="#recipes" data-view="all">My Recipes</a>
+          <a class="nav-link" href="#recipes" data-view="favorites">Favorites</a>
+        </nav>
+
+        <div class="header-actions">
+          <label class="header-search" for="headerSearch">
+            <span aria-hidden="true">⌕</span>
+            <input id="headerSearch" type="search" placeholder="Find a recipe" autocomplete="off" />
+          </label>
+          <button class="button button-small button-outline" type="button" data-action="open-add">
+            <span aria-hidden="true">+</span> Add recipe
+          </button>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="hero-title">
+          <div class="hero-copy">
+            <p class="eyebrow"><span class="eyebrow-rule"></span> NOTES FROM MY KITCHEN</p>
+            <h1 id="hero-title">Good food,<br />made <em>your way.</em></h1>
+            <p class="hero-description">
+              A little collection of recipes worth coming back to. For slow
+              Sundays, full tables, and everything in between.
+            </p>
+            <a class="button button-primary explore-button" href="#recipes">
+              Explore my recipes <span aria-hidden="true">↘</span>
+            </a>
+            <p class="handwritten-note">Gather around, there's always room for one more.</p>
+          </div>
+          <figure class="hero-photo">
+            <img
+              src="https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?auto=format&fit=crop&w=1500&q=85"
+              alt="A homemade meal set out to share in soft natural light"
+              fetchpriority="high"
+            />
+            <figcaption><span>AT THE TABLE</span> A little something for supper</figcaption>
+            <span class="photo-stamp" aria-hidden="true">GOOD<br />THINGS<br />GROW</span>
+          </figure>
+          <span class="hero-side-note" aria-hidden="true">COOK · EAT · REMEMBER</span>
+        </section>
+
+        <section class="collection-section" id="recipes" aria-labelledby="collection-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">A WELL-LOVED COLLECTION</p>
+              <h2 id="collection-title">Recipes to keep <em>close.</em></h2>
+              <p class="section-subtitle">Your kitchen favorites, all in one place.</p>
+            </div>
+            <span id="recipeCount" class="collection-count">0 recipes</span>
+          </div>
+
+          <div class="collection-toolbar">
+            <label class="collection-search" for="collectionSearch">
+              <span aria-hidden="true">⌕</span>
+              <input
+                id="collectionSearch"
+                type="search"
+                placeholder="Search recipes or ingredients..."
+                autocomplete="off"
+              />
+              <kbd>/</kbd>
+            </label>
+            <div class="filter-list" role="group" aria-label="Filter recipes">
+              <button class="filter-button is-active" type="button" data-filter="all" aria-pressed="true">All recipes</button>
+              <button class="filter-button" type="button" data-filter="favorites" aria-pressed="false">Favorites</button>
+              <button class="filter-button" type="button" data-filter="recent" aria-pressed="false">Recently added</button>
+            </div>
+          </div>
+
+          <p id="appMessage" class="app-message" role="status" aria-live="polite"></p>
+          <div id="recipeContainer" class="recipe-grid" aria-live="polite"></div>
+
+          <div class="collection-bottom">
+            <p>A recipe is a story you get to taste again.</p>
+            <button class="text-button" id="clearRecipesButton" type="button" data-action="clear-all">
+              Clear all recipes
+            </button>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <a class="wordmark footer-wordmark" href="#home">Gather <span>&amp;</span> Thyme</a>
+        <p>Made slowly, shared gladly.</p>
+        <a href="#home" class="back-to-top">Back to the top ↑</a>
+      </footer>
+    </div>
+
+    <dialog class="recipe-dialog add-dialog" id="addRecipeDialog" aria-labelledby="form-title">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">A NEW PAGE IN THE COOKBOOK</p>
+          <h2 id="form-title">Add a recipe</h2>
+        </div>
+        <button class="dialog-close" type="button" data-action="close-add" aria-label="Close add recipe form">×</button>
+      </div>
+      <p class="dialog-intro">The best recipes are the ones you remember to write down.</p>
+      <form id="recipeEntryForm">
+        <label for="recipeTitle">Recipe title <span class="required-mark">*</span></label>
+        <input
+          type="text"
+          id="recipeTitle"
+          placeholder="e.g. Sunday lemon cake"
+          maxlength="100"
+          required
+        />
+
+        <div class="form-row">
+          <div>
+            <label for="recipeCategory">A little category</label>
+            <select id="recipeCategory">
+              <option value="">Choose one</option>
+              <option>Breakfast</option>
+              <option>Lunch</option>
+              <option>Dinner</option>
+              <option>Something sweet</option>
+              <option>Little bites</option>
+              <option>From my kitchen</option>
+            </select>
+          </div>
+          <div>
+            <label for="recipeImage">Image URL <span class="optional-label">optional</span></label>
+            <input
+              type="url"
+              id="recipeImage"
+              placeholder="https://..."
+            />
+          </div>
+        </div>
+
+        <label for="recipeDescription">A few words about it <span class="optional-label">optional</span></label>
+        <input
+          type="text"
+          id="recipeDescription"
+          maxlength="160"
+          placeholder="A weeknight favorite with a little sunshine."
+        />
+
+        <label for="ingredients">Ingredients <span class="required-mark">*</span></label>
+        <textarea
+          id="ingredients"
+          placeholder="One ingredient per line&#10;2 cups flour&#10;3 ripe tomatoes"
+          rows="5"
+          required
+        ></textarea>
+
+        <label for="instructions">How to make it <span class="required-mark">*</span></label>
+        <textarea
+          id="instructions"
+          placeholder="Write the steps just as you make it."
+          rows="5"
+          required
+        ></textarea>
+        <p class="form-error" id="formError" role="alert"></p>
+        <div class="form-actions">
+          <button class="button button-outline" type="button" data-action="close-add">Cancel</button>
+          <button class="button button-primary" type="submit">Save recipe <span aria-hidden="true">↗</span></button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="recipe-dialog detail-dialog" id="recipeDetailDialog" aria-labelledby="detailTitle">
+      <div class="detail-content" id="recipeDetailContent"></div>
+    </dialog>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
