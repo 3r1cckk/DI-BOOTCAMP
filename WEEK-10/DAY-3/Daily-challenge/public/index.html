@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#020805" />
+    <meta
+      name="description"
+      content="A step-by-step, hands-on guide to JWT authentication in Node.js and Express."
+    />
+    <title>JWT Auth Guide — Node.js &amp; Express</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <div class="matrix-container" id="matrixBackground" aria-hidden="true">
+      <div class="matrix-pattern" id="matrixPattern"></div>
+      <div class="matrix-shade"></div>
+    </div>
+
+    <div class="page">
+      <header class="site-header">
+        <a class="brand" href="/" aria-label="JWT Auth Guide home">
+          <span class="brand-mark" aria-hidden="true">&lt;/&gt;</span>
+          <span>AUTH<span class="brand-divider">/</span>LAB</span>
+        </a>
+        <span class="header-caption">NODE.JS · EXPRESS · JWT</span>
+        <span class="status-indicator"><span></span> HANDS-ON GUIDE</span>
+      </header>
+
+      <main>
+        <section class="intro">
+          <p class="eyebrow"><span>01</span> A PRACTICAL WALKTHROUGH</p>
+          <h1>Authentication,<br /><span>step by step.</span></h1>
+          <p class="intro-copy">
+            Build a small, working sign-in flow with Express, hashed passwords,
+            and JWTs stored in secure HTTP-only cookies. Follow along, try it,
+            then make it your own.
+          </p>
+          <a class="scroll-link" href="#authPanel">START HERE <span aria-hidden="true">↓</span></a>
+        </section>
+
+        <div class="content-grid">
+          <section class="auth-panel" id="authPanel" aria-labelledby="authHeading">
+            <div class="panel-topline">
+              <span class="panel-index">INTERACTIVE EXAMPLE</span>
+              <span class="panel-lock" aria-hidden="true">◇</span>
+            </div>
+            <div class="panel-heading">
+              <p class="eyebrow" id="authEyebrow">YOUR LOCAL AUTH PLAYGROUND</p>
+              <h2 id="authHeading">Make an account.</h2>
+              <p id="authSubheading">Register, then try the protected profile route.</p>
+            </div>
+
+            <div class="tabs" role="tablist" aria-label="Authentication options">
+              <button class="tab is-active" id="registerTab" type="button" role="tab" aria-selected="true" aria-controls="authFormPanel">
+                Register
+              </button>
+              <button class="tab" id="loginTab" type="button" role="tab" aria-selected="false" aria-controls="authFormPanel">
+                Sign in
+              </button>
+            </div>
+
+            <div id="authFormPanel" role="tabpanel" aria-labelledby="registerTab">
+              <form class="auth-form" id="authForm" novalidate>
+                <label for="username" id="usernameLabel">Username</label>
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  minlength="3"
+                  maxlength="24"
+                  autocomplete="username"
+                  placeholder="e.g. alex_cooks"
+                  required
+                />
+
+                <div id="emailField">
+                  <label for="email">Email address</label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    maxlength="254"
+                    autocomplete="email"
+                    placeholder="you@example.com"
+                    required
+                  />
+                </div>
+
+                <label for="password">Password</label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  minlength="12"
+                  maxlength="128"
+                  autocomplete="new-password"
+                  aria-describedby="passwordHint"
+                  placeholder="At least 12 characters"
+                  required
+                />
+                <p class="field-hint" id="passwordHint">Use 12+ characters, with at least one letter and one number.</p>
+                <p class="form-message" id="formMessage" role="alert" aria-live="polite"></p>
+                <button class="primary-button" id="submitButton" type="submit">
+                  <span>Create account</span><span aria-hidden="true">↗</span>
+                </button>
+              </form>
+              <p class="panel-footnote"><span aria-hidden="true">◇</span> Demo accounts live only in your local SQLite database.</p>
+            </div>
+
+            <section class="profile-panel" id="profilePanel" hidden aria-labelledby="profileHeading">
+              <div class="profile-greeting">
+                <span class="profile-avatar" id="profileAvatar">A</span>
+                <div>
+                  <p class="eyebrow">YOU’RE SIGNED IN</p>
+                  <h3 id="profileHeading">Welcome back.</h3>
+                </div>
+              </div>
+              <dl class="profile-data">
+                <div><dt>USERNAME</dt><dd id="profileUsername"></dd></div>
+                <div><dt>EMAIL</dt><dd id="profileEmail"></dd></div>
+                <div><dt>ACCOUNT CREATED</dt><dd id="profileCreated"></dd></div>
+              </dl>
+              <form class="profile-edit" id="profileForm">
+                <label for="newUsername">Change username</label>
+                <div class="inline-control">
+                  <input id="newUsername" name="username" type="text" minlength="3" maxlength="24" autocomplete="username" required />
+                  <button class="secondary-button" type="submit">Save</button>
+                </div>
+                <p class="form-message" id="profileMessage" role="status" aria-live="polite"></p>
+              </form>
+              <button class="logout-button" id="logoutButton" type="button">Sign out <span aria-hidden="true">↗</span></button>
+            </section>
+          </section>
+
+          <aside class="guide" aria-labelledby="guideHeading">
+            <div class="guide-heading">
+              <p class="eyebrow"><span>THE CHECKLIST</span> 6 STEPS</p>
+              <h2 id="guideHeading">What’s happening under the hood.</h2>
+            </div>
+            <ol class="steps">
+              <li>
+                <span class="step-number">01</span>
+                <div><h3>Make an account</h3><p>Express validates your details and bcrypt hashes your password before saving it.</p></div>
+                <span class="step-status" aria-hidden="true">✓</span>
+              </li>
+              <li>
+                <span class="step-number">02</span>
+                <div><h3>Get your tokens</h3><p>The server signs a short-lived access token and a longer-lived refresh token.</p></div>
+                <span class="step-status" aria-hidden="true">✓</span>
+              </li>
+              <li>
+                <span class="step-number">03</span>
+                <div><h3>Keep them in cookies</h3><p>HTTP-only cookies keep token values out of JavaScript and browser storage.</p></div>
+                <span class="step-status" aria-hidden="true">✓</span>
+              </li>
+              <li>
+                <span class="step-number">04</span>
+                <div><h3>Visit your profile</h3><p>Middleware checks the access token before the protected profile route responds.</p></div>
+                <span class="step-status" aria-hidden="true">✓</span>
+              </li>
+              <li>
+                <span class="step-number">05</span>
+                <div><h3>Refresh your session</h3><p>When the access token expires, the refresh token is rotated and its old copy revoked.</p></div>
+                <span class="step-status" aria-hidden="true">✓</span>
+              </li>
+              <li>
+                <span class="step-number">06</span>
+                <div><h3>Sign out cleanly</h3><p>The refresh token is revoked in SQLite and both authentication cookies are cleared.</p></div>
+                <span class="step-status" aria-hidden="true">✓</span>
+              </li>
+            </ol>
+            <div class="token-note">
+              <span class="token-note-mark" aria-hidden="true">i</span>
+              <p><strong>A JWT is signed, not secret.</strong> Its header and payload can be read. Never put passwords or sensitive information in a token.</p>
+            </div>
+          </aside>
+        </div>
+
+        <section class="next-steps" aria-labelledby="nextStepsHeading">
+          <p class="eyebrow">WHEN YOU’RE READY TO GO FURTHER</p>
+          <h2 id="nextStepsHeading">Good next steps.</h2>
+          <div class="next-grid">
+            <article><span>01 / SECURITY</span><h3>Add email verification</h3><p>Confirm an address before allowing a new account to sign in.</p></article>
+            <article><span>02 / STORAGE</span><h3>Choose your database</h3><p>This guide uses SQLite. Move to Postgres or another database for a larger app.</p></article>
+            <article><span>03 / PROTECTION</span><h3>Review your threat model</h3><p>Add CSRF protection as needed, use HTTPS, and keep dependencies up to date.</p></article>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <a class="brand footer-brand" href="/" aria-label="Auth Lab home">
+          <span class="brand-mark" aria-hidden="true">&lt;/&gt;</span><span>AUTH<span class="brand-divider">/</span>LAB</span>
+        </a>
+        <p>A learning project. Take care with production auth.</p>
+        <a href="#authPanel">Back to the top ↑</a>
+      </footer>
+    </div>
+  </body>
+</html>
