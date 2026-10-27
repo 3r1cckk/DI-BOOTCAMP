@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f7f9ff">
+  <meta name="description" content="Sign in to your Akiba chama workspace.">
+  <title>Sign in | Akiba</title>
+  <link rel="icon" type="image/png" href="assets/akiba-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="auth.css?v=split-layout-1">
+</head>
+<body>
+  <main class="auth-shell">
+    <section class="auth-story" aria-label="About Akiba">
+      <a class="auth-brand" href="/" aria-label="Akiba home">
+        <span class="brand-mark"><img src="assets/akiba-logo.png" alt=""></span>
+        <span>akiba<span class="brand-period">.</span></span>
+      </a>
+      <div class="story-copy">
+        <span class="story-kicker"><span></span> GOOD THINGS GROW TOGETHER</span>
+        <h1>Make room<br>for <span>your next</span><br>big thing.</h1>
+        <p>A calmer way to keep your chama's people, plans, and progress in one place.</p>
+        <div class="story-note">
+          <span class="story-note-icon"><i class="fa-solid fa-people-group" aria-hidden="true"></i></span>
+          <span><strong>Built around togetherness</strong><small>Every little step adds up.</small></span>
+          <i class="fa-solid fa-arrow-trend-up story-trend" aria-hidden="true"></i>
+        </div>
+      </div>
+      <span class="story-decoration decoration-one" aria-hidden="true"></span>
+      <span class="story-decoration decoration-two" aria-hidden="true"></span>
+      <p class="story-footer">Akiba · Grow your chama, together</p>
+    </section>
+
+    <section class="auth-panel">
+      <a class="mobile-brand auth-brand" href="/" aria-label="Akiba home">
+        <span class="brand-mark"><img src="assets/akiba-logo.png" alt=""></span>
+        <span>akiba<span class="brand-period">.</span></span>
+      </a>
+      <div class="auth-card">
+        <span class="form-eyebrow">YOUR CHAMA WORKSPACE</span>
+        <h2 id="formTitle">Welcome back</h2>
+        <p class="form-subtitle" id="formSubtitle">Sign in to pick up where your group left off.</p>
+
+        <div class="auth-tabs" role="tablist" aria-label="Account access">
+          <button class="auth-tab active" id="loginTab" type="button" role="tab" aria-selected="true">Log in</button>
+          <button class="auth-tab" id="registerTab" type="button" role="tab" aria-selected="false">Create account</button>
+        </div>
+
+        <form id="authForm" novalidate>
+          <div class="form-field" id="nameField" hidden>
+            <label for="name">Your name</label>
+            <div class="input-wrap">
+              <i class="fa-regular fa-user" aria-hidden="true"></i>
+              <input id="name" name="name" type="text" autocomplete="name" minlength="2" maxlength="80" placeholder="e.g. Amina Wanjiku">
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="email">Email address</label>
+            <div class="input-wrap">
+              <i class="fa-regular fa-envelope" aria-hidden="true"></i>
+              <input id="email" name="email" type="email" autocomplete="email" maxlength="254" required placeholder="you@example.com">
+            </div>
+          </div>
+          <div class="form-field">
+            <div class="label-row">
+              <label for="password">Password</label>
+              <span class="password-hint" id="passwordHint" hidden>At least 12 characters</span>
+            </div>
+            <div class="input-wrap">
+              <i class="fa-solid fa-lock" aria-hidden="true"></i>
+              <input id="password" name="password" type="password" autocomplete="current-password" minlength="12" maxlength="128" required placeholder="Enter your password">
+              <button class="password-toggle" type="button" aria-label="Show password" aria-pressed="false"><i class="fa-regular fa-eye" aria-hidden="true"></i></button>
+            </div>
+          </div>
+          <div class="form-field" id="confirmField" hidden>
+            <label for="confirmPassword">Confirm password</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-lock" aria-hidden="true"></i>
+              <input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" placeholder="Enter your password again">
+            </div>
+          </div>
+          <p class="auth-message" id="authMessage" role="status" aria-live="polite" hidden></p>
+          <button class="submit-button" id="submitButton" type="submit">
+            <span>Log in</span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          </button>
+        </form>
+
+        <p class="switch-copy" id="switchCopy">New to Akiba? <button type="button" data-switch-mode="register">Create an account</button></p>
+        <p class="privacy-note"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Your account stays protected with your personal password.</p>
+        <p class="demo-note">This demo currently keeps chama records in this browser. Accounts do not yet sync or separate group data across devices.</p>
+      </div>
+      <p class="panel-footer"><a href="/">Back to Akiba home</a><span>© 2026 Akiba</span></p>
+    </section>
+  </main>
+  <script src="auth-page.js?v=auth-admin-1"></script>
+</body>
+</html>

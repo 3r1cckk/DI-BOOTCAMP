@@ -5,11 +5,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Akiba | Chama Dashboard</title>
-  <link rel="stylesheet" href="style.css?v=workspace-designs">
+  <link rel="icon" type="image/png" href="assets/akiba-logo.png">
+  <link rel="stylesheet" href="style.css?v=chama-platform-1">
   <link rel="stylesheet" href="loading.css?v=workspace-designs">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
@@ -36,7 +37,7 @@
     <!-- LEFT SIDEBAR -->
     <aside class="sidebar">
       <a href="#" class="brand">
-        <i class="fa-solid fa-shapes"></i>
+        <span class="brand-logo"><img src="assets/akiba-logo.png" alt=""></span>
         <span>Akiba</span>
       </a>
 
@@ -55,6 +56,9 @@
         </a>
         <a href="#" class="nav-link" data-page="Transactions">
           <i class="fa-solid fa-arrow-right-arrow-left"></i><span>Transactions</span>
+        </a>
+        <a href="#" class="nav-link" data-page="Approvals" hidden>
+          <i class="fa-solid fa-clipboard-check"></i><span>Approvals</span>
         </a>
         <a href="#" class="nav-link" data-page="Reports">
           <i class="fa-solid fa-chart-simple"></i><span>Reports</span>
@@ -81,6 +85,12 @@
           <input type="search" id="globalSearch" placeholder="Search anything...">
         </div>
 
+        <label class="chama-switcher">
+          <i class="fa-solid fa-people-group" aria-hidden="true"></i>
+          <span class="visually-hidden">Active chama</span>
+          <select id="chamaSwitcher" aria-label="Active chama"></select>
+        </label>
+
         <div class="topbar-right">
           <button class="notification-button" id="notificationButton" aria-label="Notifications">
             <i class="fa-regular fa-bell"></i>
@@ -92,6 +102,10 @@
             <span>Chama Admin</span>
             <i class="fa-solid fa-chevron-down"></i>
           </button>
+          <button class="sign-out-button" id="signOutButton" type="button">
+            <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
+            <span>Sign out</span>
+          </button>
         </div>
       </header>
 
@@ -102,15 +116,16 @@
         <!-- WELCOME SECTION -->
         <section class="welcome-row">
           <div>
-            <h1>Welcome back, Chama Admin! <span>👋</span></h1>
-            <p>Manage your chama, track savings, and grow together.</p>
+            <p class="dashboard-eyebrow">CHAMA OVERVIEW</p>
+            <h1>Your chama at a glance</h1>
+            <p>Keep members, contributions, and shared progress moving in one place.</p>
           </div>
 
           <div class="date-card">
             <i class="fa-regular fa-calendar-days"></i>
             <div>
               <strong id="currentDate">Today</strong>
-              <span>Good morning!</span>
+              <span>Chama activity</span>
             </div>
           </div>
         </section>
@@ -125,7 +140,7 @@
             <div class="summary-info">
               <p>Total Members</p>
               <h2 id="totalMembers">0</h2>
-              <span class="growth"><i class="fa-solid fa-arrow-up"></i> +0 this month</span>
+              <span class="growth">Your chama community</span>
             </div>
           </article>
 
@@ -136,7 +151,7 @@
             <div class="summary-info">
               <p>Total Contributions</p>
               <h2 id="totalContributions">KES 0.00</h2>
-              <span class="growth"><i class="fa-solid fa-arrow-up"></i> +0% this month</span>
+              <span class="growth">All contributions recorded</span>
             </div>
           </article>
 
@@ -147,7 +162,7 @@
             <div class="summary-info">
               <p>Total Expenses</p>
               <h2 id="totalExpenses">KES 0.00</h2>
-              <span class="growth red-growth"><i class="fa-solid fa-arrow-up"></i> +0% this month</span>
+              <span class="growth red-growth">All recorded expenses</span>
             </div>
           </article>
 
@@ -158,7 +173,7 @@
             <div class="summary-info">
               <p>Available Balance</p>
               <h2 id="availableBalance">KES 0.00</h2>
-              <span class="growth"><i class="fa-solid fa-arrow-up"></i> +0% this month</span>
+              <span class="growth">Income less expenses</span>
             </div>
           </article>
 
@@ -359,6 +374,8 @@
               </button>
             </div>
           </section>
+
+          <section class="members-list-panel chama-access-panel" id="chamaAccessPanel" aria-labelledby="chamaAccessTitle" hidden></section>
         </section>
 
         <section class="workspace-page" id="workspacePage" aria-live="polite" hidden></section>
@@ -380,6 +397,10 @@
 
     <form id="memberForm">
       <div id="modalFields"></div>
+      <p class="contribution-payment-hint" id="contributionPaymentHint" hidden>
+        <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+        The member approves this request on their phone. Akiba never asks for an M-Pesa PIN.
+      </p>
       <div class="modal-actions">
         <button type="button" class="cancel-button" id="cancelMemberModal">Cancel</button>
         <button type="submit" class="save-button">Save Member</button>
@@ -390,6 +411,7 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="app.js?v=workspace-designs"></script>
+  <script src="app.js?v=trust-backup-1"></script>
+  <script src="dashboard-auth.js?v=auth-1"></script>
 </body>
 </html>

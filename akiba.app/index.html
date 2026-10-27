@@ -6,17 +6,18 @@
   <meta name="description" content="Akiba helps chama groups organize members, track contributions, manage loans, and understand their finances in one simple workspace.">
   <meta name="theme-color" content="#f7f9ff">
   <title>Akiba — Grow your chama, together</title>
+  <link rel="icon" type="image/png" href="assets/akiba-logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  <link rel="stylesheet" href="landing.css?v=landing-1">
+  <link rel="stylesheet" href="landing.css?v=akiba-logo-1">
 </head>
 <body>
   <header class="site-header">
     <nav class="navigation page-container" aria-label="Main navigation">
       <a class="brand" href="#home" aria-label="Akiba home">
-        <span class="brand-mark"><i class="fa-solid fa-shapes" aria-hidden="true"></i></span>
+        <span class="brand-mark"><img src="assets/akiba-logo.png" alt=""></span>
         <span>akiba<span class="brand-period">.</span></span>
       </a>
       <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primaryNav" aria-label="Open navigation">
@@ -26,8 +27,8 @@
         <a href="#features">Features</a>
         <a href="#how-it-works">How it works</a>
         <a href="#about">Why Akiba</a>
-        <a class="nav-login" href="dashboard.html">Sign in</a>
-        <a class="button button-small" href="dashboard.html">Open dashboard <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+        <a class="nav-login" href="#auth" data-open-auth="login">Sign in</a>
+        <a class="button button-small" href="#auth" data-open-auth="login">Open dashboard <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
       </div>
     </nav>
   </header>
@@ -39,7 +40,7 @@
         <h1>Your people.<br>Your plans.<br><span>Your progress.</span></h1>
         <p class="hero-description">Bring your chama’s money story into focus. Akiba makes it easier to organize members, follow contributions, and keep every plan moving forward.</p>
         <div class="hero-actions">
-          <a class="button" href="dashboard.html">Explore the dashboard <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+          <a class="button" href="#auth" data-open-auth="login">Explore the dashboard <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
           <a class="text-link" href="#how-it-works"><span class="play-icon"><i class="fa-solid fa-play" aria-hidden="true"></i></span> See how it works</a>
         </div>
         <div class="hero-proof">
@@ -56,7 +57,7 @@
         <div class="floating-note note-top"><span class="note-icon note-green"><i class="fa-solid fa-arrow-trend-up"></i></span><span><small>Group progress</small><strong>Moving forward</strong></span><i class="fa-solid fa-ellipsis"></i></div>
         <div class="preview-window">
           <div class="preview-top">
-            <div class="preview-brand"><span class="preview-mark"><i class="fa-solid fa-shapes"></i></span><strong>akiba</strong></div>
+            <div class="preview-brand"><span class="preview-mark"><img src="assets/akiba-logo.png" alt=""></span><strong>akiba</strong></div>
             <span class="preview-status"><i class="fa-solid fa-circle"></i> Your chama</span>
             <span class="preview-avatar">AK</span>
           </div>
@@ -141,13 +142,53 @@
 
   <footer class="site-footer">
     <div class="page-container footer-inner">
-      <a class="brand footer-brand" href="#home"><span class="brand-mark"><i class="fa-solid fa-shapes"></i></span><span>akiba<span class="brand-period">.</span></span></a>
+      <a class="brand footer-brand" href="#home" aria-label="Akiba home"><span class="brand-mark"><img src="assets/akiba-logo.png" alt=""></span><span>akiba<span class="brand-period">.</span></span></a>
       <p>Small steps. Shared dreams. Stronger together.</p>
       <div class="footer-links"><a href="#features">Features</a><a href="#about">About Akiba</a><a href="dashboard.html">Dashboard</a></div>
       <span class="copyright">© 2026 Akiba. Made for growing together.</span>
     </div>
   </footer>
 
+  <dialog class="landing-auth-dialog" id="authDialog" aria-labelledby="authTitle">
+    <div class="landing-auth-card">
+      <button class="landing-auth-close" id="closeAuth" type="button" aria-label="Close sign-in dialog">&times;</button>
+      <a class="landing-auth-brand" href="#home" aria-label="Akiba home">
+        <span class="brand-mark"><img src="assets/akiba-logo.png" alt=""></span>
+        <span>akiba<span class="brand-period">.</span></span>
+      </a>
+      <span class="landing-auth-kicker">YOUR CHAMA WORKSPACE</span>
+      <h2 id="authTitle">Welcome back</h2>
+      <p class="landing-auth-subtitle" id="authSubtitle">Sign in to pick up where your group left off.</p>
+      <div class="landing-auth-tabs" role="tablist" aria-label="Account access">
+        <button class="landing-auth-tab active" id="authLoginTab" type="button" role="tab" aria-selected="true">Log in</button>
+        <button class="landing-auth-tab" id="authRegisterTab" type="button" role="tab" aria-selected="false">Create account</button>
+      </div>
+      <form id="landingAuthForm" novalidate>
+        <div class="landing-auth-field" id="authNameField" hidden>
+          <label for="authName">Your name</label>
+          <input id="authName" name="name" type="text" autocomplete="name" minlength="2" maxlength="80" placeholder="e.g. Amina Wanjiku">
+        </div>
+        <div class="landing-auth-field">
+          <label for="authEmail">Email address</label>
+          <input id="authEmail" name="email" type="email" autocomplete="email" maxlength="254" required placeholder="you@example.com">
+        </div>
+        <div class="landing-auth-field">
+          <label for="authPassword">Password <span id="authPasswordHint" hidden>At least 12 characters</span></label>
+          <input id="authPassword" name="password" type="password" autocomplete="current-password" minlength="12" maxlength="128" required placeholder="Enter your password">
+        </div>
+        <div class="landing-auth-field" id="authConfirmField" hidden>
+          <label for="authConfirmPassword">Confirm password</label>
+          <input id="authConfirmPassword" name="confirmPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" placeholder="Enter your password again">
+        </div>
+        <p class="landing-auth-message" id="landingAuthMessage" role="status" aria-live="polite" hidden></p>
+        <button class="landing-auth-submit" id="landingAuthSubmit" type="submit">Log in <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+      </form>
+      <p class="landing-auth-switch" id="landingAuthSwitch">New to Akiba? <button type="button" data-auth-mode="register">Create an account</button></p>
+      <p class="landing-auth-note"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Your account stays protected with your personal password.</p>
+      <p class="landing-auth-demo">Chama records currently stay in this browser and are not yet separated or synced between accounts.</p>
+    </div>
+  </dialog>
   <script src="landing.js?v=landing-1"></script>
+  <script src="landing-auth.js?v=auth-admin-1"></script>
 </body>
 </html>
