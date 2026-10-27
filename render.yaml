@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: mtaani-fix
+    runtime: node
+    plan: starter
+    rootDir: mtaani-fix
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /healthz
+    disk:
+      name: mtaani-fix-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: TRUST_PROXY
+        value: "1"
+      - key: DATA_DIR
+        value: /var/data
+      - key: ALLOW_REGISTRATION
+        value: "false"

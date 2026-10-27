@@ -22,7 +22,8 @@ const sessionDurationMs = 7 * 24 * 60 * 60 * 1000;
 const sessionCookieName = 'mtaafix_session';
 const csrfCookieName = 'mtaafix_csrf';
 const isProduction = process.env.NODE_ENV === 'production';
-const appOrigin = process.env.APP_ORIGIN?.replace(/\/+$/, '');
+const appOrigin = (process.env.APP_ORIGIN || process.env.RENDER_EXTERNAL_URL)?.replace(/\/+$/, '');
+const registrationEnabled = process.env.ALLOW_REGISTRATION !== 'false';
 const allowedCategories = new Set(['garbage', 'roads', 'streetlights', 'water', 'sanitation', 'environment']);
 const allowedStatuses = new Set(['reported', 'progress', 'solved']);
 const allowedPriorities = new Set(['low', 'medium', 'high', 'urgent']);
@@ -66,6 +67,10 @@ if (process.env.TRUST_PROXY) {
 }
 
 app.disable('x-powered-by');
+app.get('/healthz', (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    res.status(200).type('text').send('ok');
+});
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
@@ -612,12 +617,16 @@ app.get('/api/profile', requireAuth, (req, res) => {
 app.get('/api/auth/session', (req, res) => {
     res.json({
         csrfToken: res.locals.csrfToken,
-        user: req.user ? getSafeUser(req.user) : null
+        user: req.user ? getSafeUser(req.user) : null,
+        registrationEnabled
     });
 });
 
 app.post('/api/auth/register', authRateLimit, requireCsrf, async (req, res, next) => {
     try {
+        if (!registrationEnabled) {
+            return res.status(503).json({ error: 'New account registration is temporarily paused while verified location data is prepared.' });
+        }
         if (!locationCatalogReady) {
             return res.status(503).json({ error: 'Location-based registration is temporarily unavailable while the verified Kenya location catalog is prepared.' });
         }
@@ -1556,7 +1565,7 @@ app.use((error, req, res, next) => {
     res.status(500).type('text').send('Something went wrong.');
 });
 
-const host = process.env.HOST || '127.0.0.1';
+const host = process.env.HOST || (isProduction ? '0.0.0.0' : '127.0.0.1');
 const server = app.listen(port, host, () => {
     console.log('MtaaFix is listening on port ' + port + '. Open http://localhost:' + port);
 });

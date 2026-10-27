@@ -55,9 +55,17 @@ The report form is responsive for mobile use and warns residents that MtaaFix is
 For a public deployment:
 
 - Set `NODE_ENV=production` and `APP_ORIGIN` to the exact public HTTPS origin.
+- Set `DATA_DIR` to persistent storage; local SQLite data must not live on an ephemeral service filesystem.
+- Set `ALLOW_REGISTRATION=false` until the location catalog is verified against an authoritative source.
 - Serve the app over HTTPS. Session cookies are marked `Secure` in production.
 - If the app is behind one trusted reverse proxy, set `TRUST_PROXY=1`. Do not trust arbitrary client-supplied proxy headers.
-- Configure the host and port using `HOST` and `PORT`, keep `data/mtaafix.sqlite` on persistent storage, and back it up securely.
+- Configure the host and port using `HOST` and `PORT`; back up the SQLite database on persistent storage securely.
 - Decide who is allowed to receive administrator access and promote accounts only from a trusted server operator shell.
+
+The repository-root Render Blueprint in `../render.yaml` configures the Node web service, a persistent
+SQLite disk, HTTPS/proxy settings, a health check, and disabled public registration.
+Render supplies `RENDER_EXTERNAL_URL`, which the app uses as its production origin
+unless `APP_ORIGIN` is explicitly set. The included location catalog is demo-only;
+public registration should remain disabled until a verified dataset is installed.
 
 This starter does not provide email verification, password reset, SMS/email notifications, or account deletion.

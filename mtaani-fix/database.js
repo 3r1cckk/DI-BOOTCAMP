@@ -4,7 +4,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const projectDirectory = path.dirname(fileURLToPath(import.meta.url));
-const dataDirectory = path.join(projectDirectory, 'data');
+const dataDirectory = process.env.DATA_DIR
+    ? path.resolve(process.env.DATA_DIR)
+    : path.join(projectDirectory, 'data');
 
 fs.mkdirSync(dataDirectory, { recursive: true });
 

@@ -31,6 +31,7 @@
 
     let csrfToken = '';
     let currentUser = null;
+    let registrationEnabled = true;
 
     function pageHref(fileName) {
         return window.location.pathname.includes('/pages/') ? fileName : 'pages/' + fileName;
@@ -563,13 +564,17 @@
             return /(?:^|\/)register\.html$/.test(link.getAttribute('href'));
         });
 
+        if (!registrationEnabled) {
+            document.querySelectorAll('a[href$="register.html"]').forEach(function (link) {
+                link.hidden = true;
+            });
+        }
+
         if (!currentUser) {
             if (loginLink) {
                 loginLink.hidden = false;
             }
-            if (registerLink) {
-                registerLink.hidden = false;
-            }
+            if (registerLink) registerLink.hidden = !registrationEnabled;
             return;
         }
 
@@ -1170,6 +1175,11 @@
                 event.preventDefault();
                 const feedback = form.querySelector('.auth-feedback');
                 const submitButton = form.querySelector('[type="submit"]');
+                if (form.dataset.authForm === 'register' && !registrationEnabled) {
+                    feedback.classList.add('is-error');
+                    feedback.textContent = 'New account registration is temporarily paused while verified location data is prepared.';
+                    return;
+                }
                 feedback.classList.remove('is-error');
                 feedback.textContent = '';
                 submitButton.disabled = true;
@@ -1671,7 +1681,16 @@
     const sessionReady = apiRequest('/api/auth/session')
         .then(function (result) {
             currentUser = result.user;
+            registrationEnabled = result.registrationEnabled !== false;
             renderAuthNavigation();
+            if (!registrationEnabled) {
+                document.querySelectorAll('[data-auth-form="register"] input, [data-auth-form="register"] select, [data-auth-form="register"] button').forEach(function (control) {
+                    control.disabled = true;
+                });
+                document.querySelectorAll('[data-auth-form="register"] .auth-feedback').forEach(function (feedback) {
+                    feedback.textContent = 'New account registration is temporarily paused while verified location data is prepared.';
+                });
+            }
             updateReportFormAccess();
             return result;
         })
