@@ -1,0 +1,6 @@
+{
+  "name": "Akiba - Chama Management System",
+  "description": "Smart Kenyan Chama financial management platform for member contributions, welfare savings, merry-go-round cycles, loans, and automated M-Pesa ledger tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

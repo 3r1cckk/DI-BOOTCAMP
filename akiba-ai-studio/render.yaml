@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: akiba-ai-studio
+    runtime: node
+    plan: starter
+    rootDir: akiba-ai-studio
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /healthz
+    disk:
+      name: akiba-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: AKIBA_DATA_DIR
+        value: /var/data
+      - key: APP_URL
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
