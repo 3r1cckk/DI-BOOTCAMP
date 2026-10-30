@@ -28,9 +28,11 @@ create a Blueprint from this repository and set the Blueprint Path to
 configures a different app. The service builds with `npm install && npm run
 build` and runs with `npm start`.
 
-The blueprint provisions a Starter web service with a 1 GB persistent disk
-mounted at `/var/data`, so SQLite data survives service restarts. Render charges
-for the service and persistent disk. Before using password recovery, set
+The blueprint provisions a free web service. Free services can sleep when idle
+and do not include a persistent disk. SQLite is stored under `/tmp/akiba-data`;
+accounts, chamas, and other database records may be lost after a restart or
+redeploy. Do not use this deployment for important or production financial
+records. Before using password recovery, set
 `APP_URL` to the service's public HTTPS URL and configure `RESEND_API_KEY` and
 `RESEND_FROM` with a verified sender. Set `GEMINI_API_KEY` to enable Gemini
 features. For phone invitations, configure `SOZURI_API_KEY` and
