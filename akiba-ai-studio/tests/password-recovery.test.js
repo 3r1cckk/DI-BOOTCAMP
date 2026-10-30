@@ -54,6 +54,7 @@ test('password recovery uses a one-time email token and invalidates prior sessio
       password: 'Akiba123'
     });
     assert.equal(registration.status, 201);
+    const originalUser = (await registration.json()).user;
     const originalCookie = registration.headers.get('set-cookie').split(';')[0];
 
     const unknownEmail = await request('/api/auth/forgot-password', { email: 'missing@example.test' });
@@ -114,7 +115,10 @@ test('password recovery uses a one-time email token and invalidates prior sessio
       email: 'another@example.test',
       password: 'Akiba123'
     });
-    assert.equal(secondRegistration.status, 403, 'public signup must not create additional admin accounts');
+    assert.equal(secondRegistration.status, 201, 'new signups should create a separate chama with an admin');
+    const secondUser = (await secondRegistration.json()).user;
+    assert.equal(secondUser.role, 'admin');
+    assert.notEqual(secondUser.activeChama.id, originalUser.activeChama.id);
     resendStatus = 500;
     const failedDelivery = await request('/api/auth/forgot-password', { email: 'member@example.test' });
     assert.equal(failedDelivery.status, 502);

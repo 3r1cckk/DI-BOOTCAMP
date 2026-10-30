@@ -23,10 +23,21 @@ interface ChamaChoice {
   status: string;
 }
 
-type AccountMode = 'login' | 'register' | 'forgot' | 'reset';
+type AccountMode = 'login' | 'setup' | 'forgot' | 'reset' | 'invite';
 
 const resetTokenFromUrl = () =>
   new URLSearchParams(window.location.hash.slice(1)).get('reset_token') || '';
+
+const invitationTokenFromUrl = () =>
+  new URLSearchParams(window.location.hash.slice(1)).get('invite_token') || '';
+
+interface InvitationDetails {
+  name: string;
+  phoneOrEmail: string;
+  role: AuthenticatedUser['role'];
+  chamaName: string;
+  requiresEmail: boolean;
+}
 
 export const AccountAccessPage: React.FC<AccountAccessPageProps> = ({
   onAuthenticated,
@@ -34,12 +45,18 @@ export const AccountAccessPage: React.FC<AccountAccessPageProps> = ({
   initialError = '',
 }) => {
   const [resetToken, setResetToken] = useState(resetTokenFromUrl);
-  const [mode, setMode] = useState<AccountMode>(() => resetTokenFromUrl() ? 'reset' : 'login');
+  const [inviteToken, setInviteToken] = useState(invitationTokenFromUrl);
+  const [mode, setMode] = useState<AccountMode>(() =>
+    invitationTokenFromUrl() ? 'invite' : resetTokenFromUrl() ? 'reset' : 'setup'
+  );
+  const [invitation, setInvitation] = useState<InvitationDetails | null>(null);
   const [chamaChoices, setChamaChoices] = useState<ChamaChoice[]>([]);
   const [selectedChamaId, setSelectedChamaId] = useState('');
   const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [chamaName, setChamaName] = useState('');
   const [email, setEmail] = useState('');
+  const [inviteEmail, setInviteEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -48,29 +65,56 @@ export const AccountAccessPage: React.FC<AccountAccessPageProps> = ({
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
 
-  const registering = mode === 'register';
+  const registering = mode === 'setup';
   const loggingIn = mode === 'login';
   const resetting = mode === 'reset';
+  const inviting = mode === 'invite';
+
+  React.useEffect(() => {
+    if (!inviteToken) return;
+    let active = true;
+    fetch(`/api/auth/invites/${encodeURIComponent(inviteToken)}`, { credentials: 'same-origin' })
+      .then(async (response) => {
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'This invitation is not available.');
+        return result as InvitationDetails;
+      })
+      .then((details) => {
+        if (!active) return;
+        setInvitation(details);
+        if (!details.requiresEmail) setInviteEmail(details.phoneOrEmail);
+      })
+      .catch((inviteError: unknown) => {
+        if (active) setError(inviteError instanceof Error ? inviteError.message : 'This invitation is not available.');
+      });
+    return () => {
+      active = false;
+    };
+  }, [inviteToken]);
 
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError('');
     setMessage('');
 
-    if (registering && password !== confirmPassword) {
+    if ((registering || resetting || inviting) && password !== confirmPassword) {
       setError('Your passwords do not match.');
       return;
     }
 
     const endpoint = registering
       ? '/api/auth/register'
+      : inviting
+        ? '/api/auth/accept-invitation'
       : resetting
         ? '/api/auth/reset-password'
         : mode === 'forgot'
           ? '/api/auth/forgot-password'
           : '/api/auth/login';
     const payload = registering
-      ? { name: name.trim(), email: email.trim(), password, chamaName: chamaName.trim() || 'My Chama' }
+      ? { name: name.trim(), email: email.trim(), phone: phone.trim(), password, chamaName: chamaName.trim() || 'My Chama' }
+      : inviting
+        ? { token: inviteToken, password, ...(invitation?.requiresEmail ? { email: inviteEmail.trim() } : {}) }
       : resetting
         ? { token: resetToken, password }
         : { email: email.trim(), ...(mode === 'forgot' ? {} : { password, ...(selectedChamaId ? { chamaId: selectedChamaId } : {}) }) };
@@ -100,6 +144,16 @@ export const AccountAccessPage: React.FC<AccountAccessPageProps> = ({
         setConfirmPassword('');
         setMode('login');
         setMessage(result.message);
+        return;
+      }
+      if (inviting) {
+        if (!isAuthenticatedUser(result.user)) {
+          setError('The account service returned an invalid invitation response.');
+          return;
+        }
+        window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
+        setInviteToken('');
+        onAuthenticated(result.user);
         return;
       }
       if (result.requiresChamaSelection === true && Array.isArray(result.memberships)) {
@@ -197,12 +251,12 @@ export const AccountAccessPage: React.FC<AccountAccessPageProps> = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => switchMode('register')}
+                  onClick={() => switchMode('setup')}
                   className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-bold transition ${
                     registering ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
-                  Create initial admin
+                  Create new chama
                 </button>
               </div>
             ) : (
@@ -218,22 +272,41 @@ export const AccountAccessPage: React.FC<AccountAccessPageProps> = ({
 
             <h2 className="text-2xl font-extrabold">
               {registering
-                ? 'Create your account'
+                ? 'Set up your chama'
                 : resetting
                   ? 'Choose a new password'
+                  : inviting
+                    ? 'Accept your invitation'
                   : mode === 'forgot'
                     ? 'Recover your password'
                     : 'Welcome back'}
             </h2>
             <p className="mt-2 text-sm text-slate-500">
               {registering
-                ? 'Set up your account before entering the platform.'
+                ? 'Start a new chama. Your account will be its admin.'
                 : resetting
                   ? 'Enter a new password for your Akiba account.'
+                  : inviting
+                    ? 'Choose a password to create your member account. Your role is assigned by the chama admin.'
                   : mode === 'forgot'
                     ? 'We’ll email you a secure link to reset your password.'
                     : 'Sign in once to open the chama and role linked to your membership.'}
             </p>
+
+            {registering && (
+              <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900">
+                This creates a separate chama. It will not recover or give access to records in an existing chama.
+              </p>
+            )}
+
+            {inviting && invitation && (
+              <div className="mt-5 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+                <p className="font-bold">{invitation.name} · {invitation.chamaName}</p>
+                <p className="mt-1 text-xs text-blue-800">
+                  Invited as {invitation.role}. Contact: {invitation.phoneOrEmail}
+                </p>
+              </div>
+            )}
 
             <form className="mt-7 space-y-4" onSubmit={submit}>
               {registering && (
@@ -252,6 +325,18 @@ export const AccountAccessPage: React.FC<AccountAccessPageProps> = ({
               )}
               {registering && (
                 <label className="block text-sm font-semibold text-slate-700">
+                  Phone number (optional)
+                  <input
+                    autoComplete="tel"
+                    className="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-3 font-normal outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    maxLength={30}
+                    onChange={(event) => setPhone(event.target.value)}
+                    value={phone}
+                  />
+                </label>
+              )}
+              {registering && (
+                <label className="block text-sm font-semibold text-slate-700">
                   Chama name
                   <input
                     autoComplete="organization"
@@ -263,26 +348,26 @@ export const AccountAccessPage: React.FC<AccountAccessPageProps> = ({
                   />
                 </label>
               )}
-              {!resetting && (
+              {!resetting && (!inviting || invitation?.requiresEmail) && (
                 <label className="block text-sm font-semibold text-slate-700">
-                  Email address
+                  {inviting ? 'Email address for your login' : 'Email address'}
                   <input
                     autoComplete="email"
                     className="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-3 font-normal outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                     maxLength={254}
-                    onChange={(event) => setEmail(event.target.value)}
+                    onChange={(event) => inviting ? setInviteEmail(event.target.value) : setEmail(event.target.value)}
                     required
                     type="email"
-                    value={email}
+                    value={inviting ? inviteEmail : email}
                   />
                 </label>
               )}
               {mode !== 'forgot' && (
                 <label className="block text-sm font-semibold text-slate-700">
-                  {resetting ? 'New password' : 'Password'}
+                  {resetting ? 'New password' : inviting ? 'Choose a password' : 'Password'}
                   <div className="relative mt-1.5">
                     <input
-                      autoComplete={registering || resetting ? 'new-password' : 'current-password'}
+                      autoComplete={registering || resetting || inviting ? 'new-password' : 'current-password'}
                       className="w-full rounded-xl border border-slate-300 px-4 py-3 pr-12 font-normal outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                       maxLength={128}
                       minLength={8}
@@ -303,7 +388,7 @@ export const AccountAccessPage: React.FC<AccountAccessPageProps> = ({
                         : <Eye aria-hidden="true" className="h-5 w-5" />}
                     </button>
                   </div>
-                  {(registering || resetting) && (
+                  {(registering || resetting || inviting) && (
                     <span className="mt-1 block text-xs font-normal text-slate-500">
                       Use at least 8 characters, including a letter and a number.
                     </span>
@@ -327,7 +412,7 @@ export const AccountAccessPage: React.FC<AccountAccessPageProps> = ({
                   )}
                 </label>
               )}
-              {(registering || resetting) && (
+              {(registering || resetting || inviting) && (
                 <label className="block text-sm font-semibold text-slate-700">
                   Confirm password
                   <div className="relative mt-1.5">
@@ -369,13 +454,15 @@ export const AccountAccessPage: React.FC<AccountAccessPageProps> = ({
 
               <button
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 disabled:cursor-wait disabled:opacity-60"
-                disabled={busy}
+                disabled={busy || (inviting && !invitation)}
                 type="submit"
               >
                 {busy
                   ? 'Please wait…'
                   : registering
-                    ? 'Create account'
+                    ? 'Set up chama'
+                    : inviting
+                      ? 'Accept invitation'
                     : resetting
                       ? 'Reset password'
                       : mode === 'forgot'
@@ -396,7 +483,9 @@ export const AccountAccessPage: React.FC<AccountAccessPageProps> = ({
             )}
 
             <p className="mt-5 text-center text-xs leading-5 text-slate-500">
-              Password recovery is sent by email. Reset links expire after 30 minutes and work once.
+              {inviting
+                ? 'Invitation links expire after 48 hours and can only be used once.'
+                : 'Password recovery is sent by email. Reset links expire after 30 minutes and work once.'}
             </p>
           </div>
         </section>

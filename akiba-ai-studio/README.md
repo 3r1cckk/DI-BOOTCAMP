@@ -32,8 +32,11 @@ mounted at `/var/data`, so SQLite data survives service restarts. Render charges
 for the service and persistent disk. Before using password recovery, set
 `APP_URL` to the service's public HTTPS URL and configure `RESEND_API_KEY` and
 `RESEND_FROM` with a verified sender. Set `GEMINI_API_KEY` to enable Gemini
-features. Enter these values directly in Render's environment settings; never
-commit them to the repository.
+features. For phone invitations, configure `SOZURI_API_KEY` and
+`SOZURI_PROJECT`; the blueprint sets the Sozuri messaging endpoint. Set
+`APP_URL` to the Render service's public HTTPS URL so invitation links work
+from invitees' phones. Enter secrets directly in Render's environment settings;
+never commit them to the repository.
 
 ## Account recovery email
 
@@ -122,9 +125,11 @@ the member permission set until additional duties are explicitly defined.
 Only `admin` receives management routes. This avoids inferring elevated rights
 from a job title.
 
-The first account created bootstraps the first chama admin. Thereafter an
-admin creates accounts and assigns chama roles from the member directory.
-Existing users can have separate roles in each chama.
+Anyone can create an account to start a separate chama as its admin. This does
+not grant access to existing chamas. Admins can invite members from the member
+directory and assign their role; email invitations are sent by Resend and phone
+invitations by Sozuri SMS. Invitees set their own password using a single-use,
+48-hour invitation link. Existing users can have separate roles in each chama.
 
 ## Frontend access guards
 

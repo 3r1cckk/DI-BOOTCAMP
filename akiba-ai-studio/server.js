@@ -16,6 +16,7 @@ const port = Number(process.env.PORT || 3000);
 const sessionCookie = 'akiba_session';
 const sessionLifetimeMs = 7 * 24 * 60 * 60 * 1000;
 const resetLifetimeMs = 30 * 60 * 1000;
+const invitationLifetimeMs = 48 * 60 * 60 * 1000;
 const rateLimits = new Map();
 const adminOnly = requireRole(['admin']);
 const anyMembership = requireMembership;
@@ -35,10 +36,11 @@ app.post('/api/auth/register', requireSameOrigin, limitRequests('register', 10, 
     const name = typeof req.body?.name === 'string' ? req.body.name.trim() : '';
     const email = normalizeEmail(req.body?.email);
     const password = req.body?.password;
+    const phone = typeof req.body?.phone === 'string' ? req.body.phone.trim() : '';
     const chamaName = typeof req.body?.chamaName === 'string' ? req.body.chamaName.trim() : 'My Chama';
     if (name.length < 2 || name.length > 80 || !isValidEmail(email) ||
-      chamaName.length < 2 || chamaName.length > 100) {
-      res.status(400).json({ error: 'Enter a valid name, email, and chama name.' });
+      phone.length > 30 || chamaName.length < 2 || chamaName.length > 100) {
+      res.status(400).json({ error: 'Enter a valid name, email, phone number, and chama name.' });
       return;
     }
     if (!isValidPassword(password)) {
@@ -53,38 +55,28 @@ app.post('/api/auth/register', requireSameOrigin, limitRequests('register', 10, 
     const salt = randomBytes(16);
     const passwordHash = await hashPassword(password, salt);
     const createAdmin = db.transaction(() => {
-      if (db.prepare('SELECT COUNT(*) AS count FROM users').get().count > 0) {
-        const error = new Error('Admin setup is complete. Ask an existing chama admin to create your account.');
-        error.code = 'ADMIN_SETUP_COMPLETE';
-        throw error;
-      }
       db.prepare(`
         INSERT INTO users (id, name, email, password_salt, password_hash) VALUES (?, ?, ?, ?, ?)
       `).run(userId, name, email, salt.toString('base64'), passwordHash.toString('base64'));
       db.prepare('INSERT INTO chamas (id, name) VALUES (?, ?)').run(chamaId, chamaName);
       db.prepare(`
-        INSERT INTO memberships (id, chama_id, user_id, role, status) VALUES (?, ?, ?, 'admin', 'active')
-      `).run(membershipId, chamaId, userId);
+        INSERT INTO memberships (id, chama_id, user_id, role, status, phone)
+        VALUES (?, ?, ?, 'admin', 'active', ?)
+      `).run(membershipId, chamaId, userId, phone);
       writeAuditLog(db, {
-        actorId: userId, chamaId, action: 'admin.bootstrap', entityType: 'membership',
+        actorId: userId, chamaId, action: 'chama.admin_signup', entityType: 'membership',
         entityId: membershipId, metadata: { role: 'admin' }
       });
     });
-    try {
-      createAdmin.immediate();
-    } catch (error) {
-      if (error.code === 'ADMIN_SETUP_COMPLETE') {
-        res.status(403).json({ error: error.message });
-        return;
-      }
-      throw error;
-    }
+    createAdmin.immediate();
     const token = await createSession(db, userId, chamaId);
     setSessionCookie(res, token);
     res.status(201).json({ user: getAuthPayload(db, userId, chamaId) });
   } catch (error) {
     if (isUniqueConstraint(error)) {
-      res.status(409).json({ error: 'An account with this email already exists.' });
+      res.status(409).json({
+        error: 'This email already has an Akiba account. Log in to that account, or use a different email to create a separate chama.'
+      });
       return;
     }
     next(error);
@@ -141,6 +133,121 @@ app.post('/api/auth/login', requireSameOrigin, limitRequests('login', 10, 15 * 6
       user: getAuthPayload(db, user.id, selected.chamaId),
       memberships
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get('/api/auth/invites/:token', limitRequests('invite-lookup', 30, 15 * 60 * 1000), async (req, res, next) => {
+  try {
+    const db = await getDatabase();
+    const invite = db.prepare(`
+      SELECT i.name, i.phone_or_email AS phoneOrEmail, i.role, i.expires_at AS expiresAt,
+        c.name AS chamaName
+      FROM invites i JOIN chamas c ON c.id = i.chama_id
+      WHERE i.token = ? AND i.used_at IS NULL
+    `).get(hashToken(req.params.token));
+    if (!invite || invite.expiresAt <= Date.now()) {
+      res.status(410).json({ error: 'This invitation is invalid, expired, or has already been used.' });
+      return;
+    }
+    res.json({
+      name: invite.name,
+      phoneOrEmail: invite.phoneOrEmail,
+      role: invite.role,
+      chamaName: invite.chamaName,
+      requiresEmail: !isValidEmail(invite.phoneOrEmail)
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post('/api/auth/accept-invitation', requireSameOrigin, limitRequests('accept-invitation', 10, 60 * 60 * 1000), async (req, res, next) => {
+  try {
+    const token = typeof req.body?.token === 'string' ? req.body.token : '';
+    const password = req.body?.password;
+    if (!token || token.length > 128 || !isValidPassword(password)) {
+      res.status(400).json({ error: 'Enter a valid invitation and a password of at least 8 characters with a letter and a number.' });
+      return;
+    }
+
+    const db = await getDatabase();
+    const invite = db.prepare(`
+      SELECT id, chama_id AS chamaId, name, phone_or_email AS phoneOrEmail, role,
+        id_number AS idNumber, monthly_pledge AS monthlyPledge, expires_at AS expiresAt, used_at AS usedAt
+      FROM invites WHERE token = ?
+    `).get(hashToken(token));
+    if (!invite || invite.usedAt || invite.expiresAt <= Date.now()) {
+      res.status(410).json({ error: 'This invitation is invalid, expired, or has already been used.' });
+      return;
+    }
+
+    const email = isValidEmail(invite.phoneOrEmail)
+      ? normalizeEmail(invite.phoneOrEmail)
+      : normalizeEmail(req.body?.email);
+    if (!isValidEmail(email)) {
+      res.status(400).json({ error: 'Enter a valid email address to use for your Akiba login.' });
+      return;
+    }
+    if (db.prepare('SELECT 1 FROM users WHERE email = ? COLLATE NOCASE').get(email)) {
+      res.status(409).json({ error: 'An account already uses this email. Ask the chama admin to invite your existing account.' });
+      return;
+    }
+
+    const userId = randomId();
+    const membershipId = randomId();
+    const salt = randomBytes(16);
+    const passwordHash = await hashPassword(password, salt);
+    const accept = db.transaction(() => {
+      const currentInvite = db.prepare(`
+        SELECT used_at AS usedAt, expires_at AS expiresAt FROM invites WHERE id = ?
+      `).get(invite.id);
+      if (!currentInvite || currentInvite.usedAt || currentInvite.expiresAt <= Date.now()) {
+        const error = new Error('This invitation is invalid, expired, or has already been used.');
+        error.code = 'INVITATION_UNAVAILABLE';
+        throw error;
+      }
+      if (db.prepare('SELECT 1 FROM users WHERE email = ? COLLATE NOCASE').get(email)) {
+        const error = new Error('An account already uses this email.');
+        error.code = 'INVITATION_EMAIL_EXISTS';
+        throw error;
+      }
+      db.prepare(`
+        INSERT INTO users (id, name, email, password_salt, password_hash) VALUES (?, ?, ?, ?, ?)
+      `).run(userId, invite.name, email, salt.toString('base64'), passwordHash.toString('base64'));
+      db.prepare(`
+        INSERT INTO memberships
+          (id, chama_id, user_id, role, status, phone, id_number, monthly_pledge)
+        VALUES (?, ?, ?, ?, 'active', ?, ?, ?)
+      `).run(
+        membershipId, invite.chamaId, userId, invite.role,
+        isValidEmail(invite.phoneOrEmail) ? '' : invite.phoneOrEmail,
+        invite.idNumber, invite.monthlyPledge
+      );
+      db.prepare('UPDATE invites SET used_at = ? WHERE id = ? AND used_at IS NULL')
+        .run(Date.now(), invite.id);
+      writeAuditLog(db, {
+        actorId: userId, chamaId: invite.chamaId, action: 'membership.invitation_accepted',
+        entityType: 'membership', entityId: membershipId, metadata: { role: invite.role }
+      });
+    });
+    try {
+      accept.immediate();
+    } catch (error) {
+      if (error.code === 'INVITATION_UNAVAILABLE') {
+        res.status(410).json({ error: error.message });
+        return;
+      }
+      if (error.code === 'INVITATION_EMAIL_EXISTS' || isUniqueConstraint(error)) {
+        res.status(409).json({ error: 'An account already uses this email. Ask the chama admin to invite your existing account.' });
+        return;
+      }
+      throw error;
+    }
+    const sessionToken = await createSession(db, userId, invite.chamaId);
+    setSessionCookie(res, sessionToken);
+    res.status(201).json({ user: getAuthPayload(db, userId, invite.chamaId) });
   } catch (error) {
     next(error);
   }
@@ -487,6 +594,147 @@ app.get('/api/admin/members', authenticate, adminOnly, async (req, res, next) =>
       WHERE m.chama_id = ? ORDER BY u.name COLLATE NOCASE
     `).all(req.auth.membership.chama_id);
     res.json({ members });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post('/api/admin/invites', requireSameOrigin, limitRequests('create-invite', 20, 60 * 60 * 1000), authenticate, adminOnly, async (req, res, next) => {
+  try {
+    const name = typeof req.body?.name === 'string' ? req.body.name.trim() : '';
+    const phoneOrEmail = typeof req.body?.phoneOrEmail === 'string' ? req.body.phoneOrEmail.trim() : '';
+    const role = typeof req.body?.role === 'string' ? req.body.role.toLowerCase() : 'member';
+    const idNumber = typeof req.body?.idNumber === 'string' ? req.body.idNumber.trim() : '';
+    const monthlyPledge = Number(req.body?.monthlyPledge);
+    const emailContact = normalizeEmail(phoneOrEmail);
+    if (name.length < 2 || name.length > 80 ||
+      (!isValidEmail(emailContact) && !isValidPhone(phoneOrEmail)) ||
+      !SUPPORTED_ROLES.includes(role) || idNumber.length > 80 ||
+      !Number.isFinite(monthlyPledge) || monthlyPledge < 0) {
+      res.status(400).json({ error: 'Enter a valid name, phone number or email, chama role, and monthly pledge.' });
+      return;
+    }
+
+    const db = await getDatabase();
+    const chamaId = req.auth.membership.chama_id;
+    const isEmailInvite = isValidEmail(emailContact);
+    if (isEmailInvite) {
+      if (db.prepare('SELECT 1 FROM users WHERE email = ? COLLATE NOCASE').get(emailContact)) {
+        res.status(409).json({ error: 'This email already has an account. Invite the existing account instead.' });
+        return;
+      }
+      const emailConfigurationMissing = [
+        !process.env.RESEND_API_KEY && 'RESEND_API_KEY',
+        !process.env.RESEND_FROM && 'RESEND_FROM'
+      ].filter(Boolean);
+      if (emailConfigurationMissing.length) {
+        res.status(503).json({
+          error: `Email invitations are not configured. Set ${emailConfigurationMissing.join(', ')} in .env.local and restart Akiba.`
+        });
+        return;
+      }
+    } else {
+      const missingSmsConfiguration = [
+        !process.env.SOZURI_API_KEY && 'SOZURI_API_KEY',
+        !process.env.SOZURI_PROJECT && 'SOZURI_PROJECT'
+      ].filter(Boolean);
+      if (missingSmsConfiguration.length) {
+        res.status(503).json({
+          error: `Sozuri SMS invitations are not configured. Set ${missingSmsConfiguration.join(', ')} in .env.local and restart Akiba.`
+        });
+        return;
+      }
+    }
+    const existingInvite = db.prepare(`
+      SELECT 1 FROM invites
+      WHERE chama_id = ? AND phone_or_email = ? COLLATE NOCASE
+        AND used_at IS NULL AND expires_at > ?
+    `).get(chamaId, isEmailInvite ? emailContact : phoneOrEmail, Date.now());
+    if (existingInvite) {
+      res.status(409).json({ error: 'An active invitation already exists for this contact.' });
+      return;
+    }
+
+    const baseUrl = getAppBaseUrl(req);
+    if (!baseUrl) {
+      res.status(503).json({ error: 'Invitations require APP_URL to be HTTPS (or localhost during development).' });
+      return;
+    }
+    const rawToken = randomBytes(32).toString('base64url');
+    const tokenHash = hashToken(rawToken);
+    const inviteId = randomId();
+    const expiresAt = Date.now() + invitationLifetimeMs;
+    try {
+      const createInvite = db.transaction(() => {
+        db.prepare(`
+          INSERT INTO invites
+            (id, chama_id, phone_or_email, role, token, expires_at, created_by, name, id_number, monthly_pledge)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+          inviteId, chamaId, isEmailInvite ? emailContact : phoneOrEmail, role, tokenHash, expiresAt,
+          req.auth.user.id, name, idNumber, monthlyPledge
+        );
+        writeAuditLog(db, {
+          actorId: req.auth.user.id, chamaId, action: 'membership.invited',
+          entityType: 'invite', entityId: inviteId,
+          metadata: { role, channel: isEmailInvite ? 'email' : 'sms' }
+        });
+      });
+      createInvite();
+    } catch (error) {
+      if (isUniqueConstraint(error)) {
+        res.status(409).json({ error: 'An active invitation already exists for this contact.' });
+        return;
+      }
+      throw error;
+    }
+
+    const invitationUrl = new URL('/', baseUrl);
+    invitationUrl.hash = new URLSearchParams({ invite_token: rawToken }).toString();
+    if (isEmailInvite) {
+      try {
+        const chama = db.prepare('SELECT name FROM chamas WHERE id = ?').get(chamaId);
+        await sendInvitationEmail({
+          apiKey: process.env.RESEND_API_KEY,
+          from: process.env.RESEND_FROM,
+          to: emailContact,
+          name,
+          chamaName: chama.name,
+          invitationUrl: invitationUrl.toString()
+        });
+      } catch (error) {
+        db.prepare('UPDATE invites SET expires_at = ? WHERE id = ? AND used_at IS NULL')
+          .run(Date.now(), inviteId);
+        console.error('Resend member invitation delivery failed:', error);
+        res.status(502).json({ error: 'We could not send the invitation email. Please try again later.' });
+        return;
+      }
+    } else {
+      try {
+        await sendInvitationSms({
+          apiKey: process.env.SOZURI_API_KEY,
+          project: process.env.SOZURI_PROJECT,
+          apiUrl: process.env.SOZURI_API_URL || 'https://sozuri.net/api/v1/messaging',
+          from: process.env.SOZURI_FROM || 'Akiba',
+          type: process.env.SOZURI_TYPE || 'transactional',
+          to: normalizeKenyanPhone(phoneOrEmail),
+          name,
+          chamaName: db.prepare('SELECT name FROM chamas WHERE id = ?').get(chamaId).name,
+          invitationUrl: invitationUrl.toString()
+        });
+      } catch (error) {
+        db.prepare('UPDATE invites SET expires_at = ? WHERE id = ? AND used_at IS NULL')
+          .run(Date.now(), inviteId);
+        console.error('Sozuri member invitation delivery failed:', error);
+        res.status(502).json({ error: 'We could not send the invitation SMS. Check the phone number and SMS provider configuration, then try again.' });
+        return;
+      }
+    }
+    res.status(201).json({
+      invitationUrl: invitationUrl.toString(),
+      delivery: isEmailInvite ? 'email' : 'sms',
+      expiresAt
+    });
   } catch (error) {
     next(error);
   }
@@ -1239,6 +1487,17 @@ function isValidEmail(value) {
   return value.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+function isValidPhone(value) {
+  return value.length >= 7 && value.length <= 30 && /^[+()\d\s.-]+$/.test(value);
+}
+
+function normalizeKenyanPhone(value) {
+  const digits = value.replace(/\D/g, '');
+  if (digits.startsWith('0')) return `+254${digits.slice(1)}`;
+  if (digits.startsWith('254')) return `+${digits}`;
+  return `+${digits}`;
+}
+
 function isValidPassword(value) {
   return typeof value === 'string' && value.length >= 8 && value.length <= 128 &&
     /[a-z]/i.test(value) && /\d/.test(value);
@@ -1299,7 +1558,10 @@ function nonNegativeNumber(value) {
 }
 
 function isUniqueConstraint(error) {
-  return error.code === 'SQLITE_CONSTRAINT_UNIQUE' || error.code === 'SQLITE_CONSTRAINT_PRIMARYKEY';
+  return error.code === 'SQLITE_CONSTRAINT_UNIQUE' ||
+    error.code === 'SQLITE_CONSTRAINT_PRIMARYKEY' ||
+    error.errcode === 2067 ||
+    error.errcode === 1555;
 }
 
 function getAppBaseUrl(req) {
@@ -1324,6 +1586,60 @@ async function sendResetEmail({ apiKey, from, to, name, resetUrl }) {
     signal: AbortSignal.timeout(10000)
   });
   if (!response.ok) throw new Error(`Resend returned HTTP ${response.status}.`);
+}
+
+async function sendInvitationEmail({ apiKey, from, to, name, chamaName, invitationUrl }) {
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from, to: [to], subject: `You are invited to join ${chamaName} on Akiba`,
+      text: `Hello ${name},\n\nYou have been invited to join ${chamaName} on Akiba. Use the link below to accept your invitation and set your password. This link expires in 48 hours and can only be used once.\n\n${invitationUrl}\n\nIf you were not expecting this invitation, you can ignore this email.`
+    }),
+    signal: AbortSignal.timeout(10000)
+  });
+  if (!response.ok) throw new Error(`Resend returned HTTP ${response.status}.`);
+}
+
+async function sendInvitationSms({ apiKey, project, apiUrl, from, type, to, name, chamaName, invitationUrl }) {
+  let endpoint;
+  try {
+    endpoint = new URL(apiUrl);
+  } catch {
+    throw new Error('SOZURI_API_URL must be a valid HTTPS URL.');
+  }
+  if (endpoint.protocol !== 'https:') {
+    throw new Error('SOZURI_API_URL must use HTTPS.');
+  }
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      project,
+      apiKey,
+      from,
+      to,
+      message: `Hello ${name}, you are invited to join ${chamaName} on Akiba. Set your password using this one-time link (expires in 48 hours): ${invitationUrl}`,
+      channel: 'sms',
+      type
+    }),
+    signal: AbortSignal.timeout(10000)
+  });
+  const responseText = await response.text();
+  let result = {};
+  try {
+    result = responseText ? JSON.parse(responseText) : {};
+  } catch {
+    if (response.ok) {
+      throw new Error('Sozuri returned an invalid response.');
+    }
+  }
+  if (!response.ok || result.success === false || result.status === 'failed') {
+    throw new Error(`Sozuri rejected the SMS request (HTTP ${response.status}).`);
+  }
 }
 
 export { app, requireRole };

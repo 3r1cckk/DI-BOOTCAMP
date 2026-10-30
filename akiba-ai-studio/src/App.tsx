@@ -9,6 +9,7 @@ import { RecordContributionModal } from './components/RecordContributionModal';
 import { LoanRequestModal } from './components/LoanRequestModal';
 import { LoanApprovalModal } from './components/LoanApprovalModal';
 import { AddMemberModal } from './components/AddMemberModal';
+import type { MemberInvitationInput, MemberInvitationResult } from './components/AddMemberModal';
 import { MpesaSimulatorModal } from './components/MpesaSimulatorModal';
 import { ReportsModal } from './components/ReportsModal';
 import { VsCodeGuideModal } from './components/VsCodeGuideModal';
@@ -35,8 +36,10 @@ export default function App() {
   const [currentTab, setCurrentTab] = useState<string>('dashboard');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const hasPasswordResetToken = new URLSearchParams(window.location.hash.slice(1)).has('reset_token');
-  const [showLandingPage, setShowLandingPage] = useState<boolean>(!hasPasswordResetToken);
-  const [showAccountAccess, setShowAccountAccess] = useState<boolean>(hasPasswordResetToken);
+  const hasInvitationToken = new URLSearchParams(window.location.hash.slice(1)).has('invite_token');
+  const hasAccountToken = hasPasswordResetToken || hasInvitationToken;
+  const [showLandingPage, setShowLandingPage] = useState<boolean>(!hasAccountToken);
+  const [showAccountAccess, setShowAccountAccess] = useState<boolean>(hasAccountToken);
   const [accountServiceError, setAccountServiceError] = useState<string>('');
   const [authenticatedUser, setAuthenticatedUser] = useState<AuthenticatedUser | null>(null);
   const [adminDataLoaded, setAdminDataLoaded] = useState(false);
@@ -58,7 +61,7 @@ export default function App() {
   const [isVsCodeGuideOpen, setIsVsCodeGuideOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    if (hasPasswordResetToken) return;
+    if (hasAccountToken) return;
     let active = true;
     fetch('/api/auth/session', { credentials: 'same-origin' })
       .then(async (response) => {
@@ -318,18 +321,22 @@ export default function App() {
   };
 
   const handleAddMember = async (
-    newMem: Omit<Member, 'id' | 'totalSaved' | 'activeLoanAmount' | 'status' | 'joinedDate'> & { password?: string }
-  ) => {
-    const response = await fetch('/api/admin/members', {
+    newMem: MemberInvitationInput
+  ): Promise<MemberInvitationResult> => {
+    const response = await fetch('/api/admin/invites', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'same-origin',
       body: JSON.stringify(newMem),
     });
     const result = await response.json();
-    if (!response.ok) throw new Error(result.error || 'Could not create the member login.');
-    const member = result.member as Member;
-    setMembers((prev) => [...prev, member]);
+    if (!response.ok) throw new Error(result.error || 'Could not create the member invitation.');
+    if (typeof result.invitationUrl !== 'string' ||
+      !['email', 'sms'].includes(result.delivery) ||
+      typeof result.expiresAt !== 'number') {
+      throw new Error('The invitation service returned an invalid response.');
+    }
+    return result as MemberInvitationResult;
   };
 
   const handleUpdateMember = async (

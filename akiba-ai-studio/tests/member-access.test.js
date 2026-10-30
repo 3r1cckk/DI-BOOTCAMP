@@ -44,7 +44,15 @@ test('one user has chama-specific roles and member requests are scoped and read-
       method: 'POST',
       body: { name: 'Public User', email: 'public@example.test', password: 'PublicAkibaPassword2026' }
     });
-    assert.equal(publicRegistration.status, 403);
+    assert.equal(publicRegistration.status, 201);
+    const publicAdmin = (await publicRegistration.json()).user;
+    assert.equal(publicAdmin.role, 'admin');
+    assert.notEqual(publicAdmin.activeChama.id, adminUser.activeChama.id);
+    const publicAdminMembers = await request('/api/admin/members', {
+      cookie: cookieFrom(publicRegistration)
+    });
+    assert.equal(publicAdminMembers.status, 200);
+    assert.deepEqual((await publicAdminMembers.json()).members.map((member) => member.name), ['Public User']);
 
     const createMember = (member, cookie = adminCookie) => request('/api/admin/members', {
       method: 'POST',

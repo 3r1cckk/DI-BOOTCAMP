@@ -39,7 +39,7 @@ export const MembersView: React.FC<MembersViewProps> = ({
           className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer w-fit"
         >
           <UserPlus className="w-4 h-4" />
-          <span>Add New Member</span>
+          <span>Invite Member</span>
         </button>
       </div>
 

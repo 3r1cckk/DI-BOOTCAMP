@@ -24,3 +24,11 @@ services:
         sync: false
       - key: GEMINI_API_KEY
         sync: false
+      - key: SOZURI_API_KEY
+        sync: false
+      - key: SOZURI_PROJECT
+        sync: false
+      - key: SOZURI_API_URL
+        value: https://sozuri.net/api/v1/messaging
+      - key: SOZURI_FROM
+        sync: false

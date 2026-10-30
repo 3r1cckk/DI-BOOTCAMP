@@ -35,6 +35,25 @@ CREATE TABLE IF NOT EXISTS memberships (
 CREATE INDEX IF NOT EXISTS memberships_user_status_idx ON memberships(user_id, status);
 CREATE INDEX IF NOT EXISTS memberships_chama_status_idx ON memberships(chama_id, status);
 
+CREATE TABLE IF NOT EXISTS invites (
+  id TEXT PRIMARY KEY,
+  chama_id TEXT NOT NULL REFERENCES chamas(id) ON DELETE CASCADE,
+  phone_or_email TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'member'
+    CHECK (role IN ('member', 'treasurer', 'secretary', 'chairperson', 'admin')),
+  token TEXT NOT NULL UNIQUE,
+  expires_at INTEGER NOT NULL,
+  used_at INTEGER,
+  created_by TEXT REFERENCES users(id),
+  name TEXT NOT NULL,
+  id_number TEXT NOT NULL DEFAULT '',
+  monthly_pledge REAL NOT NULL DEFAULT 0 CHECK (monthly_pledge >= 0),
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS invites_chama_contact_expiry_idx
+  ON invites(chama_id, phone_or_email, expires_at);
+
 CREATE TABLE IF NOT EXISTS sessions (
   id_hash TEXT PRIMARY KEY,
   user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,

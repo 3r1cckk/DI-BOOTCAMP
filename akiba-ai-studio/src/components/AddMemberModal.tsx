@@ -1,11 +1,25 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, UserPlus, X } from 'lucide-react';
+import { Check, Copy, UserPlus, X } from 'lucide-react';
 import { Member } from './utils/chamaCalculations';
+
+export interface MemberInvitationInput {
+  name: string;
+  phoneOrEmail: string;
+  idNumber: string;
+  role: Member['role'];
+  monthlyPledge: number;
+}
+
+export interface MemberInvitationResult {
+  invitationUrl: string;
+  delivery: 'email' | 'sms';
+  expiresAt: number;
+}
 
 interface AddMemberModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddMember: (member: Omit<Member, 'id' | 'totalSaved' | 'activeLoanAmount' | 'status' | 'joinedDate'> & { password?: string }) => Promise<void>;
+  onAddMember: (member: MemberInvitationInput) => Promise<MemberInvitationResult>;
 }
 
 export const AddMemberModal: React.FC<AddMemberModalProps> = ({
@@ -14,15 +28,26 @@ export const AddMemberModal: React.FC<AddMemberModalProps> = ({
   onAddMember,
 }) => {
   const [name, setName] = useState('');
-  const [phone, setPhone] = useState('07');
+  const [phoneOrEmail, setPhoneOrEmail] = useState('');
   const [idNumber, setIdNumber] = useState('');
-  const [email, setEmail] = useState('');
   const [role, setRole] = useState<Member['role']>('member');
   const [monthlyPledge, setMonthlyPledge] = useState(5000);
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [invitation, setInvitation] = useState<MemberInvitationResult | null>(null);
+  const [copied, setCopied] = useState(false);
   const [busy, setBusy] = useState(false);
+
+  React.useEffect(() => {
+    if (isOpen) return;
+    setName('');
+    setPhoneOrEmail('');
+    setIdNumber('');
+    setRole('member');
+    setMonthlyPledge(5000);
+    setError('');
+    setInvitation(null);
+    setCopied(false);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -31,21 +56,16 @@ export const AddMemberModal: React.FC<AddMemberModalProps> = ({
     setError('');
     setBusy(true);
     try {
-      await onAddMember({
+      const result = await onAddMember({
         name: name.trim(),
-        phone: phone.trim(),
+        phoneOrEmail: phoneOrEmail.trim(),
         idNumber: idNumber.trim(),
-        email: email.trim(),
         role,
         monthlyPledge: Number(monthlyPledge),
-        ...(password ? { password } : {}),
       });
-      setName('');
-      setEmail('');
-      setPassword('');
-      onClose();
+      setInvitation(result);
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : 'Could not create the member account.');
+      setError(submitError instanceof Error ? submitError.message : 'Could not create the invitation.');
     } finally {
       setBusy(false);
     }
@@ -61,8 +81,8 @@ export const AddMemberModal: React.FC<AddMemberModalProps> = ({
               <UserPlus className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-slate-900">Add New Chama Member</h2>
-              <p className="text-xs text-slate-500">Register member contact & savings quota</p>
+              <h2 className="text-base font-bold text-slate-900">Invite a Chama Member</h2>
+              <p className="text-xs text-slate-500">They will create their own password using a secure link.</p>
             </div>
           </div>
           <button
@@ -84,6 +104,7 @@ export const AddMemberModal: React.FC<AddMemberModalProps> = ({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              maxLength={80}
               placeholder="Enter member name"
               className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-600"
               required
@@ -93,13 +114,14 @@ export const AddMemberModal: React.FC<AddMemberModalProps> = ({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-                Phone Number
+                  Phone number or email
               </label>
               <input
                 type="text"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="07XXXXXXXX"
+                value={phoneOrEmail}
+                onChange={(e) => setPhoneOrEmail(e.target.value)}
+                maxLength={254}
+                placeholder="07XXXXXXXX or member@example.com"
                 className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-purple-600"
                 required
               />
@@ -113,6 +135,7 @@ export const AddMemberModal: React.FC<AddMemberModalProps> = ({
                 type="text"
                 value={idNumber}
                 onChange={(e) => setIdNumber(e.target.value)}
+                maxLength={80}
                 placeholder="e.g. 29482710"
                 className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-purple-600"
               />
@@ -153,48 +176,39 @@ export const AddMemberModal: React.FC<AddMemberModalProps> = ({
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-              Email Address (Member login)
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="e.g. member@gmail.com"
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-600"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-              Password (for a new account)
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                autoComplete="new-password"
-                minLength={8}
-                maxLength={128}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 pr-10 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-600"
-              />
-              <button
-                type="button"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-                aria-pressed={showPassword}
-                onClick={() => setShowPassword((visible) => !visible)}
-                className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-500 hover:text-purple-700"
-              >
-                {showPassword
-                  ? <EyeOff aria-hidden="true" className="h-4 w-4" />
-                  : <Eye aria-hidden="true" className="h-4 w-4" />}
-              </button>
+          {invitation && (
+            <div className="space-y-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+              <p className="text-xs font-semibold text-emerald-800" role="status">
+                {invitation.delivery === 'email'
+                  ? 'Invitation email sent. You can also copy the link to share it.'
+                  : 'Invitation SMS sent. You can also copy the link to share it by WhatsApp.'}
+                {' '}Expires {new Date(invitation.expiresAt).toLocaleString()}.
+              </p>
+              <div className="flex gap-2">
+                <input
+                  aria-label="Invitation link"
+                  className="min-w-0 flex-1 rounded-lg border border-emerald-200 bg-white px-2 py-2 text-xs"
+                  readOnly
+                  value={invitation.invitationUrl}
+                />
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(invitation.invitationUrl);
+                      setCopied(true);
+                    } catch {
+                      setError('Could not copy the link. Select and copy it manually.');
+                    }
+                  }}
+                  className="inline-flex items-center gap-1 rounded-lg bg-emerald-700 px-3 py-2 text-xs font-bold text-white"
+                >
+                  {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                  {copied ? 'Copied' : 'Copy'}
+                </button>
+              </div>
             </div>
-            <p className="mt-1 text-[11px] text-slate-500">Required only for a new account. Existing users keep their current password.</p>
-          </div>
+          )}
 
           {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700" role="alert">{error}</p>}
 
@@ -204,15 +218,17 @@ export const AddMemberModal: React.FC<AddMemberModalProps> = ({
               onClick={onClose}
               className="flex-1 py-2.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50"
             >
-              Cancel
+              {invitation ? 'Done' : 'Cancel'}
             </button>
-            <button
-              type="submit"
-              disabled={busy}
-              className="flex-1 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-bold shadow-xs cursor-pointer disabled:opacity-60"
-            >
-              {busy ? 'Creating account…' : 'Create Member Login'}
-            </button>
+            {!invitation && (
+              <button
+                type="submit"
+                disabled={busy}
+                className="flex-1 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-bold shadow-xs cursor-pointer disabled:opacity-60"
+              >
+                {busy ? 'Creating invitation…' : 'Create invitation'}
+              </button>
+            )}
           </div>
         </form>
       </div>
