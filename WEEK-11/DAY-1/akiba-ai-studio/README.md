@@ -21,11 +21,12 @@ View your app in AI Studio: https://ai.studio/apps/e476a830-8206-4eca-8e06-30bde
 
 ## Deploy to Render
 
-The Render blueprint for this app is `akiba-ai-studio/render.yaml`. In Render,
+The Render blueprint for this app is
+`WEEK-11/DAY-1/akiba-ai-studio/render.yaml`. In Render,
 create a Blueprint from this repository and set the Blueprint Path to
-`akiba-ai-studio/render.yaml`; the repository-root blueprint configures a
-different app. The service builds with `npm install && npm run build` and runs
-with `npm start`.
+`WEEK-11/DAY-1/akiba-ai-studio/render.yaml`; the repository-root blueprint
+configures a different app. The service builds with `npm install && npm run
+build` and runs with `npm start`.
 
 The blueprint provisions a Starter web service with a 1 GB persistent disk
 mounted at `/var/data`, so SQLite data survives service restarts. Render charges

@@ -3,7 +3,7 @@ services:
     name: akiba-ai-studio
     runtime: node
     plan: starter
-    rootDir: akiba-ai-studio
+    rootDir: WEEK-11/DAY-1/akiba-ai-studio
     buildCommand: npm install && npm run build
     startCommand: npm start
     healthCheckPath: /healthz
