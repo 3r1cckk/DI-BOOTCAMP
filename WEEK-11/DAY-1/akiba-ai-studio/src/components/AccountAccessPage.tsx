@@ -75,8 +75,11 @@ export const AccountAccessPage: React.FC<AccountAccessPageProps> = ({
     let active = true;
     fetch(`/api/auth/invites/${encodeURIComponent(inviteToken)}`, { credentials: 'same-origin' })
       .then(async (response) => {
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || 'This invitation is not available.');
+        const result = await readResponseObject(response);
+        if (!result) throw new Error('The account service returned an invalid response. Please try again.');
+        if (!response.ok) {
+          throw new Error(typeof result.error === 'string' ? result.error : 'This invitation is not available.');
+        }
         return result as InvitationDetails;
       })
       .then((details) => {
@@ -127,14 +130,18 @@ export const AccountAccessPage: React.FC<AccountAccessPageProps> = ({
         credentials: 'same-origin',
         body: JSON.stringify(payload),
       });
-      const result = await response.json();
+      const result = await readResponseObject(response);
+      if (!result) {
+        setError('The account service returned an invalid response. Please try again in a moment.');
+        return;
+      }
       if (!response.ok) {
         setError(typeof result.error === 'string' ? result.error : 'We could not complete the request.');
         return;
       }
 
       if (mode === 'forgot') {
-        setMessage(result.message);
+        setMessage(typeof result.message === 'string' ? result.message : 'If an account exists for that email, a password reset link has been sent.');
         return;
       }
       if (resetting) {
@@ -143,7 +150,7 @@ export const AccountAccessPage: React.FC<AccountAccessPageProps> = ({
         setPassword('');
         setConfirmPassword('');
         setMode('login');
-        setMessage(result.message);
+        setMessage(typeof result.message === 'string' ? result.message : 'Your password has been reset. You can now log in.');
         return;
       }
       if (inviting) {
@@ -177,6 +184,17 @@ export const AccountAccessPage: React.FC<AccountAccessPageProps> = ({
       setBusy(false);
     }
   };
+
+  async function readResponseObject(response: Response): Promise<Record<string, unknown> | null> {
+    try {
+      const value: unknown = await response.json();
+      return value !== null && typeof value === 'object' && !Array.isArray(value)
+        ? value as Record<string, unknown>
+        : null;
+    } catch {
+      return null;
+    }
+  }
 
   function isAuthenticatedUser(value: unknown): value is AuthenticatedUser {
     if (!value || typeof value !== 'object') return false;
