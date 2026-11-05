@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: erick-juma-portfolio
+    runtime: static
+    rootDir: portfolio
+    buildCommand: ""
+    staticPublishPath: .
