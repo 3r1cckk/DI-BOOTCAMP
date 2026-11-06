@@ -1,0 +1,6 @@
+{
+  "name": "DuePulse - Student Assignment & Deadline Reminder",
+  "description": "Proactive deadline tracking and multi-tier submission reminders for students, featuring live countdowns, portal launch links, browser notifications, and calendar sync.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Akiba | Chama Dashboard</title>
   <link rel="icon" type="image/png" href="assets/akiba-logo.png">
-  <link rel="stylesheet" href="style.css?v=chama-platform-1">
+  <link rel="stylesheet" href="style.css?v=audit-log-1">
   <link rel="stylesheet" href="loading.css?v=workspace-designs">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -59,6 +59,9 @@
         </a>
         <a href="#" class="nav-link" data-page="Approvals" hidden>
           <i class="fa-solid fa-clipboard-check"></i><span>Approvals</span>
+        </a>
+        <a href="#" class="nav-link" data-page="Audit Log" hidden>
+          <i class="fa-solid fa-clock-rotate-left"></i><span>Audit log</span>
         </a>
         <a href="#" class="nav-link" data-page="Reports">
           <i class="fa-solid fa-chart-simple"></i><span>Reports</span>
@@ -177,6 +180,36 @@
             </div>
           </article>
 
+        </section>
+
+        <section class="dashboard-analytics" aria-label="This month's financial health">
+          <article class="dashboard-analytics-card">
+            <div class="dashboard-analytics-heading">
+              <span class="dashboard-analytics-icon analytics-icon-green"><i class="fa-solid fa-bullseye" aria-hidden="true"></i></span>
+              <span class="dashboard-analytics-label">Contribution progress</span>
+            </div>
+            <strong id="pledgeProgressValue">Set member pledges to track progress</strong>
+            <div class="analytics-progress" id="pledgeProgress" role="progressbar" aria-label="Monthly pledge collection rate" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <span></span>
+            </div>
+            <small id="pledgeProgressDetails">No monthly pledges have been set yet.</small>
+          </article>
+          <article class="dashboard-analytics-card">
+            <div class="dashboard-analytics-heading">
+              <span class="dashboard-analytics-icon analytics-icon-orange"><i class="fa-solid fa-clock" aria-hidden="true"></i></span>
+              <span class="dashboard-analytics-label">Pledges outstanding</span>
+            </div>
+            <strong id="monthlyOutstanding">KES 0.00</strong>
+            <small id="monthlyOutstandingDetails">0 members outstanding · 0 overdue</small>
+          </article>
+          <article class="dashboard-analytics-card">
+            <div class="dashboard-analytics-heading">
+              <span class="dashboard-analytics-icon analytics-icon-blue"><i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i></span>
+              <span class="dashboard-analytics-label">Net cash flow this month</span>
+            </div>
+            <strong id="monthlyNetCashFlow">KES 0.00</strong>
+            <small id="monthlyNetCashFlowDetails">Income KES 0.00 · Expenses KES 0.00</small>
+          </article>
         </section>
 
         <!-- QUICK ACTIONS -->
@@ -411,7 +444,7 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="app.js?v=trust-backup-1"></script>
-  <script src="dashboard-auth.js?v=auth-1"></script>
+  <script type="module" src="app.js?v=audit-log-1"></script>
+  <script src="dashboard-auth.js?v=logout-2"></script>
 </body>
 </html>

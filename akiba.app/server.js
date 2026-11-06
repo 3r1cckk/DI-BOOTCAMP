@@ -9,30 +9,35 @@ import {
   updatePayment
 } from "./mpesa-store.js";
 import {
+  acceptChamaInvitation,
   addChamaMember,
+  createChamaInvitation,
   createFinancialApproval,
   decideFinancialApproval,
+  getChamaInvitation,
   getChamaData,
   getChamaRole,
   getChamasForUser,
   initializeAuthStore,
+  listChamaAuditLog,
   listChamaMembers,
   listFinancialApprovals,
   saveChamaData,
   updateChamaMemberRole
 } from "./auth-store.js";
 import { authRouter, getAuthenticatedUser, requireAuth } from "./auth.js";
+import { getPublicBaseUrl } from "./email.js";
 
 const app = express();
-const PORT = Number(process.env.AKIBA_PORT || 3000);
+const PORT = Number(process.env.PORT || process.env.AKIBA_PORT || 3000);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const darajaBaseUrl = "https://sandbox.safaricom.co.ke";
 const paymentAttempts = new Map();
 const chamaRoles = new Set(["chairperson", "treasurer", "secretary", "ordinary_member"]);
 const roleCapabilities = {
-  chairperson: new Set(["manage_members", "manage_roles", "manage_finances", "manage_settings", "view_approvals", "approve_finances"]),
-  treasurer: new Set(["manage_finances", "view_approvals", "approve_finances"]),
+  chairperson: new Set(["manage_members", "manage_roles", "manage_finances", "manage_settings", "view_approvals", "approve_finances", "view_audit_log"]),
+  treasurer: new Set(["manage_finances", "view_approvals", "approve_finances", "view_audit_log"]),
   secretary: new Set(["manage_members"]),
   ordinary_member: new Set()
 };
@@ -40,17 +45,23 @@ const privateStaticPaths = new Set([
   "/server.js",
   "/auth.js",
   "/auth-store.js",
+  "/email.js",
   "/mpesa.js",
   "/mpesa-store.js"
 ]);
 
 app.disable("x-powered-by");
+app.set("trust proxy", 1);
 app.use(express.json({ limit: "16kb" }));
 app.use("/api/auth", authRouter);
 
+app.get("/healthz", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 app.get("/login.html", async (req, res, next) => {
   const user = await getAuthenticatedUser(req);
-  if (user?.adminAuthorized) {
+  if (user?.adminAuthorized && !req.query.invite && !req.query.verify) {
     res.redirect("/dashboard.html");
     return;
   }
@@ -98,7 +109,7 @@ app.put("/api/chamas/:chamaId/data", requireAuth, requireSameOriginApi, requireC
     return;
   }
   const visible = visibleChamaData(current, req.chamaRole);
-  const sections = ["members", "contributions", "loans", "transactions", "settings", "pendingMpesaPayments"];
+  const sections = ["members", "contributions", "loans", "loanRepayments", "transactions", "settings", "pendingMpesaPayments"];
   for (const section of sections) {
     if (!canEditSection(req.chamaRole, section) &&
         JSON.stringify(submitted[section]) !== JSON.stringify(visible[section])) {
@@ -120,7 +131,7 @@ app.put("/api/chamas/:chamaId/data", requireAuth, requireSameOriginApi, requireC
   }
 
   if (req.chamaRole === "treasurer") {
-    for (const section of ["contributions", "loans", "transactions"]) {
+    for (const section of ["contributions", "loans", "loanRepayments", "transactions"]) {
       if (!isAppendOnly(current[section], next[section])) {
         res.status(403).json({ error: "Treasurers may add financial records but cannot rewrite existing records." });
         return;
@@ -144,6 +155,7 @@ app.put("/api/chamas/:chamaId/data", requireAuth, requireSameOriginApi, requireC
     const approval = await createFinancialApproval({
       chamaId: req.chamaId,
       requestedBy: req.authenticatedUser.id,
+      requestedByName: req.authenticatedUser.name,
       amount: significantOperation.amount,
       description: significantOperation.description,
       baseDataHash: hashChamaData(current),
@@ -156,7 +168,8 @@ app.put("/api/chamas/:chamaId/data", requireAuth, requireSameOriginApi, requireC
     return;
   }
 
-  await saveChamaData(req.chamaId, next);
+  const auditEvents = buildFinancialAuditEvents(current, next, req.authenticatedUser);
+  await saveChamaData(req.chamaId, next, auditEvents);
   res.json({ data: next });
 });
 
@@ -166,6 +179,57 @@ app.get("/api/chamas/:chamaId/members", requireAuth, requireChamaAccess(), async
     members: req.chamaRole === "chairperson" || req.chamaRole === "platform_admin"
       ? members
       : members.map(({ email, ...member }) => member)
+  });
+});
+
+app.post("/api/chamas/:chamaId/invitations", requireAuth, requireSameOriginApi, requireChamaAccess("manage_members"), async (req, res) => {
+  const role = req.body?.role;
+  const invitationRoles = new Set(["treasurer", "secretary", "ordinary_member"]);
+  if (!invitationRoles.has(role)) {
+    res.status(400).json({ error: "Choose a valid role for the invitation." });
+    return;
+  }
+  if (req.chamaRole === "secretary" && role !== "ordinary_member") {
+    res.status(403).json({ error: "Secretaries can invite ordinary members only." });
+    return;
+  }
+
+  const invitation = await createChamaInvitation({
+    chamaId: req.chamaId,
+    createdBy: req.authenticatedUser.id,
+    role
+  });
+  const inviteUrl = new URL("/login.html", getPublicBaseUrl(req));
+  inviteUrl.searchParams.set("invite", invitation.token);
+  res.status(201).json({
+    inviteUrl: inviteUrl.toString(),
+    expiresAt: invitation.expiresAt
+  });
+});
+
+app.get("/api/invitations/:token", async (req, res) => {
+  const invitation = await getChamaInvitation(req.params.token);
+  if (!invitation) {
+    res.status(410).json({ error: "This invite link has expired or has already been used." });
+    return;
+  }
+  res.set("Cache-Control", "no-store");
+  res.json({ invitation });
+});
+
+app.post("/api/invitations/:token/accept", requireAuth, requireSameOriginApi, async (req, res) => {
+  const result = await acceptChamaInvitation({
+    token: req.params.token,
+    userId: req.authenticatedUser.id
+  });
+  if (result === "unavailable") {
+    res.status(410).json({ error: "This invite link has expired or has already been used." });
+    return;
+  }
+  res.json({
+    message: result === "already_member"
+      ? "Your account already has access to this chama."
+      : "You have joined the chama."
   });
 });
 
@@ -220,7 +284,18 @@ app.put("/api/chamas/:chamaId/members/:userId/role", requireAuth, requireSameOri
 });
 
 app.get("/api/chamas/:chamaId/approvals", requireAuth, requireChamaAccess("view_approvals"), async (req, res) => {
-  res.json({ approvals: await listFinancialApprovals(req.chamaId) });
+  const approvals = await listFinancialApprovals(req.chamaId);
+  res.json({
+    approvals: approvals.map(({ requestedBy, ...approval }) => ({
+      ...approval,
+      canReview: requestedBy !== req.authenticatedUser.id
+    }))
+  });
+});
+
+app.get("/api/chamas/:chamaId/audit-log", requireAuth, requireChamaAccess("view_audit_log"), async (req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.json({ entries: await listChamaAuditLog(req.chamaId) });
 });
 
 app.post("/api/chamas/:chamaId/approvals/:approvalId/decision", requireAuth, requireSameOriginApi, requireChamaAccess("approve_finances"), async (req, res) => {
@@ -238,6 +313,7 @@ app.post("/api/chamas/:chamaId/approvals/:approvalId/decision", requireAuth, req
     approvalId: req.params.approvalId,
     chamaId: req.chamaId,
     reviewerId: req.authenticatedUser.id,
+    reviewerName: req.authenticatedUser.name,
     decision,
     currentDataHash: hashChamaData(current)
   });
@@ -550,7 +626,7 @@ function canEditSection(role, section) {
   if (role === "platform_admin") return true;
   if (section === "members") return roleCapabilities[role]?.has("manage_members") === true;
   if (section === "settings") return roleCapabilities[role]?.has("manage_settings") === true;
-  if (["contributions", "loans", "transactions"].includes(section)) {
+  if (["contributions", "loans", "loanRepayments", "transactions"].includes(section)) {
     return roleCapabilities[role]?.has("manage_finances") === true;
   }
   if (section === "pendingMpesaPayments") return roleCapabilities[role]?.has("manage_finances") === true;
@@ -575,13 +651,59 @@ function visibleChamaData(data, role) {
 }
 
 function changedChamaSections(current, next) {
-  return ["members", "contributions", "loans", "transactions", "settings", "pendingMpesaPayments"]
+  return ["members", "contributions", "loans", "loanRepayments", "transactions", "settings", "pendingMpesaPayments"]
     .filter((section) => JSON.stringify(current[section]) !== JSON.stringify(next[section]));
+}
+
+function buildFinancialAuditEvents(current, next, user) {
+  const labels = {
+    contributions: "contribution",
+    loans: "loan",
+    loanRepayments: "loan repayment",
+    transactions: "transaction"
+  };
+  return changedChamaSections(current, next)
+    .filter((section) => Object.hasOwn(labels, section))
+    .map((section) => {
+      const oldRecords = current[section];
+      const newRecords = next[section];
+      const label = labels[section];
+      const isAppend = isAppendOnly(oldRecords, newRecords);
+      const changedRecords = isAppend
+        ? newRecords.slice(oldRecords.length)
+        : newRecords.filter((record, index) =>
+          JSON.stringify(record) !== JSON.stringify(oldRecords[index])
+        );
+      const references = changedRecords
+        .slice(0, 4)
+        .map((record) => getAuditRecordReference(section, record));
+      const referenceNote = references.length
+        ? ` References: ${references.join(", ")}${changedRecords.length > references.length ? ", …" : ""}.`
+        : "";
+      const summary = isAppend
+        ? `Added ${changedRecords.length} ${label} record${changedRecords.length === 1 ? "" : "s"}.${referenceNote}`
+        : `Updated ${label} records (${oldRecords.length} to ${newRecords.length}).${referenceNote}`;
+      return {
+        actorId: user.id,
+        actorName: user.name,
+        action: "financial_records_updated",
+        summary
+      };
+    });
+}
+
+function getAuditRecordReference(section, record) {
+  const identifier = record.id || record.receiptNumber;
+  if (typeof identifier === "string" && identifier.length) return identifier.slice(0, 40);
+  return createHash("sha256")
+    .update(`${section}:${JSON.stringify(record)}`)
+    .digest("hex")
+    .slice(0, 12);
 }
 
 function isValidChamaData(data) {
   if (!data || typeof data !== "object" || Array.isArray(data)) return false;
-  const sections = ["members", "contributions", "loans", "transactions", "pendingMpesaPayments"];
+  const sections = ["members", "contributions", "loans", "loanRepayments", "transactions", "pendingMpesaPayments"];
   if (Object.keys(data).some((key) => ![...sections, "settings"].includes(key))) return false;
   if (sections.some((section) => !Array.isArray(data[section]) || data[section].length > 10000)) return false;
   if (!data.settings || typeof data.settings !== "object" || Array.isArray(data.settings)) return false;
@@ -589,6 +711,45 @@ function isValidChamaData(data) {
   if (typeof data.settings.adminName !== "string" || data.settings.adminName.length < 1 || data.settings.adminName.length > 80) return false;
   if (typeof (data.settings.adminEmail || "") !== "string" || (data.settings.adminEmail || "").length > 254) return false;
   if (!Number.isInteger(data.settings.contributionDueDay) || data.settings.contributionDueDay < 1 || data.settings.contributionDueDay > 28) return false;
+  const isText = (value, maxLength) =>
+    typeof value === "string" && value.length > 0 && value.length <= maxLength;
+  const isDate = (value) => isText(value, 64) && Number.isFinite(Date.parse(value));
+  if (data.loans.some((loan) =>
+    !loan || typeof loan !== "object" ||
+    (loan.id !== undefined && !isText(loan.id, 100)) ||
+    !isText(loan.borrower, 80) ||
+    (loan.borrowerId !== undefined && !isText(loan.borrowerId, 100)) ||
+    !Number.isFinite(loan.amount) || loan.amount <= 0 ||
+    (loan.interestRate !== undefined &&
+      (!Number.isFinite(loan.interestRate) || loan.interestRate < 0 || loan.interestRate > 100)) ||
+    !isDate(loan.dueDate) ||
+    (loan.issuedAt !== undefined && !isDate(loan.issuedAt))
+  )) return false;
+  if (data.loanRepayments.some((repayment) =>
+    !repayment || typeof repayment !== "object" ||
+    !isText(repayment.id, 100) ||
+    !isText(repayment.loanId, 100) ||
+    !Number.isFinite(repayment.amount) || repayment.amount <= 0 ||
+    !isDate(repayment.date)
+  )) return false;
+
+  const loansById = new Map(data.loans.map((loan, index) => [
+    loan.id || `legacy-${index}`,
+    loan
+  ]));
+  if (loansById.size !== data.loans.length) return false;
+  const repaymentIds = new Set();
+  const repaidByLoan = new Map();
+  for (const repayment of data.loanRepayments) {
+    if (repaymentIds.has(repayment.id) || !loansById.has(repayment.loanId)) return false;
+    repaymentIds.add(repayment.id);
+    repaidByLoan.set(repayment.loanId, (repaidByLoan.get(repayment.loanId) || 0) + repayment.amount);
+  }
+  for (const [loanId, loan] of loansById) {
+    const repaid = repaidByLoan.get(loanId) || 0;
+    const totalDue = loan.amount * (1 + (loan.interestRate || 0) / 100);
+    if (repaid > totalDue + 0.01) return false;
+  }
   return JSON.stringify(data).length <= 5 * 1024 * 1024;
 }
 

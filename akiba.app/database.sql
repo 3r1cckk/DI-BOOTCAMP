@@ -12,6 +12,9 @@ CREATE TABLE IF NOT EXISTS akiba_users (
 ALTER TABLE akiba_users
   ADD COLUMN IF NOT EXISTS is_platform_admin BOOLEAN NOT NULL DEFAULT FALSE;
 
+ALTER TABLE akiba_users
+  ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAULT TRUE;
+
 CREATE TABLE IF NOT EXISTS akiba_sessions (
   token_hash CHAR(64) PRIMARY KEY,
   user_id TEXT NOT NULL REFERENCES akiba_users(id) ON DELETE CASCADE,
@@ -44,6 +47,32 @@ CREATE TABLE IF NOT EXISTS akiba_chama_memberships (
   PRIMARY KEY (chama_id, user_id)
 );
 
+CREATE TABLE IF NOT EXISTS akiba_chama_invitations (
+  token_hash CHAR(64) PRIMARY KEY,
+  chama_id TEXT NOT NULL REFERENCES akiba_chamas(id) ON DELETE CASCADE,
+  created_by TEXT NOT NULL REFERENCES akiba_users(id),
+  role TEXT NOT NULL CHECK (role IN ('treasurer', 'secretary', 'ordinary_member')),
+  expires_at TIMESTAMPTZ NOT NULL,
+  accepted_by TEXT REFERENCES akiba_users(id),
+  accepted_at TIMESTAMPTZ,
+  revoked_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS akiba_chama_invitations_chama_created_idx
+  ON akiba_chama_invitations (chama_id, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS akiba_email_verifications (
+  token_hash CHAR(64) PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES akiba_users(id) ON DELETE CASCADE,
+  invite_token_hash CHAR(64),
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS akiba_email_verifications_user_created_idx
+  ON akiba_email_verifications (user_id, created_at DESC);
+
 CREATE UNIQUE INDEX IF NOT EXISTS akiba_chama_one_chairperson_idx
   ON akiba_chama_memberships (chama_id)
   WHERE role = 'chairperson';
@@ -73,3 +102,16 @@ CREATE TABLE IF NOT EXISTS akiba_financial_approvals (
 
 CREATE INDEX IF NOT EXISTS akiba_financial_approvals_chama_status_idx
   ON akiba_financial_approvals (chama_id, status, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS akiba_chama_audit_log (
+  id TEXT PRIMARY KEY,
+  chama_id TEXT NOT NULL REFERENCES akiba_chamas(id) ON DELETE CASCADE,
+  actor_id TEXT NOT NULL REFERENCES akiba_users(id),
+  actor_name VARCHAR(80) NOT NULL,
+  action VARCHAR(80) NOT NULL,
+  summary VARCHAR(250) NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS akiba_chama_audit_log_chama_created_idx
+  ON akiba_chama_audit_log (chama_id, created_at DESC);

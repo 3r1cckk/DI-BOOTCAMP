@@ -1,3 +1,17 @@
+-- Active: 1792053163779@@localhost@5500
+import {
+  contributionMonthLabel,
+  formatDueDay,
+  getMonthlyContributionStatus,
+  summarizeContributionReminders
+} from "./contribution-reminders.js";
+import { getLoanBalance, summarizeLoans } from "./loan-tracking.js";
+import {
+  getContributionHealth,
+  getMonthlyFinancialSeries
+} from "./dashboard-analytics.js";
+import { buildWorkspaceCsv } from "./csv-export.js";
+
 const toast = document.getElementById("toast");
 const modal = document.getElementById("memberModal");
 const form = document.getElementById("memberForm");
@@ -12,6 +26,7 @@ const emptyData = {
   members: [],
   contributions: [],
   loans: [],
+  loanRepayments: [],
   transactions: [],
   pendingMpesaPayments: [],
   settings: {
@@ -53,7 +68,7 @@ function saveData() {
       Object.assign(data, result.data);
       renderDashboard();
       refreshActiveWorkspace();
-      showMessage("This financial operation needs chairperson approval before it is recorded.");
+      showMessage("This financial operation needs approval from another financial manager before it is recorded.");
       return false;
     }
     if (!response.ok) {
@@ -96,6 +111,9 @@ async function loadChamaData(preferredChamaId = "") {
   if (!response.ok) throw new Error(result.error || "Could not load this chama's records.");
   Object.assign(data, emptyData, result.data, {
     settings: { ...emptyData.settings, ...result.data.settings },
+    loanRepayments: Array.isArray(result.data.loanRepayments)
+      ? result.data.loanRepayments
+      : [],
     pendingMpesaPayments: Array.isArray(result.data.pendingMpesaPayments)
       ? result.data.pendingMpesaPayments
       : []
@@ -119,9 +137,12 @@ function applyRolePermissions() {
   document.getElementById("emptyAddMemberButton").hidden = !canManageMembers;
   document.getElementById("profileButton").disabled = !canManageSettings;
   document.body.dataset.role = currentRole;
-  document.getElementById("chamaAccessPanel").hidden = !["chairperson", "platform_admin"].includes(currentRole);
+  document.getElementById("chamaAccessPanel").hidden =
+    !["chairperson", "secretary", "platform_admin"].includes(currentRole);
   const approvalsLink = document.querySelector('.nav-link[data-page="Approvals"]');
   approvalsLink.hidden = !["chairperson", "treasurer", "platform_admin"].includes(currentRole);
+  const auditLogLink = document.querySelector('.nav-link[data-page="Audit Log"]');
+  auditLogLink.hidden = !["chairperson", "treasurer", "platform_admin"].includes(currentRole);
 }
 
 async function loadChamaMembers() {
@@ -157,7 +178,12 @@ async function loadChamaMembers() {
   email.maxLength = 254;
   email.placeholder = "Existing Akiba account email";
   email.setAttribute("aria-label", "Existing Akiba account email");
-  const roleSelect = createRoleSelect("ordinary_member");
+  const accountRoles = currentRole === "secretary"
+    ? ["ordinary_member"]
+    : undefined;
+  const roleSelect = accountRoles
+    ? createRoleSelect("ordinary_member", accountRoles)
+    : createRoleSelect("ordinary_member");
   roleSelect.setAttribute("aria-label", "Chama role for new account");
   const addButton = document.createElement("button");
   addButton.type = "submit";
@@ -181,52 +207,129 @@ async function loadChamaMembers() {
   });
   panel.append(form);
 
+  const inviteForm = document.createElement("form");
+  inviteForm.className = "chama-invite-form";
+  const invitationRoles = currentRole === "secretary"
+    ? ["ordinary_member"]
+    : ["treasurer", "secretary", "ordinary_member"];
+  const inviteRole = createRoleSelect("ordinary_member", invitationRoles);
+  inviteRole.setAttribute("aria-label", "Role for invited member");
+  const inviteButton = document.createElement("button");
+  inviteButton.type = "submit";
+  inviteButton.className = "members-add-button";
+  inviteButton.innerHTML = '<i class="fa-solid fa-link" aria-hidden="true"></i><span>Create invite link</span>';
+  const inviteNote = document.createElement("p");
+  inviteNote.textContent = "Invite links expire after 7 days and can be used once.";
+  inviteForm.append(inviteRole, inviteButton, inviteNote);
+
+  const inviteResult = document.createElement("div");
+  inviteResult.className = "chama-invite-result";
+  inviteResult.hidden = true;
+  const inviteUrl = document.createElement("input");
+  inviteUrl.type = "url";
+  inviteUrl.readOnly = true;
+  inviteUrl.setAttribute("aria-label", "Chama invitation link");
+  const copyButton = document.createElement("button");
+  copyButton.type = "button";
+  copyButton.className = "member-row-button";
+  copyButton.textContent = "Copy link";
+  copyButton.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(inviteUrl.value);
+      showMessage("Invite link copied.");
+    } catch (error) {
+      showMessage(error.message || "Could not copy the invite link. Select and copy it manually.");
+    }
+  });
+  inviteResult.append(inviteUrl, copyButton);
+  inviteForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    inviteButton.disabled = true;
+    try {
+      const response = await fetch(`/api/chamas/${encodeURIComponent(activeChamaId)}/invitations`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: inviteRole.value })
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        showMessage(result.error || "Could not create an invite link.");
+        return;
+      }
+      inviteUrl.value = result.inviteUrl;
+      inviteResult.hidden = false;
+      showMessage("Invite link created. Share it with the person joining your chama.");
+    } catch (error) {
+      showMessage(error.message || "Could not create an invite link.");
+    } finally {
+      inviteButton.disabled = false;
+    }
+  });
+  panel.append(inviteForm, inviteResult);
+
+  const canManageRoles = ["chairperson", "platform_admin"].includes(currentRole);
   const list = document.createElement("div");
   list.className = "chama-access-list";
   result.members.forEach((member) => {
     const row = document.createElement("div");
     row.className = "chama-access-row";
+    if (!canManageRoles) row.classList.add("read-only");
     const identity = document.createElement("div");
     const name = document.createElement("strong");
     name.textContent = member.name;
     const accountEmail = document.createElement("small");
     accountEmail.textContent = member.email || "Account email hidden";
     identity.append(name, accountEmail);
-    const select = createRoleSelect(member.role);
-    select.setAttribute("aria-label", `Role for ${member.name}`);
-    const saveButton = document.createElement("button");
-    saveButton.type = "button";
-    saveButton.className = "member-row-button";
-    saveButton.title = `Save role for ${member.name}`;
-    saveButton.setAttribute("aria-label", `Save role for ${member.name}`);
-    saveButton.innerHTML = '<i class="fa-solid fa-check" aria-hidden="true"></i>';
-    saveButton.addEventListener("click", async () => {
-      const saveResponse = await fetch(
-        `/api/chamas/${encodeURIComponent(activeChamaId)}/members/${encodeURIComponent(member.id)}/role`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ role: select.value })
-        }
-      );
-      const saveResult = await saveResponse.json();
-      showMessage(saveResponse.ok ? saveResult.message : saveResult.error || "Could not update this role.");
-      if (saveResponse.ok) await loadChamaMembers();
-    });
-    row.append(identity, select, saveButton);
+    if (canManageRoles) {
+      const select = createRoleSelect(member.role);
+      select.setAttribute("aria-label", `Role for ${member.name}`);
+      const saveButton = document.createElement("button");
+      saveButton.type = "button";
+      saveButton.className = "member-row-button";
+      saveButton.title = `Save role for ${member.name}`;
+      saveButton.setAttribute("aria-label", `Save role for ${member.name}`);
+      saveButton.innerHTML = '<i class="fa-solid fa-check" aria-hidden="true"></i>';
+      saveButton.addEventListener("click", async () => {
+        const saveResponse = await fetch(
+          `/api/chamas/${encodeURIComponent(activeChamaId)}/members/${encodeURIComponent(member.id)}/role`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ role: select.value })
+          }
+        );
+        const saveResult = await saveResponse.json();
+        showMessage(saveResponse.ok ? saveResult.message : saveResult.error || "Could not update this role.");
+        if (saveResponse.ok) await loadChamaMembers();
+      });
+      row.append(identity, select, saveButton);
+    } else {
+      const role = document.createElement("span");
+      role.className = "chama-access-role";
+      role.textContent = member.role === "ordinary_member"
+        ? "Ordinary member"
+        : member.role.charAt(0).toUpperCase() + member.role.slice(1);
+      row.append(identity, role);
+    }
     list.append(row);
   });
   panel.append(list);
 }
 
-function createRoleSelect(selectedRole) {
+function createRoleSelect(selectedRole, availableRoles = [
+  "chairperson",
+  "treasurer",
+  "secretary",
+  "ordinary_member"
+]) {
   const select = document.createElement("select");
-  [
+  const roles = [
     ["chairperson", "Chairperson"],
     ["treasurer", "Treasurer"],
     ["secretary", "Secretary"],
     ["ordinary_member", "Ordinary member"]
-  ].forEach(([value, label]) => {
+  ];
+  roles.filter(([value]) => availableRoles.includes(value)).forEach(([value, label]) => {
     const option = document.createElement("option");
     option.value = value;
     option.textContent = label;
@@ -245,6 +348,7 @@ function createBackup() {
       members: data.members,
       contributions: data.contributions,
       loans: data.loans,
+      loanRepayments: data.loanRepayments,
       transactions: data.transactions,
       pendingMpesaPayments: data.pendingMpesaPayments,
       settings: data.settings
@@ -275,6 +379,7 @@ function validateBackup(backup) {
     !isList(source.members) ||
     !isList(source.contributions) ||
     !isList(source.loans) ||
+    !(source.loanRepayments === undefined || isList(source.loanRepayments)) ||
     !isList(source.transactions) ||
     !isList(source.pendingMpesaPayments) ||
     !source.settings ||
@@ -328,11 +433,39 @@ function validateBackup(backup) {
   const loans = source.loans.map((loan) => {
     if (
       !loan || typeof loan !== "object" ||
+      !isOptionalText(loan.id, 100) ||
       !isText(loan.borrower, 80) ||
       !isAmount(loan.amount) ||
-      !isDate(loan.dueDate)
+      !isDate(loan.dueDate) ||
+      !(loan.interestRate === undefined ||
+        (Number.isFinite(loan.interestRate) && loan.interestRate >= 0 && loan.interestRate <= 100)) ||
+      !isOptionalText(loan.borrowerId, 100) ||
+      !(loan.issuedAt === undefined || isDate(loan.issuedAt))
     ) return null;
-    return { borrower: loan.borrower, amount: loan.amount, dueDate: loan.dueDate };
+    return {
+      ...(loan.id ? { id: loan.id } : {}),
+      borrower: loan.borrower,
+      ...(loan.borrowerId ? { borrowerId: loan.borrowerId } : {}),
+      amount: loan.amount,
+      interestRate: Number(loan.interestRate) || 0,
+      dueDate: loan.dueDate,
+      ...(loan.issuedAt ? { issuedAt: loan.issuedAt } : {})
+    };
+  });
+  const loanRepayments = (source.loanRepayments || []).map((repayment) => {
+    if (
+      !repayment || typeof repayment !== "object" ||
+      !isText(repayment.id, 100) ||
+      !isText(repayment.loanId, 100) ||
+      !isAmount(repayment.amount) ||
+      !isDate(repayment.date)
+    ) return null;
+    return {
+      id: repayment.id,
+      loanId: repayment.loanId,
+      amount: repayment.amount,
+      date: repayment.date
+    };
   });
   const transactions = source.transactions.map((transaction) => {
     if (
@@ -369,14 +502,28 @@ function validateBackup(backup) {
   });
 
   if (
-    [...members, ...contributions, ...loans, ...transactions, ...pendingMpesaPayments]
+    [...members, ...contributions, ...loans, ...loanRepayments, ...transactions, ...pendingMpesaPayments]
       .some((item) => item === null)
+  ) return null;
+
+  const loanIds = new Set(loans.map((loan, index) => loan.id || `legacy-${index}`));
+  if (
+    loanIds.size !== loans.length ||
+    loanRepayments.some((repayment) => !loanIds.has(repayment.loanId)) ||
+    loans.some((loan, index) => {
+      const loanId = loan.id || `legacy-${index}`;
+      const repaid = loanRepayments
+        .filter((repayment) => repayment.loanId === loanId)
+        .reduce((total, repayment) => total + repayment.amount, 0);
+      return repaid > loan.amount * (1 + (loan.interestRate || 0) / 100) + 0.01;
+    })
   ) return null;
 
   return {
     members,
     contributions,
     loans,
+    loanRepayments,
     transactions,
     pendingMpesaPayments,
     settings: {
@@ -466,44 +613,6 @@ function currentBalance() {
   return income - expenses;
 }
 
-function getMonthlyContributionStatus(member, now = new Date()) {
-  const pledge = Number(member.monthlyPledge) || 0;
-  const received = data.contributions
-    .filter((contribution) => {
-      const date = new Date(contribution.date);
-      const sameMember = contribution.memberId
-        ? contribution.memberId === member.id
-        : contribution.member === member.name;
-      return sameMember &&
-        date.getFullYear() === now.getFullYear() &&
-        date.getMonth() === now.getMonth();
-    })
-    .reduce((total, contribution) => total + contribution.amount, 0);
-  const outstanding = Math.max(0, pledge - received);
-  const dueDay = data.settings.contributionDueDay || 5;
-  const isOverdue = pledge > 0 && outstanding > 0 && now.getDate() > dueDay;
-  const status = pledge <= 0
-    ? "Pledge not set"
-    : outstanding <= 0
-      ? "Paid"
-      : received > 0
-        ? isOverdue ? "Partially overdue" : "Partially paid"
-        : isOverdue ? "Overdue" : "Due";
-
-  return { pledge, received, outstanding, dueDay, isOverdue, status };
-}
-
-function contributionMonthLabel(date = new Date()) {
-  return new Intl.DateTimeFormat("en-KE", { month: "long", year: "numeric" }).format(date);
-}
-
-function formatDueDay(day) {
-  const suffix = day % 100 >= 11 && day % 100 <= 13
-    ? "th"
-    : ({ 1: "st", 2: "nd", 3: "rd" }[day % 10] || "th");
-  return `${day}${suffix}`;
-}
-
 function normalizeKenyanWhatsAppNumber(value) {
   let digits = String(value || "").replace(/\D/g, "");
   if (/^0[17]\d{8}$/.test(digits)) digits = `254${digits.slice(1)}`;
@@ -518,7 +627,9 @@ function openContributionReminder(member, status, month) {
     return;
   }
   const dueDay = formatDueDay(status.dueDay);
-  const message = status.received > 0
+  const message = status.isOverdue
+    ? `Hello ${member.name}, your ${month} chama contribution is overdue with a remaining balance of ${formatCurrency(status.outstanding)}. Please contribute as soon as you can. Thank you.`
+    : status.received > 0
     ? `Hello ${member.name}, this is a friendly reminder that your ${month} chama contribution has a remaining balance of ${formatCurrency(status.outstanding)}. Please contribute by the ${dueDay} of the month. Thank you.`
     : `Hello ${member.name}, this is a friendly reminder to make your ${month} chama contribution of ${formatCurrency(status.pledge)} by the ${dueDay} of the month. Thank you.`;
   const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
@@ -629,18 +740,16 @@ function renderContributionReminders(container, now = new Date()) {
     )
   );
   copy.querySelector("h2").id = "contributionRemindersTitle";
-  const summary = data.members.reduce((counts, member) => {
-    const status = getMonthlyContributionStatus(member, now);
-    if (status.pledge > 0 && status.outstanding > 0) {
-      counts.outstanding += 1;
-      if (status.isOverdue) counts.overdue += 1;
-    }
-    return counts;
-  }, { outstanding: 0, overdue: 0 });
+  const summary = summarizeContributionReminders(
+    data.members,
+    data.contributions,
+    data.settings.contributionDueDay,
+    now
+  );
   const badge = createWorkspaceElement(
     "span",
     summary.overdue ? "contribution-reminder-count is-overdue" : "contribution-reminder-count",
-    `${summary.overdue} overdue · ${summary.outstanding} to follow up`
+    `${summary.overdue} overdue · ${summary.outstanding} to follow up · ${formatCurrency(summary.outstandingAmount)}`
   );
   heading.append(copy, badge);
   panel.append(heading);
@@ -674,7 +783,12 @@ function renderContributionReminders(container, now = new Date()) {
   header.append(headerRow);
   const body = createWorkspaceElement("tbody");
   pledgedMembers.forEach((member) => {
-    const status = getMonthlyContributionStatus(member, now);
+    const status = getMonthlyContributionStatus(
+      member,
+      data.contributions,
+      data.settings.contributionDueDay,
+      now
+    );
     const row = createWorkspaceElement("tr");
     [
       member.name,
@@ -689,7 +803,7 @@ function renderContributionReminders(container, now = new Date()) {
     const statusCell = createWorkspaceElement("td");
     const statusBadge = createWorkspaceElement(
       "span",
-      `contribution-status-badge ${status.status.toLowerCase().replaceAll(" ", "-")}`,
+      `contribution-status-badge ${status.state}`,
       status.status
     );
     statusCell.append(statusBadge);
@@ -741,6 +855,46 @@ function renderDashboard() {
   document.getElementById("totalContributions").textContent = formatCurrency(totalContributions);
   document.getElementById("totalExpenses").textContent = formatCurrency(totalExpenses);
   document.getElementById("availableBalance").textContent = formatCurrency(currentBalance());
+  const now = new Date();
+  const contributionHealth = getContributionHealth(
+    data.members,
+    data.contributions,
+    data.settings.contributionDueDay,
+    now
+  );
+  const thisMonthFlow = getMonthlyFinancialSeries(data.contributions, data.transactions, now, 1)[0];
+  const pledgeProgress = document.getElementById("pledgeProgress");
+  pledgeProgress.setAttribute("aria-valuenow", contributionHealth.collectionRate.toFixed(1));
+  pledgeProgress.querySelector("span").style.width = `${contributionHealth.collectionRate}%`;
+  document.getElementById("pledgeProgressValue").textContent =
+    contributionHealth.pledgedMembers > 0
+      ? `${contributionHealth.collectionRate.toFixed(0)}% collected`
+      : "Set member pledges to track progress";
+  document.getElementById("pledgeProgressDetails").textContent =
+    contributionHealth.pledgedMembers > 0
+      ? `${contributionHealth.paidMembers} of ${contributionHealth.pledgedMembers} members paid this month`
+      : "No monthly pledges have been set yet.";
+  document.getElementById("monthlyOutstanding").textContent =
+    formatCurrency(contributionHealth.outstandingAmount);
+  document.getElementById("monthlyOutstandingDetails").textContent =
+    `${contributionHealth.outstandingMembers} members outstanding · ${contributionHealth.overdueMembers} overdue`;
+  document.getElementById("monthlyNetCashFlow").textContent =
+    formatCurrency(thisMonthFlow.netCashFlow);
+  document.getElementById("monthlyNetCashFlowDetails").textContent =
+    `Income ${formatCurrency(thisMonthFlow.otherIncome + thisMonthFlow.contributions)} · Expenses ${formatCurrency(thisMonthFlow.expenses)}`;
+  const reminderSummary = summarizeContributionReminders(
+    data.members,
+    data.contributions,
+    data.settings.contributionDueDay
+  );
+  const notificationButton = document.getElementById("notificationButton");
+  notificationButton.querySelector(".notification-dot").hidden = reminderSummary.outstanding === 0;
+  notificationButton.setAttribute(
+    "aria-label",
+    reminderSummary.overdue
+      ? `Notifications: ${reminderSummary.overdue} overdue contributions`
+      : `Notifications: ${reminderSummary.outstanding} contributions need follow-up`
+  );
 
   const list = document.getElementById("transactionsList");
   const emptyState = document.getElementById("transactionsEmpty");
@@ -766,7 +920,6 @@ function renderDashboard() {
     list.append(item);
   });
 
-  const now = new Date();
   const monthTransactions = data.transactions.filter((transaction) => {
     const date = new Date(transaction.date);
     return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
@@ -986,12 +1139,23 @@ const actionForms = {
   },
   "Manage Loans": {
     title: "Issue a Loan",
-    description: "Record a loan issued from the chama balance.",
+    description: "Record the borrower, principal, one-time interest, and repayment deadline.",
     success: "Loan recorded successfully.",
     fields: [
       { name: "borrower", label: "Borrower name", placeholder: "Enter member name" },
       { name: "amount", label: "Loan amount (KES)", type: "number", min: "0.01", step: "0.01" },
+      { name: "interestRate", label: "One-time interest (%)", type: "number", min: "0", max: "100", step: "0.01", value: "0" },
       { name: "dueDate", label: "Repayment due date", type: "date" }
+    ]
+  },
+  "Record Loan Repayment": {
+    title: "Record Loan Repayment",
+    description: "Record a full or partial repayment against an outstanding loan.",
+    success: "Loan repayment recorded successfully.",
+    fields: [
+      { name: "loanId", label: "Loan", options: [] },
+      { name: "amount", label: "Repayment amount (KES)", type: "number", min: "0.01", step: "0.01" },
+      { name: "date", label: "Payment date", type: "date", value: new Date().toISOString().slice(0, 10) }
     ]
   },
   "Record Transaction": {
@@ -1044,6 +1208,24 @@ function openForm(action, memberId = null) {
       : "Save";
   modalFields.replaceChildren();
   const fields = definition.fields.flatMap((field) => {
+    if (action === "Record Loan Repayment" && field.name === "loanId") {
+      const loans = data.loans
+        .map((loan, index) => ({ loan, id: loan.id || `legacy-${index}` }))
+        .filter(({ loan, id }) =>
+          getLoanBalance(loan, data.loanRepayments, id).outstanding > 0
+        );
+      return [{
+        ...field,
+        value: memberId || loans[0]?.id || "",
+        options: loans.map(({ loan, id }) => {
+          const balance = getLoanBalance(loan, data.loanRepayments, id);
+          return {
+            value: id,
+            label: `${loan.borrower} · ${formatCurrency(balance.outstanding)} remaining`
+          };
+        })
+      }];
+    }
     if (action !== "Record Contribution" || field.name !== "member" || data.members.length === 0) {
       return [field];
     }
@@ -1181,7 +1363,9 @@ async function startMpesaContribution(memberName, phone, amount, memberId) {
   renderDashboard();
   const activePage = document.querySelector(".nav-link.active")?.dataset.page;
   if (activePage && !["Dashboard", "Members"].includes(activePage)) {
-    renderWorkspacePage(activePage);
+    if (activePage === "Approvals") void renderApprovalsPage();
+    else if (activePage === "Audit Log") void renderAuditLogPage();
+    else renderWorkspacePage(activePage);
   }
   closeForm();
   showMessage(`${result.message} Approve it on ${phone}.`);
@@ -1262,6 +1446,7 @@ function refreshActiveWorkspace() {
   const activePage = document.querySelector(".nav-link.active")?.dataset.page;
   if (activePage && !["Dashboard", "Members"].includes(activePage)) {
     if (activePage === "Approvals") void renderApprovalsPage();
+    else if (activePage === "Audit Log") void renderAuditLogPage();
     else renderWorkspacePage(activePage);
   }
 }
@@ -1291,7 +1476,7 @@ async function renderApprovalsPage() {
     const empty = createWorkspaceElement("section", "members-list-panel members-empty-state");
     empty.append(
       createWorkspaceElement("strong", "", "No financial approvals"),
-      createWorkspaceElement("p", "", "Significant operations submitted by treasurers will appear here.")
+      createWorkspaceElement("p", "", "Significant operations submitted by financial managers will appear here.")
     );
     workspace.append(empty);
     return;
@@ -1307,7 +1492,8 @@ async function renderApprovalsPage() {
     );
     const status = createWorkspaceElement("span", `approval-status approval-${approval.status}`, approval.status);
     item.append(details, status);
-    if (approval.status === "pending" && ["chairperson", "platform_admin"].includes(currentRole)) {
+    if (approval.status === "pending" && approval.canReview &&
+        ["chairperson", "treasurer", "platform_admin"].includes(currentRole)) {
       const actions = createWorkspaceElement("div", "approval-actions");
       for (const decision of ["approved", "rejected"]) {
         const button = createWorkspaceElement("button", decision === "approved" ? "approval-approve" : "approval-reject", decision === "approved" ? "Approve" : "Reject");
@@ -1342,6 +1528,56 @@ async function renderApprovalsPage() {
   workspace.append(list);
 }
 
+async function renderAuditLogPage() {
+  const workspace = document.getElementById("workspacePage");
+  workspace.replaceChildren();
+  const heading = createWorkspaceElement("section", "workspace-page-heading");
+  const copy = createWorkspaceElement("div");
+  copy.append(
+    createWorkspaceElement("p", "members-eyebrow", "Chama workspace / governance"),
+    createWorkspaceElement("h1", "", "Financial audit log"),
+    createWorkspaceElement("p", "", "A read-only history of financial record changes and approval decisions.")
+  );
+  heading.append(copy);
+  workspace.append(heading);
+
+  const response = await fetch(`/api/chamas/${encodeURIComponent(activeChamaId)}/audit-log`, {
+    cache: "no-store"
+  });
+  const result = await response.json();
+  if (!response.ok) {
+    showMessage(result.error || "Could not load the audit log.");
+    return;
+  }
+  if (!result.entries.length) {
+    const empty = createWorkspaceElement("section", "members-list-panel members-empty-state");
+    empty.append(
+      createWorkspaceElement("strong", "", "No financial activity recorded yet"),
+      createWorkspaceElement("p", "", "New financial changes and approval decisions will appear here.")
+    );
+    workspace.append(empty);
+    return;
+  }
+
+  const list = createWorkspaceElement("section", "approval-list");
+  result.entries.forEach((entry) => {
+    const item = createWorkspaceElement("article", "approval-item audit-log-item");
+    const details = createWorkspaceElement("div", "approval-item-details");
+    const action = entry.action.replaceAll("_", " ");
+    details.append(
+      createWorkspaceElement("strong", "", entry.summary),
+      createWorkspaceElement(
+        "small",
+        "",
+        `${entry.actorName} · ${action} · ${new Date(entry.createdAt).toLocaleString("en-GB")}`
+      )
+    );
+    item.append(details);
+    list.append(item);
+  });
+  workspace.append(list);
+}
+
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
   const values = Object.fromEntries(new FormData(form).entries());
@@ -1357,6 +1593,38 @@ form.addEventListener("submit", async (event) => {
     const monthlyPledge = values.monthlyPledge === "" ? 0 : Number(values.monthlyPledge);
     if (!Number.isInteger(monthlyPledge) || monthlyPledge < 0 || monthlyPledge > 150000) {
       showMessage("Enter a whole-number monthly pledge between KES 0 and KES 150,000.");
+      return;
+    }
+  }
+
+  if (activeAction === "Manage Loans") {
+    const interestRate = values.interestRate === "" ? 0 : Number(values.interestRate);
+    if (!Number.isFinite(interestRate) || interestRate < 0 || interestRate > 100) {
+      showMessage("Enter a one-time interest rate from 0% to 100%.");
+      return;
+    }
+    if (!values.dueDate || !Number.isFinite(Date.parse(values.dueDate))) {
+      showMessage("Choose a valid loan repayment due date.");
+      return;
+    }
+  }
+
+  if (activeAction === "Record Loan Repayment") {
+    const loan = data.loans.find((item, index) =>
+      (item.id || `legacy-${index}`) === values.loanId
+    );
+    if (!loan) {
+      showMessage("Choose an outstanding loan before recording a repayment.");
+      return;
+    }
+    const loanId = loan.id || `legacy-${data.loans.indexOf(loan)}`;
+    const balance = getLoanBalance(loan, data.loanRepayments, loanId);
+    if (amount > balance.outstanding + 0.01) {
+      showMessage(`The repayment cannot exceed the outstanding balance of ${formatCurrency(balance.outstanding)}.`);
+      return;
+    }
+    if (!values.date || !Number.isFinite(Date.parse(values.date))) {
+      showMessage("Choose a valid repayment date.");
       return;
     }
   }
@@ -1434,12 +1702,36 @@ form.addEventListener("submit", async (event) => {
       }
       break;
     case "Manage Loans":
-      data.loans.push({
+      {
+        const loan = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         borrower: values.borrower.trim(),
+        ...(values.borrowerId ? { borrowerId: values.borrowerId } : {}),
         amount,
-        dueDate: values.dueDate
-      });
-      recordTransaction(`Loan to ${values.borrower.trim()}`, "expense", amount);
+        interestRate: Number(values.interestRate) || 0,
+        dueDate: values.dueDate,
+        issuedAt: new Date().toISOString()
+        };
+        data.loans.push(loan);
+        recordTransaction(`Loan to ${loan.borrower}`, "expense", amount);
+      }
+      break;
+    case "Record Loan Repayment":
+      {
+        const loan = data.loans.find((item, index) =>
+        (item.id || `legacy-${index}`) === values.loanId
+        );
+        if (!loan) return;
+        const loanId = loan.id || `legacy-${data.loans.indexOf(loan)}`;
+        const repayment = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        loanId,
+        amount,
+        date: new Date(`${values.date}T12:00:00`).toISOString()
+        };
+        data.loanRepayments.push(repayment);
+        recordTransaction(`Loan repayment — ${loan.borrower}`, "income", amount, repayment.date);
+      }
       break;
     case "Record Transaction":
       recordTransaction(values.description.trim(), values.type, amount);
@@ -1484,6 +1776,77 @@ function createWorkspaceElement(tagName, className, text) {
   return element;
 }
 
+function renderMonthlyFinancialTrend(container, now) {
+  const series = getMonthlyFinancialSeries(data.contributions, data.transactions, now);
+  const section = createWorkspaceElement("section", "report-trend-panel");
+  const heading = createWorkspaceElement("div", "report-chart-heading");
+  const copy = createWorkspaceElement("div");
+  copy.append(
+    createWorkspaceElement("h2", "", "Six-month cash flow"),
+    createWorkspaceElement("p", "", "Monthly contributions, other income, and expenses.")
+  );
+  heading.append(copy);
+  const legend = createWorkspaceElement("div", "report-trend-legend");
+  [
+    ["Contributions", "trend-contributions"],
+    ["Other income", "trend-income"],
+    ["Expenses", "trend-expenses"]
+  ].forEach(([label, color]) => {
+    const item = createWorkspaceElement("span");
+    item.append(createWorkspaceElement("i", color), document.createTextNode(label));
+    legend.append(item);
+  });
+  const chart = createWorkspaceElement("div", "report-trend-chart");
+  chart.setAttribute("role", "img");
+  chart.setAttribute("aria-label", "Six-month chart comparing contributions, other income, and expenses");
+  const maximum = Math.max(
+    ...series.flatMap((month) => [month.contributions, month.otherIncome, month.expenses]),
+    1
+  );
+  series.forEach((month) => {
+    const column = createWorkspaceElement("div", "report-trend-month");
+    const bars = createWorkspaceElement("div", "report-trend-bars");
+    [
+      ["Contributions", month.contributions, "trend-contributions"],
+      ["Other income", month.otherIncome, "trend-income"],
+      ["Expenses", month.expenses, "trend-expenses"]
+    ].forEach(([label, value, color]) => {
+      const track = createWorkspaceElement("div", "report-trend-track");
+      const bar = createWorkspaceElement("span", color);
+      bar.style.height = `${value ? Math.max(4, value / maximum * 100) : 0}%`;
+      bar.title = `${month.label} ${month.year} ${label}: ${formatCurrency(value)}`;
+      track.append(bar);
+      bars.append(track);
+    });
+    column.append(
+      bars,
+      createWorkspaceElement("strong", "", month.label),
+      createWorkspaceElement("small", "", `Net ${formatCurrency(month.netCashFlow)}`)
+    );
+    chart.append(column);
+  });
+  section.append(heading, legend, chart);
+  container.append(section);
+}
+
+function downloadWorkspaceCsv(page) {
+  const result = buildWorkspaceCsv(page, data);
+  if (!result) {
+    showMessage("CSV export is not available for this workspace.");
+    return;
+  }
+  const file = new Blob([result.csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(file);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = result.filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showMessage(`${page} CSV downloaded. Store financial exports somewhere private.`);
+}
+
 function renderWorkspacePage(page) {
   const workspace = document.getElementById("workspacePage");
   const totalContributions = data.contributions.reduce((sum, item) => sum + item.amount, 0);
@@ -1500,7 +1863,8 @@ function renderWorkspacePage(page) {
       return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
     })
     .reduce((sum, contribution) => sum + contribution.amount, 0);
-  const loanTotal = data.loans.reduce((sum, loan) => sum + loan.amount, 0);
+  const loanSummary = summarizeLoans(data.loans, data.loanRepayments, now);
+  const loanTotal = loanSummary.principal;
   const recentDate = (value) => value ? new Date(value).toLocaleDateString("en-GB") : "—";
   const pages = {
     Contributions: {
@@ -1520,19 +1884,40 @@ function renderWorkspacePage(page) {
       empty: "No contributions recorded yet."
     },
     Loans: {
-      description: "Review loans issued to members and their repayment dates.",
+      description: "Track principal, one-time interest, partial repayments, and due dates.",
       action: "Manage Loans",
       actionLabel: "Record a loan",
+      rowAction: "Record Loan Repayment",
       stats: [
-        ["Loans issued", formatCurrency(loanTotal), "fa-landmark"],
-        ["Loans recorded", String(data.loans.length), "fa-file-invoice-dollar"],
-        ["Average loan", formatCurrency(data.loans.length ? loanTotal / data.loans.length : 0), "fa-chart-line"]
+        ["Principal issued", formatCurrency(loanSummary.principal), "fa-landmark"],
+        ["Total repaid", formatCurrency(loanSummary.repaid), "fa-money-bill-transfer"],
+        ["Outstanding balance", formatCurrency(loanSummary.outstanding), "fa-file-invoice-dollar"]
       ],
       heading: "Loan register",
-      columns: ["Borrower", "Amount", "Due date"],
-      rows: [...data.loans].reverse().map((item) => [
-        item.borrower, formatCurrency(item.amount), recentDate(item.dueDate)
-      ]),
+      columns: [
+        "Borrower", "Principal", "Interest", "Repaid", "Outstanding", "Due date", "Status",
+        ...(["chairperson", "treasurer", "platform_admin"].includes(currentRole) ? ["Actions"] : [])
+      ],
+      rowAction: ["chairperson", "treasurer", "platform_admin"].includes(currentRole)
+        ? "Record Loan Repayment"
+        : "",
+      statusColumn: 6,
+      rows: data.loans.map((loan, index) => {
+        const id = loan.id || `legacy-${index}`;
+        const balance = getLoanBalance(loan, data.loanRepayments, id, now);
+        const row = [
+          loan.borrower,
+          formatCurrency(balance.principal),
+          `${balance.interestRate}%`,
+          formatCurrency(balance.repaid),
+          formatCurrency(balance.outstanding),
+          recentDate(loan.dueDate),
+          balance.status
+        ];
+        row.loanId = id;
+        row.canRepay = balance.outstanding > 0;
+        return row;
+      }).reverse(),
       empty: "No loans have been recorded yet."
     },
     Transactions: {
@@ -1568,6 +1953,8 @@ function renderWorkspacePage(page) {
         ["Other income", formatCurrency(totalIncome - totalContributions)],
         ["Expenses", formatCurrency(totalExpenses)],
         ["Loans issued", formatCurrency(loanTotal)],
+        ["Loan repayments", formatCurrency(loanSummary.repaid)],
+        ["Loan balance outstanding", formatCurrency(loanSummary.outstanding)],
         ["Available balance", formatCurrency(currentBalance())]
       ],
       empty: "Record chama activity to start building your report."
@@ -1614,6 +2001,17 @@ function renderWorkspacePage(page) {
   );
   headingCopy.querySelector("h1").id = "workspacePageTitle";
   heading.append(pageIcon, headingCopy);
+  const headingActions = createWorkspaceElement("div", "workspace-heading-actions");
+  if (["Contributions", "Loans", "Transactions", "Reports"].includes(page)) {
+    const exportButton = createWorkspaceElement("button", "workspace-export-button");
+    exportButton.type = "button";
+    exportButton.append(
+      createWorkspaceElement("i", "fa-solid fa-download"),
+      document.createTextNode(" Export CSV")
+    );
+    exportButton.addEventListener("click", () => downloadWorkspaceCsv(page));
+    headingActions.append(exportButton);
+  }
   if (definition.action) {
     const actionButton = createWorkspaceElement("button", "members-add-button");
     actionButton.type = "button";
@@ -1622,8 +2020,9 @@ function renderWorkspacePage(page) {
       document.createTextNode(` ${definition.actionLabel}`)
     );
     actionButton.addEventListener("click", () => openForm(definition.action));
-    heading.append(actionButton);
+    headingActions.append(actionButton);
   }
+  if (headingActions.childElementCount > 0) heading.append(headingActions);
   workspace.append(heading);
 
   const statGrid = createWorkspaceElement("section", "member-stat-grid");
@@ -1641,6 +2040,9 @@ function renderWorkspacePage(page) {
     statGrid.append(card);
   });
   workspace.append(statGrid);
+  if (page === "Contributions" && ["chairperson", "treasurer", "platform_admin"].includes(currentRole)) {
+    renderContributionReminders(workspace, now);
+  }
 
   if (page === "Reports") {
     const chartSection = createWorkspaceElement("section", "report-chart-panel");
@@ -1678,6 +2080,7 @@ function renderWorkspacePage(page) {
     });
     chartSection.append(chart);
     workspace.append(chartSection);
+    renderMonthlyFinancialTrend(workspace, now);
   }
 
   const panel = createWorkspaceElement("section", "members-list-panel");
@@ -1737,7 +2140,14 @@ function renderWorkspacePage(page) {
       }
       row.forEach((value, index) => {
         const cell = createWorkspaceElement("td");
-        if (definition.filterColumn !== undefined && index === definition.filterColumn) {
+        if (definition.statusColumn === index && page === "Loans") {
+          const status = createWorkspaceElement(
+            "span",
+            `loan-status-badge${value === "Overdue" ? " is-overdue" : value === "Paid" ? " is-paid" : ""}`,
+            value
+          );
+          cell.append(status);
+        } else if (definition.filterColumn !== undefined && index === definition.filterColumn) {
           const badge = createWorkspaceElement(
             "span",
             `workspace-type-badge ${value === "Income" ? "is-income" : "is-expense"}`,
@@ -1752,6 +2162,18 @@ function renderWorkspacePage(page) {
         }
         tableRow.append(cell);
       });
+      if (definition.rowAction) {
+        const actionCell = createWorkspaceElement("td");
+        if (row.canRepay) {
+          const repayButton = createWorkspaceElement("button", "loan-repayment-button", "Record payment");
+          repayButton.type = "button";
+          repayButton.addEventListener("click", () => openForm(definition.rowAction, row.loanId));
+          actionCell.append(repayButton);
+        } else {
+          actionCell.textContent = "—";
+        }
+        tableRow.append(actionCell);
+      }
       body.append(tableRow);
     });
     table.append(tableHead, body);
@@ -1891,6 +2313,7 @@ function activatePage(page) {
   dashboardHome.hidden = true;
   workspacePage.hidden = false;
   if (page === "Approvals") void renderApprovalsPage();
+  else if (page === "Audit Log") void renderAuditLogPage();
   else renderWorkspacePage(page);
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -1952,25 +2375,80 @@ document.getElementById("membersTableBody").addEventListener("click", (event) =>
 });
 
 const searchInput = document.getElementById("globalSearch");
-searchInput.addEventListener("keydown", (event) => {
-  if (event.key !== "Enter") return;
 
-  const query = searchInput.value.trim().toLocaleLowerCase();
-  if (!query) {
-    showMessage("Type a name or transaction description to search.");
+function runGlobalSearch(query) {
+  const normalized = query.trim().toLocaleLowerCase();
+  if (!normalized) {
+    showMessage("Type a name, phone number, member, or transaction description to search.");
     return;
   }
 
-  const matchingMembers = data.members.filter((member) =>
-    `${member.name} ${member.phone} ${member.email}`.toLocaleLowerCase().includes(query)
-  ).length;
-  const matchingTransactions = data.transactions.filter((transaction) =>
-    transaction.description.toLocaleLowerCase().includes(query)
-  ).length;
-  showMessage(`Found ${matchingMembers + matchingTransactions} matching records.`);
+  const matches = {
+    members: data.members.filter((member) =>
+      `${member.name} ${member.phone ?? ""} ${member.email ?? ""}`.toLocaleLowerCase().includes(normalized)
+    ),
+    contributions: data.contributions.filter((contribution) =>
+      `${contribution.member ?? ""} ${contribution.paymentMethod ?? ""} ${contribution.receiptNumber ?? ""}`.toLocaleLowerCase().includes(normalized)
+    ),
+    loans: data.loans.filter((loan) =>
+      `${loan.borrower ?? ""} ${loan.id ?? ""}`.toLocaleLowerCase().includes(normalized)
+    ),
+    transactions: data.transactions.filter((transaction) =>
+      `${transaction.description ?? ""} ${transaction.type ?? ""}`.toLocaleLowerCase().includes(normalized)
+    )
+  };
+
+  const totalMatches = Object.values(matches).reduce((sum, items) => sum + items.length, 0);
+  if (totalMatches === 0) {
+    showMessage(`No matching records found for “${query.trim()}”.`);
+    return;
+  }
+
+  const pageOrder = ["members", "contributions", "loans", "transactions"];
+  const bestMatch = pageOrder.find((page) => matches[page].length > 0);
+  if (bestMatch) activatePage(bestMatch === "members" ? "Members" : bestMatch === "contributions" ? "Contributions" : bestMatch === "loans" ? "Loans" : "Transactions");
+
+  const messageParts = pageOrder
+    .filter((page) => matches[page].length > 0)
+    .map((page) => `${matches[page].length} ${page}`);
+  showMessage(`Found ${totalMatches} matching record${totalMatches === 1 ? "" : "s"}: ${messageParts.join(" · ")}.`);
+}
+
+searchInput.addEventListener("input", (event) => {
+  const query = event.target.value;
+  if (!query.trim()) {
+    return;
+  }
+  runGlobalSearch(query);
+});
+
+searchInput.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    runGlobalSearch(searchInput.value);
+    return;
+  }
+
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+    event.preventDefault();
+    searchInput.focus();
+    searchInput.select();
+  }
 });
 
 document.getElementById("notificationButton").addEventListener("click", () => {
+  const reminderSummary = summarizeContributionReminders(
+    data.members,
+    data.contributions,
+    data.settings.contributionDueDay
+  );
+  if (reminderSummary.outstanding > 0) {
+    activatePage("Contributions");
+    showMessage(
+      `${reminderSummary.overdue} overdue · ${reminderSummary.outstanding} contributions need follow-up (${formatCurrency(reminderSummary.outstandingAmount)} outstanding).`
+    );
+    return;
+  }
   const latest = data.transactions[data.transactions.length - 1];
   showMessage(latest ? `Latest activity: ${latest.description}.` : "You're all caught up! No new notifications.");
 });

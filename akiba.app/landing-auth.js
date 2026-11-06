@@ -4,6 +4,7 @@ const authMessage = document.getElementById("landingAuthMessage");
 const authSubmit = document.getElementById("landingAuthSubmit");
 const authPassword = document.getElementById("authPassword");
 const authConfirmPassword = document.getElementById("authConfirmPassword");
+const authResend = document.getElementById("landingAuthResend");
 let authMode = "login";
 
 function setAuthMode(mode) {
@@ -40,6 +41,7 @@ function clearAuthMessage() {
   authMessage.textContent = "";
   authMessage.hidden = true;
   authMessage.className = "landing-auth-message";
+  authResend.hidden = true;
 }
 
 function openAuthDialog(mode = "login") {
@@ -51,6 +53,8 @@ function openAuthDialog(mode = "login") {
     firstInput?.focus();
   }, 0);
 }
+
+if (window.location.hash === "#auth") openAuthDialog("login");
 
 document.addEventListener("click", (event) => {
   const trigger = event.target.closest("[data-open-auth]");
@@ -112,6 +116,14 @@ authForm.addEventListener("submit", async (event) => {
     const result = await readApiResponse(response);
     if (!response.ok) {
       showAuthMessage(result.error || "We couldn't complete that request. Please try again.");
+      if (result.code === "email_not_verified") authResend.hidden = false;
+      return;
+    }
+    if (authMode === "register" && response.status === 202) {
+      document.getElementById("authEmail").value = fields.get("email");
+      setAuthMode("login");
+      showAuthMessage(result.message, "success");
+      authResend.hidden = false;
       return;
     }
     window.location.assign("/dashboard.html");
@@ -120,6 +132,37 @@ authForm.addEventListener("submit", async (event) => {
   } finally {
     authSubmit.disabled = false;
     authSubmit.innerHTML = `${authMode === "register" ? "Create account" : "Log in"} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>`;
+  }
+});
+
+authResend.addEventListener("click", async () => {
+  const email = document.getElementById("authEmail").value.trim();
+  if (!email) {
+    showAuthMessage("Enter your email address first.");
+    document.getElementById("authEmail").focus();
+    return;
+  }
+  authResend.disabled = true;
+  try {
+    const response = await fetch("/api/auth/verification/resend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify({ email })
+    });
+    const result = await readApiResponse(response);
+    showAuthMessage(
+      response.ok
+        ? result.message
+        : result.error || "Could not resend the verification link.",
+      response.ok ? "success" : "error"
+    );
+    authResend.hidden = false;
+  } catch (error) {
+    showAuthMessage(error.message || "Could not resend the verification link.");
+    authResend.hidden = false;
+  } finally {
+    authResend.disabled = false;
   }
 });
 

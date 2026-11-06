@@ -2,21 +2,29 @@ import { Router } from "express";
 import {
   authenticateUser,
   createSession,
+  createEmailVerification,
   ensureDefaultChama,
   findSession,
   registerUser,
-  revokeSession
+  revokeSession,
+  verifyEmailToken
 } from "./auth-store.js";
+import {
+  assertEmailDeliveryConfigured,
+  getPublicBaseUrl,
+  sendEmailVerification
+} from "./email.js";
 
 export const authRouter = Router();
 const sessionCookieName = "akibaSession";
 const attempts = new Map();
+const emailResendAttempts = new Map();
 const rateLimitWindowMs = 15 * 60 * 1000;
 
 authRouter.get("/session", async (req, res) => {
   res.set("Cache-Control", "no-store");
   const user = await findSession(readSessionCookie(req));
-  if (!user?.adminAuthorized) {
+  if (!user?.adminAuthorized || !user.emailVerified) {
     res.status(401).json({ error: "Please sign in to continue." });
     return;
   }
@@ -44,14 +52,114 @@ authRouter.post("/register", limitAuthAttempts, requireSameOrigin, async (req, r
     return;
   }
 
-  const user = await registerUser({ name, email, password });
-  if (!user) {
+  const inviteToken = req.body && Object.hasOwn(req.body, "inviteToken")
+    ? req.body.inviteToken
+    : undefined;
+  if (inviteToken !== undefined && (typeof inviteToken !== "string" || !inviteToken)) {
+    res.status(400).json({ error: "This invite link is invalid." });
+    return;
+  }
+  let publicBaseUrl;
+  try {
+    assertEmailDeliveryConfigured();
+    publicBaseUrl = getPublicBaseUrl(req);
+  } catch (error) {
+    res.status(503).json({ error: error.message });
+    return;
+  }
+
+  const registration = await registerUser({ name, email, password, inviteToken });
+  if (registration === "invitation_unavailable") {
+    res.status(410).json({ error: "This invite link has expired or has already been used." });
+    return;
+  }
+  if (!registration) {
     res.status(409).json({ error: "An account with this email already exists. Please log in." });
     return;
   }
 
+  try {
+    await sendEmailVerification({
+      email,
+      name,
+      token: registration.verificationToken,
+      publicBaseUrl
+    });
+  } catch (error) {
+    console.error("Could not send an Akiba verification email:", error);
+    res.status(503).json({
+      error: "Your account was created, but the verification email could not be sent. Please request a new email after the mail service is available."
+    });
+    return;
+  }
+  res.status(202).json({
+    message: "Check your inbox for a verification link. It expires in 24 hours."
+  });
+});
+
+authRouter.post("/verification/resend", limitAuthAttempts, requireSameOrigin, async (req, res) => {
+  const email = normalizeEmail(req.body?.email);
+  if (!isValidEmail(email)) {
+    res.status(400).json({ error: "Enter the email address you registered with." });
+    return;
+  }
+  const inviteToken = req.body?.inviteToken;
+  if (inviteToken !== undefined && (typeof inviteToken !== "string" || !inviteToken)) {
+    res.status(400).json({ error: "This invite link is invalid." });
+    return;
+  }
+  if (!allowVerificationResend(email)) {
+    res.status(429).json({ error: "Please wait before requesting another verification email." });
+    return;
+  }
+
+  let publicBaseUrl;
+  try {
+    assertEmailDeliveryConfigured();
+    publicBaseUrl = getPublicBaseUrl(req);
+  } catch (error) {
+    res.status(503).json({ error: error.message });
+    return;
+  }
+
+  const verification = await createEmailVerification({ email, inviteToken });
+  if (verification === "invitation_unavailable") {
+    res.status(410).json({ error: "This invite link has expired or has already been used." });
+    return;
+  }
+  if (verification) {
+    try {
+      await sendEmailVerification({
+        email,
+        name: verification.name,
+        token: verification.verificationToken,
+        publicBaseUrl
+      });
+    } catch (error) {
+      console.error("Could not resend an Akiba verification email:", error);
+      res.status(503).json({ error: "The verification email could not be sent. Please try again later." });
+      return;
+    }
+  }
+  res.status(202).json({
+    message: "If an unverified account exists for that address, a new verification email has been sent."
+  });
+});
+
+authRouter.post("/verify-email", requireSameOrigin, async (req, res) => {
+  const user = await verifyEmailToken(req.body?.token);
+  if (user === "invitation_unavailable") {
+    res.status(410).json({
+      error: "This invite link has expired. Ask the chama manager for a new invitation, then request a new verification email."
+    });
+    return;
+  }
+  if (user === "invalid") {
+    res.status(410).json({ error: "This verification link is invalid, expired, or already used." });
+    return;
+  }
   await startSession(res, user, true);
-  res.status(201).json({ user });
+  res.json({ message: "Your email is verified.", user });
 });
 
 authRouter.post("/login", limitAuthAttempts, requireSameOrigin, async (req, res) => {
@@ -67,6 +175,13 @@ authRouter.post("/login", limitAuthAttempts, requireSameOrigin, async (req, res)
     res.status(401).json({ error: "The email or password is incorrect." });
     return;
   }
+  if (!user.emailVerified) {
+    res.status(403).json({
+      code: "email_not_verified",
+      error: "Verify your email address before signing in. You can resend the verification link below."
+    });
+    return;
+  }
 
   await ensureDefaultChama(user);
   await startSession(res, user, true);
@@ -77,6 +192,7 @@ authRouter.post("/logout", requireSameOrigin, async (req, res) => {
   const token = readSessionCookie(req);
   await revokeSession(token);
   clearSessionCookie(res);
+  res.set("Cache-Control", "no-store");
   res.json({ message: "You are signed out." });
 });
 
@@ -86,8 +202,9 @@ export async function getAuthenticatedUser(req) {
 
 export async function requireAuth(req, res, next) {
   const user = await getAuthenticatedUser(req);
-  if (!user?.adminAuthorized) {
+  if (!user?.adminAuthorized || !user.emailVerified) {
     if (req.path === "/dashboard.html") {
+      res.set("Cache-Control", "no-store");
       res.redirect("/login.html");
     } else {
       res.status(401).json({ error: "Please sign in to continue." });
@@ -146,6 +263,21 @@ function limitAuthAttempts(req, res, next) {
   }
   current.count += 1;
   next();
+}
+
+function allowVerificationResend(email) {
+  const now = Date.now();
+  for (const [key, attempt] of emailResendAttempts) {
+    if (attempt.resetAt <= now) emailResendAttempts.delete(key);
+  }
+  const attempt = emailResendAttempts.get(email);
+  if (!attempt || attempt.resetAt <= now) {
+    emailResendAttempts.set(email, { count: 1, resetAt: now + rateLimitWindowMs });
+    return true;
+  }
+  if (attempt.count >= 3) return false;
+  attempt.count += 1;
+  return true;
 }
 
 function requireSameOrigin(req, res, next) {

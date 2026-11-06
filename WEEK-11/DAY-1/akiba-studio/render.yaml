@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: akiba-studio
+    runtime: node
+    plan: free
+    rootDir: WEEK-11/DAY-1/akiba-studio
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: AKIBA_DATA_DIR
+        value: /tmp/akiba-data
+      - key: APP_URL
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: SOZURI_API_KEY
+        sync: false
+      - key: SOZURI_PROJECT
+        sync: false
+      - key: SOZURI_API_URL
+        value: https://sozuri.net/api/v1/messaging
+      - key: SOZURI_FROM
+        sync: false

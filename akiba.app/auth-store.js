@@ -6,10 +6,22 @@ import { Pool } from "pg";
 
 const authDataPath = process.env.AKIBA_AUTH_DATA_PATH;
 const sessionLifetimeMs = 7 * 24 * 60 * 60 * 1000;
+const invitationLifetimeMs = 7 * 24 * 60 * 60 * 1000;
+const emailVerificationLifetimeMs = 24 * 60 * 60 * 1000;
 const passwordHashLength = 64;
 const dummySalt = Buffer.alloc(16, 7);
 let pool = null;
-let store = { users: [], sessions: [], chamas: [], memberships: [], chamaData: [], approvals: [] };
+let store = {
+  users: [],
+  sessions: [],
+  chamas: [],
+  memberships: [],
+  chamaData: [],
+  approvals: [],
+  auditLogs: [],
+  invitations: [],
+  emailVerifications: []
+};
 
 if (authDataPath) {
   const storePath = path.resolve(authDataPath);
@@ -24,12 +36,20 @@ if (authDataPath) {
       throw new TypeError("Akiba authentication store has an invalid structure.");
     }
     store = {
-      users: savedStore.users,
+      users: savedStore.users.map((user) => ({
+        ...user,
+        emailVerified: user.emailVerified !== false
+      })),
       sessions: savedStore.sessions,
       chamas: Array.isArray(savedStore.chamas) ? savedStore.chamas : [],
       memberships: Array.isArray(savedStore.memberships) ? savedStore.memberships : [],
       chamaData: Array.isArray(savedStore.chamaData) ? savedStore.chamaData : [],
-      approvals: Array.isArray(savedStore.approvals) ? savedStore.approvals : []
+      approvals: Array.isArray(savedStore.approvals) ? savedStore.approvals : [],
+      auditLogs: Array.isArray(savedStore.auditLogs) ? savedStore.auditLogs : [],
+      invitations: Array.isArray(savedStore.invitations) ? savedStore.invitations : [],
+      emailVerifications: Array.isArray(savedStore.emailVerifications)
+        ? savedStore.emailVerifications
+        : []
     };
   } catch (error) {
     if (error.code !== "ENOENT") throw error;
@@ -56,21 +76,27 @@ export async function initializeAuthStore() {
   await migrateLegacyAuthStore();
 }
 
-export async function registerUser({ name, email, password, chamaName }) {
+export async function registerUser({ name, email, password, chamaName, inviteToken }) {
   const salt = randomBytes(16);
   const passwordHash = hashPassword(password, salt).toString("hex");
   const id = randomBytes(16).toString("hex");
   const isPlatformAdmin = false;
+  const invitationTokenHash = inviteToken ? hashInvitationToken(inviteToken) : null;
+  if (inviteToken && !invitationTokenHash) return "invitation_unavailable";
+  const verificationToken = randomBytes(32).toString("base64url");
+  const verificationTokenHash = hashVerificationToken(verificationToken);
+  const expiresAt = new Date(Date.now() + emailVerificationLifetimeMs);
 
   if (pool) {
     const client = await pool.connect();
     try {
       await client.query("BEGIN");
       const result = await client.query(
-        `INSERT INTO akiba_users (id, name, email, password_salt, password_hash, is_platform_admin)
-         VALUES ($1, $2, $3, $4, $5, $6)
+        `INSERT INTO akiba_users
+         (id, name, email, password_salt, password_hash, is_platform_admin, email_verified)
+         VALUES ($1, $2, $3, $4, $5, $6, FALSE)
          ON CONFLICT (email) DO NOTHING
-         RETURNING id, name, email, is_platform_admin`,
+         RETURNING id, name, email, is_platform_admin, email_verified`,
         [id, name, email, salt.toString("hex"), passwordHash, isPlatformAdmin]
       );
       if (!result.rows[0]) {
@@ -78,11 +104,26 @@ export async function registerUser({ name, email, password, chamaName }) {
         return null;
       }
 
-      if (!isPlatformAdmin) {
-        await createChamaWithClient(client, id, chamaName || `${name}'s Chama`);
+      if (invitationTokenHash) {
+        const invitation = await client.query(
+          `SELECT token_hash FROM akiba_chama_invitations
+           WHERE token_hash = $1 AND expires_at > NOW()
+             AND accepted_at IS NULL AND revoked_at IS NULL`,
+          [invitationTokenHash]
+        );
+        if (!invitation.rows[0]) {
+          await client.query("ROLLBACK");
+          return "invitation_unavailable";
+        }
       }
+      await client.query(
+        `INSERT INTO akiba_email_verifications
+         (token_hash, user_id, invite_token_hash, expires_at)
+         VALUES ($1, $2, $3, $4)`,
+        [verificationTokenHash, id, invitationTokenHash, expiresAt]
+      );
       await client.query("COMMIT");
-      return publicUser(result.rows[0]);
+      return { user: publicUser(result.rows[0]), verificationToken };
     } catch (error) {
       await client.query("ROLLBACK");
       throw error;
@@ -92,6 +133,9 @@ export async function registerUser({ name, email, password, chamaName }) {
   }
 
   if (store.users.some((user) => user.email === email)) return null;
+  if (invitationTokenHash && !findAvailableInvitation(invitationTokenHash)) {
+    return "invitation_unavailable";
+  }
   const user = {
     id,
     name,
@@ -99,18 +143,318 @@ export async function registerUser({ name, email, password, chamaName }) {
     passwordSalt: salt.toString("hex"),
     passwordHash,
     isPlatformAdmin,
+    emailVerified: false,
     createdAt: new Date().toISOString()
   };
   store.users.push(user);
-  if (!isPlatformAdmin) createChamaInMemory(user, chamaName || `${name}'s Chama`);
+  store.emailVerifications.push({
+    tokenHash: verificationTokenHash,
+    userId: id,
+    inviteTokenHash: invitationTokenHash,
+    expiresAt: expiresAt.getTime(),
+    createdAt: Date.now()
+  });
+  persistStore();
+  return { user: publicUser(user), verificationToken };
+}
+
+export async function verifyEmailToken(token) {
+  const tokenHash = hashVerificationToken(token);
+  if (!tokenHash) return "invalid";
+
+  if (pool) {
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      const result = await client.query(
+        `SELECT v.user_id, v.invite_token_hash,
+                u.id, u.name, u.email, u.is_platform_admin, u.email_verified
+         FROM akiba_email_verifications AS v
+         JOIN akiba_users AS u ON u.id = v.user_id
+         WHERE v.token_hash = $1 AND v.expires_at > NOW()
+         FOR UPDATE OF v, u`,
+        [tokenHash]
+      );
+      const verification = result.rows[0];
+      if (!verification || verification.email_verified) {
+        await client.query("ROLLBACK");
+        return "invalid";
+      }
+
+      if (verification.invite_token_hash) {
+        const acceptance = await acceptInvitationWithClient(
+          client,
+          verification.invite_token_hash,
+          verification.user_id
+        );
+        if (acceptance === "unavailable") {
+          await client.query("ROLLBACK");
+          return "invitation_unavailable";
+        }
+      } else {
+        await createChamaWithClient(client, verification.user_id, `${verification.name}'s Chama`);
+      }
+
+      await client.query(
+        "UPDATE akiba_users SET email_verified = TRUE WHERE id = $1",
+        [verification.user_id]
+      );
+      await client.query(
+        "DELETE FROM akiba_email_verifications WHERE user_id = $1",
+        [verification.user_id]
+      );
+      await client.query("COMMIT");
+      return publicUser({ ...verification, email_verified: true });
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  const verification = store.emailVerifications.find((item) =>
+    item.tokenHash === tokenHash && item.expiresAt > Date.now()
+  );
+  const user = verification && store.users.find((item) => item.id === verification.userId);
+  if (!verification || !user || user.emailVerified) return "invalid";
+  if (verification.inviteTokenHash) {
+    if (!findAvailableInvitation(verification.inviteTokenHash)) {
+      return "invitation_unavailable";
+    }
+    acceptInvitationInMemory(verification.inviteTokenHash, user.id);
+  } else {
+    createChamaInMemory(user, `${user.name}'s Chama`);
+  }
+  user.emailVerified = true;
+  store.emailVerifications = store.emailVerifications.filter((item) => item.userId !== user.id);
   persistStore();
   return publicUser(user);
+}
+
+export async function createEmailVerification({ email, inviteToken }) {
+  const invitationTokenHash = inviteToken ? hashInvitationToken(inviteToken) : null;
+  if (inviteToken && !invitationTokenHash) return "invitation_unavailable";
+  const verificationToken = randomBytes(32).toString("base64url");
+  const verificationTokenHash = hashVerificationToken(verificationToken);
+  const expiresAt = new Date(Date.now() + emailVerificationLifetimeMs);
+
+  if (pool) {
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      const userResult = await client.query(
+        `SELECT id, name, email, email_verified
+         FROM akiba_users WHERE email = $1 FOR UPDATE`,
+        [email]
+      );
+      const user = userResult.rows[0];
+      if (!user || user.email_verified) {
+        await client.query("ROLLBACK");
+        return null;
+      }
+      const previous = await client.query(
+        `SELECT invite_token_hash FROM akiba_email_verifications
+         WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1 FOR UPDATE`,
+        [user.id]
+      );
+      const inviteHash = invitationTokenHash || previous.rows[0]?.invite_token_hash || null;
+      if (invitationTokenHash) {
+        const invitation = await client.query(
+          `SELECT token_hash FROM akiba_chama_invitations
+           WHERE token_hash = $1 AND expires_at > NOW()
+             AND accepted_at IS NULL AND revoked_at IS NULL`,
+          [invitationTokenHash]
+        );
+        if (!invitation.rows[0]) {
+          await client.query("ROLLBACK");
+          return "invitation_unavailable";
+        }
+      }
+      await client.query("DELETE FROM akiba_email_verifications WHERE user_id = $1", [user.id]);
+      await client.query(
+        `INSERT INTO akiba_email_verifications
+         (token_hash, user_id, invite_token_hash, expires_at)
+         VALUES ($1, $2, $3, $4)`,
+        [verificationTokenHash, user.id, inviteHash, expiresAt]
+      );
+      await client.query("COMMIT");
+      return { ...publicUser(user), verificationToken };
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  const user = store.users.find((item) => item.email === email);
+  if (!user || user.emailVerified) return null;
+  const previous = store.emailVerifications
+    .filter((item) => item.userId === user.id)
+    .sort((left, right) => right.createdAt - left.createdAt)[0];
+  if (invitationTokenHash && !findAvailableInvitation(invitationTokenHash)) {
+    return "invitation_unavailable";
+  }
+  store.emailVerifications = store.emailVerifications.filter((item) => item.userId !== user.id);
+  store.emailVerifications.push({
+    tokenHash: verificationTokenHash,
+    userId: user.id,
+    inviteTokenHash: invitationTokenHash || previous?.inviteTokenHash || null,
+    expiresAt: expiresAt.getTime(),
+    createdAt: Date.now()
+  });
+  persistStore();
+  return { ...publicUser(user), verificationToken };
+}
+
+export async function createChamaInvitation({ chamaId, createdBy, role }) {
+  const token = randomBytes(32).toString("base64url");
+  const tokenHash = hashInvitationToken(token);
+  const expiresAt = new Date(Date.now() + invitationLifetimeMs);
+
+  if (pool) {
+    await pool.query(
+      `INSERT INTO akiba_chama_invitations
+       (token_hash, chama_id, created_by, role, expires_at)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [tokenHash, chamaId, createdBy, role, expiresAt]
+    );
+  } else {
+    store.invitations.push({
+      tokenHash,
+      chamaId,
+      createdBy,
+      role,
+      expiresAt: expiresAt.getTime(),
+      acceptedBy: null,
+      acceptedAt: null,
+      revokedAt: null
+    });
+    persistStore();
+  }
+
+  return { token, expiresAt: expiresAt.toISOString() };
+}
+
+export async function getChamaInvitation(token) {
+  const tokenHash = hashInvitationToken(token);
+  if (!tokenHash) return null;
+
+  if (pool) {
+    const result = await pool.query(
+      `SELECT c.name AS chama_name, i.role, i.expires_at
+       FROM akiba_chama_invitations AS i
+       JOIN akiba_chamas AS c ON c.id = i.chama_id
+       WHERE i.token_hash = $1 AND i.expires_at > NOW()
+         AND i.accepted_at IS NULL AND i.revoked_at IS NULL`,
+      [tokenHash]
+    );
+    const invitation = result.rows[0];
+    return invitation ? {
+      chamaName: invitation.chama_name,
+      role: invitation.role,
+      expiresAt: invitation.expires_at
+    } : null;
+  }
+
+  const invitation = findAvailableInvitation(tokenHash);
+  const chama = invitation && store.chamas.find((item) => item.id === invitation.chamaId);
+  return invitation && chama ? {
+    chamaName: chama.name,
+    role: invitation.role,
+    expiresAt: new Date(invitation.expiresAt).toISOString()
+  } : null;
+}
+
+export async function acceptChamaInvitation({ token, userId }) {
+  const tokenHash = hashInvitationToken(token);
+  if (!tokenHash) return "unavailable";
+
+  if (pool) {
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      const result = await acceptInvitationWithClient(client, tokenHash, userId);
+      if (result === "unavailable") {
+        await client.query("ROLLBACK");
+        return result;
+      }
+      await client.query("COMMIT");
+      return result;
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  const result = acceptInvitationInMemory(tokenHash, userId);
+  if (result !== "unavailable") persistStore();
+  return result;
+}
+
+function findAvailableInvitation(tokenHash) {
+  return store.invitations.find((invitation) =>
+    invitation.tokenHash === tokenHash &&
+    invitation.expiresAt > Date.now() &&
+    invitation.acceptedAt === null &&
+    invitation.revokedAt === null
+  );
+}
+
+function acceptInvitationInMemory(tokenHash, userId) {
+  const invitation = findAvailableInvitation(tokenHash);
+  if (!invitation) return "unavailable";
+
+  const alreadyMember = store.memberships.some((membership) =>
+    membership.chamaId === invitation.chamaId && membership.userId === userId
+  );
+  if (!alreadyMember) {
+    store.memberships.push({
+      chamaId: invitation.chamaId,
+      userId,
+      role: invitation.role
+    });
+  }
+  invitation.acceptedBy = userId;
+  invitation.acceptedAt = Date.now();
+  return alreadyMember ? "already_member" : "accepted";
+}
+
+async function acceptInvitationWithClient(client, tokenHash, userId) {
+  const result = await client.query(
+    `SELECT chama_id, role
+     FROM akiba_chama_invitations
+     WHERE token_hash = $1 AND expires_at > NOW()
+       AND accepted_at IS NULL AND revoked_at IS NULL
+     FOR UPDATE`,
+    [tokenHash]
+  );
+  const invitation = result.rows[0];
+  if (!invitation) return "unavailable";
+
+  const membership = await client.query(
+    `INSERT INTO akiba_chama_memberships (chama_id, user_id, role)
+     VALUES ($1, $2, $3)
+     ON CONFLICT (chama_id, user_id) DO NOTHING
+     RETURNING user_id`,
+    [invitation.chama_id, userId, invitation.role]
+  );
+  await client.query(
+    `UPDATE akiba_chama_invitations
+     SET accepted_by = $2, accepted_at = NOW()
+     WHERE token_hash = $1`,
+    [tokenHash, userId]
+  );
+  return membership.rows[0] ? "accepted" : "already_member";
 }
 
 export async function authenticateUser(email, password) {
   if (pool) {
     const result = await pool.query(
-      `SELECT id, name, email, password_salt, password_hash, is_platform_admin
+      `SELECT id, name, email, password_salt, password_hash, is_platform_admin, email_verified
        FROM akiba_users
        WHERE email = $1`,
       [email]
@@ -164,7 +508,7 @@ export async function findSession(token) {
 
   if (pool) {
     const result = await pool.query(
-      `SELECT u.id, u.name, u.email, u.is_platform_admin, s.admin_authorized
+      `SELECT u.id, u.name, u.email, u.is_platform_admin, u.email_verified, s.admin_authorized
        FROM akiba_sessions AS s
        JOIN akiba_users AS u ON u.id = s.user_id
        WHERE s.token_hash = $1 AND s.expires_at > NOW()`,
@@ -292,26 +636,40 @@ export async function getChamaData(chamaId) {
       "SELECT data FROM akiba_chama_data WHERE chama_id = $1",
       [chamaId]
     );
-    return result.rows[0]?.data || null;
+    const data = result.rows[0]?.data;
+    return data ? { ...data, loanRepayments: Array.isArray(data.loanRepayments) ? data.loanRepayments : [] } : null;
   }
-  return store.chamaData.find((entry) => entry.chamaId === chamaId)?.data || null;
+  const data = store.chamaData.find((entry) => entry.chamaId === chamaId)?.data;
+  return data ? { ...data, loanRepayments: Array.isArray(data.loanRepayments) ? data.loanRepayments : [] } : null;
 }
 
-export async function saveChamaData(chamaId, data) {
+export async function saveChamaData(chamaId, data, auditEvents = []) {
   if (pool) {
-    await pool.query(
-      `INSERT INTO akiba_chama_data (chama_id, data, updated_at)
-       VALUES ($1, $2::jsonb, NOW())
-       ON CONFLICT (chama_id)
-       DO UPDATE SET data = EXCLUDED.data, updated_at = NOW()`,
-      [chamaId, JSON.stringify(data)]
-    );
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query(
+        `INSERT INTO akiba_chama_data (chama_id, data, updated_at)
+         VALUES ($1, $2::jsonb, NOW())
+         ON CONFLICT (chama_id)
+         DO UPDATE SET data = EXCLUDED.data, updated_at = NOW()`,
+        [chamaId, JSON.stringify(data)]
+      );
+      await insertAuditEvents(client, chamaId, auditEvents);
+      await client.query("COMMIT");
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
     return;
   }
 
   const entry = store.chamaData.find((item) => item.chamaId === chamaId);
   if (entry) entry.data = data;
   else store.chamaData.push({ chamaId, data });
+  appendLocalAuditEvents(chamaId, auditEvents);
   persistStore();
 }
 
@@ -436,16 +794,38 @@ export async function updateChamaMemberRole({ chamaId, userId, role }) {
 export async function createFinancialApproval(approval) {
   const record = { ...approval, id: randomUUID(), status: "pending", createdAt: new Date().toISOString() };
   if (pool) {
-    await pool.query(
-      `INSERT INTO akiba_financial_approvals
-       (id, chama_id, requested_by, status, amount, description, base_data_hash, proposed_data)
-       VALUES ($1, $2, $3, 'pending', $4, $5, $6, $7::jsonb)`,
-      [record.id, record.chamaId, record.requestedBy, record.amount,
-        record.description, record.baseDataHash, JSON.stringify(record.proposedData)]
-    );
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query(
+        `INSERT INTO akiba_financial_approvals
+         (id, chama_id, requested_by, status, amount, description, base_data_hash, proposed_data)
+         VALUES ($1, $2, $3, 'pending', $4, $5, $6, $7::jsonb)`,
+        [record.id, record.chamaId, record.requestedBy, record.amount,
+          record.description, record.baseDataHash, JSON.stringify(record.proposedData)]
+      );
+      await insertAuditEvents(client, record.chamaId, [{
+        actorId: record.requestedBy,
+        actorName: record.requestedByName,
+        action: "approval_requested",
+        summary: `Approval requested: ${record.description} (${record.amount} KES).`
+      }]);
+      await client.query("COMMIT");
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
     return record;
   }
   store.approvals.push(record);
+  appendLocalAuditEvents(record.chamaId, [{
+    actorId: record.requestedBy,
+    actorName: record.requestedByName,
+    action: "approval_requested",
+    summary: `Approval requested: ${record.description} (${record.amount} KES).`
+  }]);
   persistStore();
   return record;
 }
@@ -469,6 +849,28 @@ export async function listFinancialApprovals(chamaId) {
     .reverse();
 }
 
+export async function listChamaAuditLog(chamaId, limit = 200) {
+  if (pool) {
+    const result = await pool.query(
+      `SELECT id, actor_name AS "actorName", action, summary,
+              created_at AS "createdAt"
+       FROM akiba_chama_audit_log
+       WHERE chama_id = $1
+       ORDER BY created_at DESC
+       LIMIT $2`,
+      [chamaId, limit]
+    );
+    return result.rows;
+  }
+  return store.auditLogs
+    .filter((entry) => entry.chamaId === chamaId)
+    .slice(-limit)
+    .reverse()
+    .map(({ id, actorName, action, summary, createdAt }) =>
+      ({ id, actorName, action, summary, createdAt })
+    );
+}
+
 export async function getFinancialApproval(approvalId, chamaId) {
   if (pool) {
     const result = await pool.query(
@@ -486,7 +888,14 @@ export async function getFinancialApproval(approvalId, chamaId) {
   ) || null;
 }
 
-export async function decideFinancialApproval({ approvalId, chamaId, reviewerId, decision, currentDataHash }) {
+export async function decideFinancialApproval({
+  approvalId,
+  chamaId,
+  reviewerId,
+  reviewerName,
+  decision,
+  currentDataHash
+}) {
   if (pool) {
     const client = await pool.connect();
     try {
@@ -513,6 +922,12 @@ export async function decideFinancialApproval({ approvalId, chamaId, reviewerId,
            reviewed_at = NOW() WHERE id = $1`,
           [approvalId, reviewerId]
         );
+        await insertAuditEvents(client, chamaId, [{
+          actorId: reviewerId,
+          actorName: reviewerName,
+          action: "approval_stale",
+          summary: "Approval marked stale because chama records changed."
+        }]);
         await client.query("COMMIT");
         return "stale";
       }
@@ -528,6 +943,12 @@ export async function decideFinancialApproval({ approvalId, chamaId, reviewerId,
          reviewed_at = NOW() WHERE id = $1`,
         [approvalId, decision, reviewerId]
       );
+      await insertAuditEvents(client, chamaId, [{
+        actorId: reviewerId,
+        actorName: reviewerName,
+        action: `approval_${decision}`,
+        summary: `Financial operation ${decision}.`
+      }]);
       await client.query("COMMIT");
       return decision;
     } catch (error) {
@@ -554,8 +975,41 @@ export async function decideFinancialApproval({ approvalId, chamaId, reviewerId,
   }
   approval.reviewedBy = reviewerId;
   approval.reviewedAt = new Date().toISOString();
+  appendLocalAuditEvents(chamaId, [{
+    actorId: reviewerId,
+    actorName: reviewerName,
+    action: `approval_${approval.status}`,
+    summary: approval.status === "stale"
+      ? "Approval marked stale because chama records changed."
+      : `Financial operation ${approval.status}.`
+  }]);
   persistStore();
   return approval.status;
+}
+
+async function insertAuditEvents(client, chamaId, auditEvents) {
+  for (const event of auditEvents) {
+    await client.query(
+      `INSERT INTO akiba_chama_audit_log
+       (id, chama_id, actor_id, actor_name, action, summary)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [randomUUID(), chamaId, event.actorId, event.actorName, event.action, event.summary]
+    );
+  }
+}
+
+function appendLocalAuditEvents(chamaId, auditEvents) {
+  for (const event of auditEvents) {
+    store.auditLogs.push({
+      id: randomUUID(),
+      chamaId,
+      actorId: event.actorId,
+      actorName: event.actorName,
+      action: event.action,
+      summary: event.summary,
+      createdAt: new Date().toISOString()
+    });
+  }
 }
 
 async function createChamaWithClient(client, userId, name) {
@@ -588,6 +1042,7 @@ function emptyChamaData(chamaName, adminName) {
     members: [],
     contributions: [],
     loans: [],
+    loanRepayments: [],
     transactions: [],
     pendingMpesaPayments: [],
     settings: { chamaName, adminName, adminEmail: "", contributionDueDay: 5 }
@@ -611,11 +1066,22 @@ function hashSessionToken(token) {
   return createHash("sha256").update(token).digest("hex");
 }
 
+function hashInvitationToken(token) {
+  if (typeof token !== "string" || !/^[A-Za-z0-9_-]{43}$/.test(token)) return null;
+  return createHash("sha256").update(token).digest("hex");
+}
+
+function hashVerificationToken(token) {
+  if (typeof token !== "string" || !/^[A-Za-z0-9_-]{43}$/.test(token)) return null;
+  return createHash("sha256").update(token).digest("hex");
+}
+
 function publicUser(user) {
   return {
     id: user.id,
     name: user.name,
     email: user.email,
+    emailVerified: user.email_verified === true || user.emailVerified === true,
     isPlatformAdmin: user.is_platform_admin === true || user.isPlatformAdmin === true
   };
 }

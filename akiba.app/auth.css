@@ -222,6 +222,19 @@ button { cursor: pointer; }
 .auth-message[hidden] { display: none; }
 .auth-message.error { background: #fff0f0; color: #9d2c39; }
 .auth-message.success { background: #ecfaf4; color: #167050; }
+.verification-actions[hidden] { display: none; }
+.verification-resend-button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 9px;
+  border: 1px solid var(--auth-line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--auth-blue);
+  font-size: 11px;
+  font-weight: 700;
+}
+.verification-resend-button:disabled { cursor: wait; opacity: .65; }
 .switch-copy { margin: 21px 0 0; text-align: center; color: #7a879c; font-size: 11px; }
 .switch-copy button { padding: 0; border: 0; background: transparent; color: var(--auth-blue); font-size: inherit; font-weight: 700; }
 .privacy-note { display: flex; align-items: center; justify-content: center; gap: 7px; margin: 24px 0 0; color: #6c7b95; font-size: 10px; }

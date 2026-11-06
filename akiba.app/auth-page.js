@@ -8,6 +8,12 @@ const message = document.getElementById("authMessage");
 const submitButton = document.getElementById("submitButton");
 const passwordInput = document.getElementById("password");
 const confirmPasswordInput = document.getElementById("confirmPassword");
+const searchParams = new URLSearchParams(window.location.search);
+const inviteToken = searchParams.get("invite");
+const verificationToken = searchParams.get("verify");
+const verificationActions = document.getElementById("verificationActions");
+const resendVerificationButton = document.getElementById("resendVerificationButton");
+let inviteDetails = null;
 let mode = "login";
 
 function setMode(nextMode) {
@@ -15,8 +21,16 @@ function setMode(nextMode) {
   const registering = mode === "register";
   document.getElementById("formTitle").textContent = registering ? "Create your account" : "Welcome back";
   document.getElementById("formSubtitle").textContent = registering
-    ? "Start making your chama's plans easier to manage."
-    : "Sign in to pick up where your group left off.";
+    ? inviteDetails
+      ? `Create your account to join ${inviteDetails.chamaName}.`
+      : inviteToken
+        ? "Create an account to accept your chama invitation."
+        : "Start making your chama's plans easier to manage."
+    : inviteDetails
+      ? `Sign in to join ${inviteDetails.chamaName}.`
+      : inviteToken
+        ? "Sign in to accept your chama invitation."
+        : "Sign in to pick up where your group left off.";
   loginTab.classList.toggle("active", !registering);
   loginTab.setAttribute("aria-selected", String(!registering));
   registerTab.classList.toggle("active", registering);
@@ -40,10 +54,16 @@ function showMessage(text, kind = "error") {
   message.hidden = false;
 }
 
+function showVerificationMessage(text, kind = "error") {
+  showMessage(text, kind);
+  verificationActions.hidden = false;
+}
+
 function clearMessage() {
   message.textContent = "";
   message.hidden = true;
   message.className = "auth-message";
+  verificationActions.hidden = true;
 }
 
 loginTab.addEventListener("click", () => setMode("login"));
@@ -90,13 +110,35 @@ form.addEventListener("submit", async (event) => {
       body: JSON.stringify({
         name: fields.get("name"),
         email: fields.get("email"),
-        password
+        password,
+        ...(inviteToken && mode === "register" ? { inviteToken } : {})
       })
     });
     const result = await readApiResponse(response);
     if (!response.ok) {
-      showMessage(result.error || "We couldn't complete that request. Please try again.");
+      if (result.code === "email_not_verified") {
+        showVerificationMessage(result.error);
+      } else {
+        showMessage(result.error || "We couldn't complete that request. Please try again.");
+      }
       return;
+    }
+    if (mode === "register" && response.status === 202) {
+      document.getElementById("email").value = fields.get("email");
+      setMode("login");
+      showVerificationMessage(result.message, "success");
+      return;
+    }
+    if (mode === "login" && inviteToken) {
+      const acceptResponse = await fetch(`/api/invitations/${encodeURIComponent(inviteToken)}/accept`, {
+        method: "POST",
+        credentials: "same-origin"
+      });
+      const acceptResult = await readApiResponse(acceptResponse);
+      if (!acceptResponse.ok) {
+        showMessage(acceptResult.error || "This invitation could not be accepted.");
+        return;
+      }
     }
     window.location.replace("/dashboard.html");
   } catch (error) {
@@ -107,14 +149,89 @@ form.addEventListener("submit", async (event) => {
   }
 });
 
-fetch("/api/auth/session", { credentials: "same-origin", cache: "no-store" })
-  .then(async (response) => {
-    await readApiResponse(response);
-    if (response.ok) window.location.replace("/dashboard.html");
-  })
-  .catch((error) => showMessage(
-    error.message || "Akiba's server is not responding. Start it with `npm start` and open http://localhost:3000/login.html."
-  ));
+resendVerificationButton.addEventListener("click", async () => {
+  const email = document.getElementById("email").value.trim();
+  if (!email) {
+    showMessage("Enter your email address first.");
+    document.getElementById("email").focus();
+    return;
+  }
+  resendVerificationButton.disabled = true;
+  try {
+    const response = await fetch("/api/auth/verification/resend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify({ email, ...(inviteToken ? { inviteToken } : {}) })
+    });
+    const result = await readApiResponse(response);
+    showVerificationMessage(
+      response.ok
+        ? result.message
+        : result.error || "Could not resend the verification link.",
+      response.ok ? "success" : "error"
+    );
+  } catch (error) {
+    showVerificationMessage(error.message || "Could not resend the verification link.");
+  } finally {
+    resendVerificationButton.disabled = false;
+  }
+});
+
+async function initializeAuthPage() {
+  if (verificationToken) {
+    const verifyResponse = await fetch("/api/auth/verify-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify({ token: verificationToken })
+    });
+    const verifyResult = await readApiResponse(verifyResponse);
+    if (!verifyResponse.ok) {
+      showMessage(verifyResult.error || "This verification link is no longer available.");
+      return;
+    }
+    window.location.replace("/dashboard.html");
+    return;
+  }
+
+  const sessionResponse = await fetch("/api/auth/session", {
+    credentials: "same-origin",
+    cache: "no-store"
+  });
+  await readApiResponse(sessionResponse);
+  if (sessionResponse.ok && inviteToken) {
+    const acceptResponse = await fetch(`/api/invitations/${encodeURIComponent(inviteToken)}/accept`, {
+      method: "POST",
+      credentials: "same-origin"
+    });
+    const acceptResult = await readApiResponse(acceptResponse);
+    if (!acceptResponse.ok) {
+      showMessage(acceptResult.error || "This invitation could not be accepted.");
+      return;
+    }
+  }
+  if (sessionResponse.ok) {
+    window.location.replace("/dashboard.html");
+    return;
+  }
+  if (inviteToken) {
+    const inviteResponse = await fetch(`/api/invitations/${encodeURIComponent(inviteToken)}`, {
+      cache: "no-store"
+    });
+    const inviteResult = await readApiResponse(inviteResponse);
+    if (!inviteResponse.ok) {
+      showMessage(inviteResult.error || "This invitation is no longer available.");
+      return;
+    }
+    inviteDetails = inviteResult.invitation;
+    setMode(mode);
+  }
+}
+
+initializeAuthPage().catch((error) => showMessage(
+  error.message || "Akiba's server is not responding. Start it with `npm start` and open http://localhost:3000/login.html."
+));
 
 async function readApiResponse(response) {
   if (!response.headers.get("content-type")?.includes("application/json")) {

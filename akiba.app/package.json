@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "node --env-file=.env server.js",
+    "dev": "node --env-file=.env server.js",
+    "start": "node server.js",
     "test": "node --test"
   },
   "engines": {
@@ -11,6 +12,7 @@
   },
   "dependencies": {
     "express": "^5.1.0",
+    "nodemailer": "^10.3.1",
     "pg": "^8.23.1"
   }
 }

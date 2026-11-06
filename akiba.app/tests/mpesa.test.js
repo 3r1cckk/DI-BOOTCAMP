@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { after, test } from "node:test";
 import { normalizeKenyanPhone } from "../mpesa.js";
+import { startSmtpCapture } from "./smtp-capture.js";
 
 const dataDirectory = mkdtempSync(path.join(tmpdir(), "akiba-mpesa-test-"));
 process.env.MPESA_DATA_PATH = path.join(dataDirectory, "payments.json");
@@ -15,7 +16,13 @@ process.env.MPESA_PASSKEY = "test-passkey";
 process.env.MPESA_CALLBACK_URL = "https://example.test/api/mpesa/callback";
 process.env.MPESA_CALLBACK_SECRET = "test-callback-secret";
 process.env.AKIBA_AUTH_DATA_PATH = path.join(dataDirectory, "auth-users.json");
-process.env.AKIBA_ADMIN_PASSWORD = "shared-admin-password-123";
+const smtp = await startSmtpCapture();
+process.env.SMTP_HOST = "127.0.0.1";
+process.env.SMTP_PORT = String(smtp.port);
+process.env.SMTP_SECURE = "false";
+process.env.SMTP_USER = "";
+process.env.SMTP_PASSWORD = "";
+process.env.AKIBA_EMAIL_FROM = "Akiba <no-reply@example.test>";
 
 const darajaCalls = [];
 const originalFetch = globalThis.fetch;
@@ -49,8 +56,25 @@ after(async () => {
   await new Promise((resolve, reject) => {
     server.close((error) => error ? reject(error) : resolve());
   });
+  await smtp.close();
   rmSync(dataDirectory, { recursive: true, force: true });
 });
+
+async function registerAccount(name, email) {
+  const response = await nativeFetch(`${baseUrl}/api/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email, password: "secure-password-123" })
+  });
+  assert.equal(response.status, 202);
+  const verification = await nativeFetch(`${baseUrl}/api/auth/verify-email`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token: smtp.verificationTokenFor(email) })
+  });
+  assert.equal(verification.status, 200);
+  return verification.headers.getSetCookie()[0].split(";")[0];
+}
 
 async function requestJson(route, { method = "GET", body, authenticated = true } = {}) {
   const headers = body ? { "Content-Type": "application/json" } : {};
@@ -78,18 +102,7 @@ test("validates input and starts a Till STK Push without exposing credentials", 
   assert.equal(unauthenticated.status, 401);
   assert.equal(darajaCalls.length, 0);
 
-  const registrationResponse = await nativeFetch(`${baseUrl}/api/auth/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name: "Amina Test",
-      email: "amina@example.test",
-      password: "secure-password-123",
-      adminPassword: "shared-admin-password-123"
-    })
-  });
-  assert.equal(registrationResponse.status, 201);
-  authCookie = registrationResponse.headers.getSetCookie()[0].split(";")[0];
+  authCookie = await registerAccount("Amina Test", "amina@example.test");
 
   const invalid = await requestJson("/api/mpesa/stk-push", {
     method: "POST",
@@ -118,18 +131,7 @@ test("validates input and starts a Till STK Push without exposing credentials", 
   assert.equal(pending.body.status, "pending");
 
   const ownerCookie = authCookie;
-  const secondRegistration = await nativeFetch(`${baseUrl}/api/auth/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name: "Brian Test",
-      email: "brian@example.test",
-      password: "secure-password-456",
-      adminPassword: "shared-admin-password-123"
-    })
-  });
-  assert.equal(secondRegistration.status, 201);
-  authCookie = secondRegistration.headers.getSetCookie()[0].split(";")[0];
+  authCookie = await registerAccount("Brian Test", "brian@example.test");
   const otherUserPayment = await requestJson("/api/mpesa/status/ws_CO_test_123");
   assert.equal(otherUserPayment.status, 404);
   authCookie = ownerCookie;
