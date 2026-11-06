@@ -3,6 +3,7 @@ services:
     name: akiba-studio
     runtime: node
     plan: free
+    branch: main
     rootDir: WEEK-11/DAY-1/akiba-studio
     buildCommand: npm install && npm run build
     startCommand: npm start

@@ -21,12 +21,11 @@ View your app in AI Studio: https://ai.studio/apps/e476a830-8206-4eca-8e06-30bde
 
 ## Deploy to Render
 
-The Render blueprint for this app is
-`WEEK-11/DAY-1/akiba-studio/render.yaml`. In Render,
-create a Blueprint from this repository and set the Blueprint Path to
-`WEEK-11/DAY-1/akiba-studio/render.yaml`; the repository-root blueprint
-configures a different app. The service builds with `npm install && npm run
-build` and runs with `npm start`.
+The repository-root `render.yaml` includes this app as a Node web service,
+deploys from the `main` branch, and sets its Root Directory to
+`WEEK-11/DAY-1/akiba-studio`. In Render, create or update a Blueprint using
+the repository-root `render.yaml`. The service builds with
+`npm install && npm run build` and runs with `npm start`.
 
 The blueprint provisions a free web service. Free services can sleep when idle
 and do not include a persistent disk. SQLite is stored under `/tmp/akiba-data`;
