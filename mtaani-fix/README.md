@@ -62,10 +62,13 @@ For a public deployment:
 - Configure the host and port using `HOST` and `PORT`; back up the SQLite database on persistent storage securely.
 - Decide who is allowed to receive administrator access and promote accounts only from a trusted server operator shell.
 
-The repository-root Render Blueprint in `../render.yaml` configures the Node web service, a persistent
-SQLite disk, HTTPS/proxy settings, a health check, and disabled public registration.
+The MtaaFix Render Blueprint in `render.yaml` configures the Node web service, a persistent
+SQLite disk, HTTPS/proxy settings, a health check, and disabled public registration. When creating
+the Blueprint in Render, select `mtaani-fix/render.yaml` as its Blueprint file so the separate
+repository-root Blueprint for another app is not included.
 Render supplies `RENDER_EXTERNAL_URL`, which the app uses as its production origin
 unless `APP_ORIGIN` is explicitly set. The included location catalog is demo-only;
 public registration should remain disabled until a verified dataset is installed.
+The `mtaafix` Render service uses a persistent disk and requires a paid Render plan.
 
 This starter does not provide email verification, password reset, SMS/email notifications, or account deletion.
