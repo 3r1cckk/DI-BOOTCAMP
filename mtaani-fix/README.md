@@ -56,14 +56,14 @@ For a public deployment:
 
 - Set `NODE_ENV=production` and `APP_ORIGIN` to the exact public HTTPS origin.
 - Set `DATA_DIR` to persistent storage; local SQLite data must not live on an ephemeral service filesystem.
-- Set `ALLOW_REGISTRATION=false` until the location catalog is verified against an authoritative source.
+- Keep `ALLOW_REGISTRATION=false` if you do not want public account creation.
 - Serve the app over HTTPS. Session cookies are marked `Secure` in production.
 - If the app is behind one trusted reverse proxy, set `TRUST_PROXY=1`. Do not trust arbitrary client-supplied proxy headers.
 - Configure the host and port using `HOST` and `PORT`; back up the SQLite database on persistent storage securely.
 - Decide who is allowed to receive administrator access and promote accounts only from a trusted server operator shell.
 
-The MtaaFix Render Blueprint in `render.yaml` configures the Node web service, a persistent
-SQLite disk, HTTPS/proxy settings, a health check, and disabled public registration. When creating
+The MtaaFix Render Blueprint in `render.yaml` configures the Node web service, HTTPS/proxy
+settings, a health check, and open public registration. When creating
 the Blueprint in Render, select `mtaani-fix/render.yaml` as its Blueprint file so the separate
 repository-root Blueprint for another app is not included.
 Render supplies `RENDER_EXTERNAL_URL`, which the app uses as its production origin
@@ -71,6 +71,9 @@ unless `APP_ORIGIN` is explicitly set. The included location catalog is demo-onl
 public account registration is open and neighbourhood selection is optional. Residents need a
 verified location before sending local reports; install an authoritative dataset before relying on
 location-based features.
-The `mtaafix` Render service uses a persistent disk and requires a paid Render plan.
+The free Render plan has no persistent disk and may spin down after inactivity. SQLite data,
+including accounts and reports, can be lost when the service restarts, spins down, or is redeployed.
+Use this free service for demos only; a paid service with a persistent disk is required to preserve
+user data.
 
 This starter does not provide email verification, password reset, SMS/email notifications, or account deletion.

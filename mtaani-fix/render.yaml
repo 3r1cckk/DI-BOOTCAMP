@@ -2,21 +2,15 @@ services:
   - type: web
     name: mtaafix
     runtime: node
-    plan: starter
+    plan: free
     rootDir: mtaani-fix
     buildCommand: npm ci
     startCommand: npm start
     healthCheckPath: /healthz
-    disk:
-      name: mtaafix-data
-      mountPath: /var/data
-      sizeGB: 1
     envVars:
       - key: NODE_ENV
         value: production
       - key: TRUST_PROXY
         value: "1"
-      - key: DATA_DIR
-        value: /var/data
       - key: ALLOW_REGISTRATION
         value: "true"
