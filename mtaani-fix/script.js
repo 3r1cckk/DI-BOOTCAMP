@@ -470,12 +470,22 @@
         return apiRequest('/api/locations/levels')
             .then(function (result) {
                 if (!result.available) {
-                    setFeedback('Registration will open once the verified Kenya county, sub-county and ward catalog is installed.', false);
+                    if (containerId === '#registration-location-fields') {
+                        setFeedback('You can create an account now. Set your neighbourhood once verified location data is available.', false);
+                        form.elements.namedItem('area').required = false;
+                        submitButton.disabled = false;
+                    } else {
+                        setFeedback('Location setup will be available once the verified Kenya location catalog is installed.', false);
+                    }
                     return;
                 }
                 levels = result.levels;
                 if (levels.length === 0) {
                     throw new Error('Kenya location levels are not configured yet.');
+                }
+                if (containerId === '#registration-location-fields') {
+                    setFeedback('Optional: choose your area now, or connect it to your account later.', false);
+                    submitButton.disabled = false;
                 }
                 levels.forEach(function (level, index) {
                     const group = document.createElement('div');
@@ -483,7 +493,7 @@
                     const label = createTextElement('label', '', level.label);
                     const selector = document.createElement('select');
                     selector.id = 'registration-location-' + index;
-                    selector.required = true;
+                    selector.required = false;
                     selector.disabled = index > 0;
                     const placeholder = createTextElement('option', '', 'Choose a ' + level.label.toLowerCase());
                     placeholder.value = '';
@@ -495,7 +505,7 @@
 
                     selector.addEventListener('change', function () {
                         locationId.value = '';
-                        submitButton.disabled = true;
+                        submitButton.disabled = false;
                         for (let childIndex = index + 1; childIndex < selectors.length; childIndex += 1) {
                             resetSelector(childIndex);
                         }
@@ -1191,10 +1201,10 @@
                     payload.name = formData.get('name');
                     payload.phone = formData.get('phone');
                     payload.locationUnitId = Number(formData.get('locationUnitId'));
-                    payload.area = formData.get('area').trim();
-                    if (!payload.locationUnitId) {
+                    payload.area = payload.locationUnitId ? formData.get('area').trim() : '';
+                    if (payload.locationUnitId && !payload.area) {
                         feedback.classList.add('is-error');
-                        feedback.textContent = 'Choose your county, sub-county, and ward before joining.';
+                        feedback.textContent = 'Enter your local area or leave location setup for later.';
                         submitButton.disabled = false;
                         return;
                     }

@@ -68,7 +68,9 @@ the Blueprint in Render, select `mtaani-fix/render.yaml` as its Blueprint file s
 repository-root Blueprint for another app is not included.
 Render supplies `RENDER_EXTERNAL_URL`, which the app uses as its production origin
 unless `APP_ORIGIN` is explicitly set. The included location catalog is demo-only;
-public registration should remain disabled until a verified dataset is installed.
+public account registration is open and neighbourhood selection is optional. Residents need a
+verified location before sending local reports; install an authoritative dataset before relying on
+location-based features.
 The `mtaafix` Render service uses a persistent disk and requires a paid Render plan.
 
 This starter does not provide email verification, password reset, SMS/email notifications, or account deletion.

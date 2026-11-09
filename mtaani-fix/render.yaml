@@ -19,4 +19,4 @@ services:
       - key: DATA_DIR
         value: /var/data
       - key: ALLOW_REGISTRATION
-        value: "false"
+        value: "true"

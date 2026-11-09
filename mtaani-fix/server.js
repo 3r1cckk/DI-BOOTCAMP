@@ -627,9 +627,6 @@ app.post('/api/auth/register', authRateLimit, requireCsrf, async (req, res, next
         if (!registrationEnabled) {
             return res.status(503).json({ error: 'New account registration is temporarily paused while verified location data is prepared.' });
         }
-        if (!locationCatalogReady) {
-            return res.status(503).json({ error: 'Location-based registration is temporarily unavailable while the verified Kenya location catalog is prepared.' });
-        }
         const name = cleanString(req.body?.name);
         const email = cleanString(req.body?.email).toLowerCase();
         const password = typeof req.body?.password === 'string' ? req.body.password : '';
@@ -646,17 +643,23 @@ app.post('/api/auth/register', authRateLimit, requireCsrf, async (req, res, next
         if (password.length < 12 || Buffer.byteLength(password, 'utf8') > 1024) {
             return res.status(400).json({ error: 'Your password must be at least 12 characters long.' });
         }
-        if (!Number.isSafeInteger(locationUnitId) || locationUnitId < 1) {
-            return res.status(400).json({ error: 'Choose your county, sub-county, and ward.' });
-        }
-        if (area.length < 1 || area.length > 120) {
-            return res.status(400).json({ error: 'Enter a local area between 1 and 120 characters.' });
+        const hasLocation = Boolean(req.body?.locationUnitId || area);
+        if (hasLocation) {
+            if (!locationCatalogReady) {
+                return res.status(503).json({ error: 'Location-based registration is unavailable until the verified Kenya location catalog is installed.' });
+            }
+            if (!Number.isSafeInteger(locationUnitId) || locationUnitId < 1) {
+                return res.status(400).json({ error: 'Choose your county, sub-county, and ward.' });
+            }
+            if (area.length < 1 || area.length > 120) {
+                return res.status(400).json({ error: 'Enter a local area between 1 and 120 characters.' });
+            }
+            if (!isResidentRegistrationUnit(locationUnitId)) {
+                return res.status(400).json({ error: 'Choose a valid location from the registration hierarchy.' });
+            }
         }
         if (phone.length > 0 && !/^\+?[0-9().\-\s]{7,24}$/.test(phone)) {
             return res.status(400).json({ error: 'Enter a valid phone number or leave the field blank.' });
-        }
-        if (!isResidentRegistrationUnit(locationUnitId)) {
-            return res.status(400).json({ error: 'Choose a valid location from the registration hierarchy.' });
         }
 
         const passwordHash = await hashPassword(password);
@@ -669,7 +672,14 @@ app.post('/api/auth/register', authRateLimit, requireCsrf, async (req, res, next
                 const result = db.prepare(`
                     INSERT INTO users (name, email, phone, password_hash, location_unit_id, area_name)
                     VALUES (?, ?, ?, ?, ?, ?)
-                `).run(name, email, phone || null, passwordHash, locationUnitId, area);
+                `).run(
+                    name,
+                    email,
+                    phone || null,
+                    passwordHash,
+                    hasLocation ? locationUnitId : null,
+                    hasLocation ? area : null
+                );
                 const createdUser = db.prepare('SELECT id, name, email, role FROM users WHERE id = ?').get(Number(result.lastInsertRowid));
                 db.prepare('INSERT INTO sessions (token_hash, user_id, expires_at, created_at) VALUES (?, ?, ?, ?)')
                     .run(hashToken(sessionToken), createdUser.id, now + sessionDurationMs, now);
